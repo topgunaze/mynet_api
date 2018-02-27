@@ -1,0 +1,36 @@
+#  Name         : Makefile
+#  Version      : V2.00
+#  Author       : steven.tian
+#  Time         : 2016.12.12
+#  Description  : Makefile for FD1616GS soc driver user space interface
+#                 Copyright (c) 2009-2015 C-Data Co.,Ltd.
+#                 All Rights Reserved.
+#  Modification : 2016.12.12, steven.tian, created
+
+SOCDRV_DIR           ?= $(shell pwd)
+PRJ_ROOT_DIR         ?= $(shell cd ../..; pwd)
+
+include $(PRJ_ROOT_DIR)/make/Make.config
+include $(PRJ_ROOT_DIR)/make/Make.socdrv-config
+
+#  Create some dependency directory 
+$(shell $(MKDIR) $(SOCDRV_OBJ_DIR) $(SOCDRV_LIB_DIR))
+
+INCLUDE_DIRS         := $(PRJ_ROOT_DIR)/include  $(SOCDRV_INCLUDE)
+SOCDRV_CFLAGS        := $(addprefix -I,$(INCLUDE_DIRS)) 
+CFLAGS               += -Wall -Werror $(SOCDRV_CFLAGS)
+
+#  Pattern matching rules: 
+$(SOCDRV_OBJ_DIR)/%.o:     $(SOCDRV_DIR)/src/%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+all: $(SOCDRV_LIB_DIR)/libsocdrv.a
+
+$(SOCDRV_LIB_DIR)/libsocdrv.a : $(SOCDRV_DEPS)
+	$(AR) $(ARFLAGS) $(SOCDRV_LIB_DIR)/libsocdrv.a $(SOCDRV_DEPS)
+
+clean: 
+	$(RM) $(SOCDRV_OBJ_DIR)/*
+
+test:
+

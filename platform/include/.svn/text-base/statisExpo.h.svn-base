@@ -1,0 +1,113 @@
+
+#ifndef __STATISEXPO_H__
+#define __STATISEXPO_H__
+
+#include "sys_common.h"
+
+
+
+#pragma pack(1)
+typedef struct
+{
+    time_t curtime;
+    unsigned long long  InDropEvents;               /*丢包事件数*/
+    unsigned long long  InOctets;                   /*字节数*/    
+    unsigned long long  InPkts;                     /*数据报文数*/
+
+    unsigned long long  InUcastPkts;                /*单播报文数*/
+    unsigned long long  InMUcastPkts;               /*组播报文数*/    
+    unsigned long long  InBUcastPkts;               /*广播报文数*/
+
+    unsigned long long  InCrcErrors;                /*CRC错误报文数*/
+    unsigned long long  InUnderPkts64Octets;        /*超短报文数*/
+    unsigned long long  InOverPkts1518Octets;       /*超长报文数*/
+    unsigned long long  InFragmentPkts;             /*Fragment数*/
+    unsigned long long  InJabberPkts;               /*Jabber数*/
+
+    unsigned long long  InPkts64Octets;                     /*长度为64字节的报文数*/
+    unsigned long long  InStatsPkts65to127Octets;           /*长度为 65～127 字节的报文数*/
+    unsigned long long  InStatsPkts128to255Octets;          /*长度为 128～255 字节的报文数*/
+    unsigned long long  InStatsPkts256to511Octets;          /*长度为 256～511 字节的报文数*/
+    unsigned long long  InStatsPkts512to1023Octets;         /*长度为 512～1023 字节的报文数*/
+    unsigned long long  InStatsPkts1024to1518Octets;        /*长度为 1024～1518 字节的报文数*/  
+
+    unsigned long long  InDiscardsOctets; /*丢弃的字节数*/
+    unsigned long long  InDiscardsPkts;   /*丢弃报文数*/
+    unsigned long long  InErrorsPkts;     /*错误报文数*/
+
+    unsigned long long  OutDropEvents;     
+    unsigned long long  OutOctets;               
+    unsigned long long  OutPkts;                    
+    unsigned long long  OutUcastPkts;            
+    unsigned long long  OutMUcastPkts;              
+    unsigned long long  OutBUcastPkts;
+    unsigned long long  OutCrcErrors;   
+    unsigned long long  OutUnderPkts64Octets;
+    unsigned long long  OutOverPkts1518Octets; 
+    unsigned long long  OutFragmentPkts;
+    unsigned long long  OutJabberPkts;
+    unsigned long long  OutPkts64Octets;    
+    unsigned long long  OutStatsPkts65to127Octets;     
+    unsigned long long  OutStatsPkts128to255Octets;   
+    unsigned long long  OutStatsPkts256to511Octets;    
+    unsigned long long  OutStatsPkts512to1023Octets;  
+    unsigned long long  OutStatsPkts1024to1518Octets;    
+    unsigned long long  OutDiscardsOctets;   
+    unsigned long long  OutDiscardsPkts;  
+    unsigned long long  OutErrorsPkts; 
+
+    unsigned long long  NotSendDiscardsPkts;       /*未发送的丢弃报文数*/
+    unsigned long long  NotSendErrorsPkts;         /*未发送的错误报文数*/
+
+}PERF_DATA_PORT;
+
+typedef struct 
+{
+    int   perf_cycle;                
+    unsigned int   perf_timeout;   /*用UINT更好*/
+    PERF_DATA_PORT *perf_pdata;     
+    
+}PERF_STATISTIC_ST;
+
+typedef struct 
+{
+    int type;
+    int ponid;
+    int onuid;
+    int ethPortId;/*add by sun,2013-07-06*/
+    int gemPortId;/*add by hupan 2013-9-23*/
+}PERF_MSG_QUEUE;
+
+#define PERFORM_MAX_OLT_PORT        SYS_MAX_PON_NUM
+#define PERFORM_MAX_ONU_NUM         SYS_MAX_ONU_NUM
+#define PERFORM_MAX_ETH_PORT        SYS_MAX_ONU_PORT_NUM
+#define PERFORM_MAX_GEM_PORT        136/*10001000 -- 8*8 */
+
+extern PERF_DATA_PORT gDataOltReatimeBuf[PERFORM_MAX_OLT_PORT];/*实时清零时的比对数据*/
+extern PERF_DATA_PORT gDataOltHistoryBuf[PERFORM_MAX_OLT_PORT];/*前15分钟统计时的读取数据*/
+
+extern PERF_DATA_PORT    gRealtimeOltPortPerf[PERFORM_MAX_OLT_PORT];/*上报和本地显示的标准数据*/
+extern PERF_STATISTIC_ST gHistoryOltPortPerf[PERFORM_MAX_OLT_PORT];/*上报和本地显示的标准数据*/
+
+#if 000
+extern STATUS GponPerfInit();
+
+STATUS GponperfCalcStatistics(PERF_DATA_PORT *pdata,PERF_DATA_PORT *pbuf);
+STATUS GponPerfEnvInit();
+
+STATUS GponperfGetCycleOltPonLinkStatistics(UCHAR PonId,PERF_DATA_PORT *pdata);
+STATUS GponperfGetCycleOnuethStatistics(UCHAR ponId,UCHAR onuId,UCHAR portId,PERF_DATA_PORT *pdata);
+STATUS GponperfGetOltPonLinkStatistics(UCHAR  PonId,PERF_DATA_PORT *pdata);
+STATUS GponperfGetOnuethStatistics(UCHAR ponId,UCHAR onuId,UCHAR portId,PERF_DATA_PORT *pdata);
+
+STATUS GponperfOltGetStatus();
+STATUS GponperfOnuGetStatus();
+
+char *time_format (char *buf, time_t clock);
+STATUS GponStatisCallback(ULONG CmdId,UCHAR *pszBuf, ULONG ulBufLen);
+#endif
+
+#endif /* __STATISEXPO_H__ */
+
+
+

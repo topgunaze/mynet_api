@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/gpon/!svn/ver/1981/olt/FD1616GS/trunk/buildroot/platform/sqlite/sqlite-autoconf-3150200/tea
+END
+license.terms
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/gpon/!svn/ver/1981/olt/FD1616GS/trunk/buildroot/platform/sqlite/sqlite-autoconf-3150200/tea/license.terms
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/gpon/!svn/ver/1981/olt/FD1616GS/trunk/buildroot/platform/sqlite/sqlite-autoconf-3150200/tea/README
+END
+aclocal.m4
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/gpon/!svn/ver/1981/olt/FD1616GS/trunk/buildroot/platform/sqlite/sqlite-autoconf-3150200/tea/aclocal.m4
+END
+pkgIndex.tcl.in
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svn/gpon/!svn/ver/1981/olt/FD1616GS/trunk/buildroot/platform/sqlite/sqlite-autoconf-3150200/tea/pkgIndex.tcl.in
+END
+configure
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/gpon/!svn/ver/1981/olt/FD1616GS/trunk/buildroot/platform/sqlite/sqlite-autoconf-3150200/tea/configure
+END
+Makefile.in
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/gpon/!svn/ver/1981/olt/FD1616GS/trunk/buildroot/platform/sqlite/sqlite-autoconf-3150200/tea/Makefile.in
+END
+configure.ac
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/gpon/!svn/ver/1981/olt/FD1616GS/trunk/buildroot/platform/sqlite/sqlite-autoconf-3150200/tea/configure.ac
+END

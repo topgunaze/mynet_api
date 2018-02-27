@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/gpon/!svn/ver/1573/olt/FD1616GS/trunk/buildroot/build/libs/ipc
+END
+libipc_if.a
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/gpon/!svn/ver/1573/olt/FD1616GS/trunk/buildroot/build/libs/ipc/libipc_if.a
+END
+ipc_ker
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/gpon/!svn/ver/1504/olt/FD1616GS/trunk/buildroot/build/libs/ipc/ipc_ker
+END

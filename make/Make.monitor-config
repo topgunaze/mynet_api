@@ -1,0 +1,21 @@
+#  Name         : Makefile
+#  Version      : V2.00
+#  Author       : steven.tian
+#  Time         : 2015.05.18
+#  Description  : Makefile for FD1508GS soc driver user space interface
+#                 Copyright (c) 2009-2015 C-Data Co.,Ltd.
+#                 All Rights Reserved.
+#  Modification : 2015.05.18, steven.tian, created
+
+
+MONITOR_OBJ_DIR          = $(PRJ_OBJ_DIR)/monitor
+                   
+MONITOR_INCLUDE          := -I$(PRJ_ROOT_DIR)/include -I$(MONITOR_DIR)/include -I$(APP_DIR)/include -I$(APP_DIR)/common/include
+
+MONITOR_DEPS_SRCS        := $(wildcard $(MONITOR_DIR)/src/*.c)
+MONITOR_DEPS_OBJS        := $(patsubst $(MONITOR_DIR)/src/%,$(MONITOR_OBJ_DIR)/%,$(patsubst %.c,%.o,$(MONITOR_DEPS_SRCS)))
+
+#APP_DEP_LIBS         :=	$(PRJ_LIB_DIR)/ipc/libipc_if.a $(PRJ_LIB_DIR)/sysctrl/libsysMacCrypt.a $(PRJ_LIB_DIR)/common/libcommon.a \
+#                        $(PRJ_LIB_DIR)/vtysh/libvtysh.a $(PRJ_LIB_DIR)/flash/libflash.a
+APP_DEP_LIBS         :=	$(PRJ_LIB_DIR)/ipc/libipc_if.a $(PRJ_LIB_DIR)/common/libcommon.a \
+                        $(PRJ_LIB_DIR)/vtysh/libvtysh.a $(PRJ_LIB_DIR)/flash/libflash.a

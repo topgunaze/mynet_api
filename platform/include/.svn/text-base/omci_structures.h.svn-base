@@ -1,0 +1,2352 @@
+#ifndef _OMCI_STRUCTURES_H
+#define _OMCI_STRUCTURES_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
+#include    "GponAppOnuCfg.h" 
+
+#include "omci_constants.h"
+//#include "omci_message_structures.h"
+//#include "lineid.h"
+
+
+
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+/**/
+typedef struct 
+{
+    unsigned char upstream_rate_control_enable;
+    unsigned int  upstream_assure_rate;
+    unsigned int   upstream_burst_bytes;
+    unsigned int upstream_extra_bytes;
+    unsigned char downstream_rate_control_enable;
+    unsigned int downstream_assure_rate;
+    unsigned int downstream_peak_rate;
+}ONU_SWITCHPORT_RATE_CONTRL;
+
+
+
+/*------------------------------------------------------*/
+
+typedef struct _switch_port_packet_control_
+{
+    unsigned char enable;
+    unsigned int rate_limit;
+}SWITCH_PORT_PACKET_CONTROL;
+#if 0
+typedef struct _switch_port_rule_entry_
+{
+    unsigned char reserved;
+    unsigned short rule_field;
+    unsigned char rule_field_vaule[6];
+    unsigned char rule_operator;
+}SWITCH_PORT_RULE_ENTRY;
+
+typedef struct _switch_port_qos_action_
+{
+    unsigned short rule_count;
+    unsigned int assure_speed;
+    unsigned int burst_speed;
+
+    /* 2010.7.14 */
+    unsigned int extra_burst_len;
+    unsigned int extra_cell_speed;
+    
+    unsigned char mapping_enable;
+    unsigned short mapping_queue;
+    unsigned short remark_enable;
+    unsigned short priority;
+    SWITCH_PORT_RULE_ENTRY  port_qos_entry[4];
+}SWITCH_PORT_QOS_ACTION;
+
+typedef struct _switch_port_qos_rule_
+{
+    unsigned char reserved;
+    SWITCH_PORT_QOS_ACTION us_qos_action;
+    SWITCH_PORT_QOS_ACTION ds_qos_action;
+}SWITCH_PORT_QOS_RULE;
+
+typedef struct _switch_port_acl_rule_
+{
+    unsigned char reserved;
+    unsigned char us_acl_action;
+    unsigned char us_acl_count;
+    SWITCH_PORT_RULE_ENTRY us_port_acl_entry[4];
+    unsigned char ds_acl_action;
+    unsigned char ds_acl_count;
+    SWITCH_PORT_RULE_ENTRY ds_port_acl_entry[4];
+}SWITCH_PORT_ACL_RULE;
+
+/* 2010.1.23 liyang 刘的结构定义 */
+typedef struct _onu_onu20_static_route_entry_
+{
+    unsigned int net_address;
+    unsigned int net_gateway;
+    unsigned int subnet_mask;
+}ONU_ONU20_STATIC_ROUTE_ENTRY;
+
+typedef struct 
+{
+    unsigned int upstream_crc_threshold;
+    unsigned int downstream_crc_threshold;  
+}SWITCH_PORT_CRC_THRESHOLD;
+#endif
+
+typedef struct MULTICAST_IP_PORT
+{
+    unsigned int ipAddr;
+    unsigned char port;
+}MULTICAST_IP_PORT;
+
+typedef struct PORT_MAC
+{
+    unsigned char macAddr[6];
+    unsigned char reserved[2];
+}PORT_MAC;
+
+typedef struct _cvlan_mode_
+{
+    unsigned char cvlan_pri;
+    unsigned short cvlan_tpid;
+    unsigned short cvlan_vlanid;
+} CVLAN_MODE;
+
+typedef struct _qinq_mode_
+{
+    unsigned char qinq_pri;
+    unsigned short qinq_tpid;
+    unsigned short qinq_vlanid;
+} QinQ_MODE;
+
+typedef struct _onu_multicast_vlan_
+{
+    unsigned short  vlan_vlan_mode;
+    CVLAN_MODE  cvlan_config;
+    QinQ_MODE   svlan_config;
+}ONU_MULTICAST_VLAN;
+
+#if 0
+/*threshold*/
+typedef struct _optical_alarm_config_threshold
+{
+    short max_temperature_threshold;
+    short min_temperature_threshold;
+    short max_voltage_threshold;
+    short min_voltage_threshold;
+    short max_bias_current_threshold;
+    short min_bias_current_threshold;
+    short max_tx_optical_power_threshold;
+    short min_tx_optical_power_threshold;
+    short max_rx_optical_power_threshold;
+    short min_rx_optical_power_threshold;
+}OPTICAL_POWER_ALARM_THRESHOLD;
+#endif
+
+/*add by xujun.*/
+typedef unsigned long   long    uint64;     /* 64-bit quantity */
+
+/*peformance,lampstate*/
+typedef struct 
+{
+    unsigned short onuId;
+    unsigned short LedItemNums;/*灯条目数（1B）：*/
+    unsigned char lampStat[256];
+}ONU_LAMP_STAT;
+ 
+typedef struct 
+{
+    unsigned short ponId;
+    ONU_LAMP_STAT onuLampInfo;
+}ONU_PON_LAMP_STAT;
+
+#pragma pack(1)
+#if 0
+typedef struct 
+{
+ unsigned short               PONFlag;/* 永远是0*/
+ long long   UPOctetsTransferred;
+ long long    UPTotalFrame;
+ long long    UPUnicastFrames;
+ long long    UPBroadcastFrames;
+ long long    UPMulticastFrames;
+ long long    UPCRC_32Errors;
+ long long    UPUndersizeFrames;
+ long long    UPOversizeFrames;
+ long long    UPCollisions; 
+ long long    UP64OctetFrames;
+ long long    UP65_127OctetFrames;
+ long long    UP128_255OctetFrames;
+ long long    UP256_511OctetFrames;
+ long long    UP512_1023OctetFrames;
+ long long    UP1024_1518OctetFrames;
+ long long    UP1519OctetFrames;
+ long long    UPFramesDropped;
+ long long    UPBIP8;
+ 
+ long long    DownOctetsTransferred;
+ long long    DownTotalFrame;
+ long long    DownUnicastFrames;
+ long long    DownBroadcastFrames;
+ long long    DownMulticastFrames;
+ long long    DownCRC_32Errors;
+ long long    DownUndersizeFrames;
+ long long    DownOversizeFrames;
+ long long    DownCollisions; 
+ long long    Down64OctetFrames;
+ long long    Down65_127OctetFrames;
+ long long    Down128_255OctetFrames;
+ long long    Down256_511OctetFrames;
+ long long    Down512_1023OctetFrames;
+ long long    Down1024_1518OctetFrames;
+ long long    Down1519OctetFrames; 
+ long long    DownFramesDropped;
+ long long    DownBIP8;
+}
+ONU_PON_STATICS;
+
+typedef struct 
+{
+ unsigned short               FE_sFlag;/* 1- 16, 0 表示无效*/
+ long long    UPOctetsTransferred;
+ long long    UPTotalFrame;
+ long long    UPUnicastFrames;
+ long long    UPBroadcastFrames;
+ long long    UPMulticastFrames;
+ long long    UPCRC_32Errors;
+ long long    UPUndersizeFrames;
+ long long    UPOversizeFrames;
+ long long    UPCollisions; 
+ long long    UP64OctetFrames;
+ long long    UP65_127OctetFrames;
+ long long    UP128_255OctetFrames;
+ long long    UP256_511OctetFrames;
+ long long    UP512_1023OctetFrames;
+ long long    UP1024_1518OctetFrames;
+ long long    UP1519OctetFrames;
+ long long    UPFramesDropped;
+ 
+ long long    DownOctetsTransferred;
+ long long    DownTotalFrame;
+ long long    DownUnicastFrames;
+ long long    DownBroadcastFrames;
+ long long    DownMulticastFrames;
+ long long    DownCRC_32Errors;
+ long long    DownUndersizeFrames;
+ long long    DownOversizeFrames;
+ long long    DownCollisions; 
+ long long    Down64OctetFrames;
+ long long    Down65_127OctetFrames;
+ long long    Down128_255OctetFrames;
+ long long    Down256_511OctetFrames;
+ long long    Down512_1023OctetFrames;
+ long long    Down1024_1518OctetFrames;
+ long long    Down1519OctetFrames; 
+ long long    DownFramesDropped;
+}
+ONU_FE_PORT_STATICS;
+#endif
+
+
+/*
+typedef struct _onu_switchport_mode_config_
+{
+    unsigned char port_enable;
+    unsigned char port_autonegotiate_mode;
+    unsigned char port_speed;
+    unsigned char port_duplex;
+    unsigned char port_flowcontrl;
+    unsigned char port_ratectl_enable;
+    unsigned int   port_uprate;
+    unsigned int    port_downrate;
+}ONU_FE_SWITCHPORT_MODE_CONFIG;
+*/
+#if 0
+typedef struct 
+{
+    unsigned char upstream_rate_control_enable;
+    unsigned int  upstream_assure_rate;
+    unsigned int   upstream_burst_rate;
+    unsigned int upstream_extra_bytes;
+    unsigned char downstream_rate_control_enable;
+    unsigned int downstream_assure_rate;
+    unsigned int downstream_peak_rate;
+}ONU_SWITCHPORT_RATE_CONTRL;
+
+typedef struct _onu_fe_switchport_mode_config_
+{
+    unsigned char port_enable;
+    unsigned char port_autonegotiate_mode;
+    unsigned char port_speed;
+    unsigned char port_duplex;
+    unsigned char port_flowcontrl;
+    unsigned char /*port_us_ratectl_enable*/port_ratectl_enable;
+    unsigned char port_ds_ratectl_enable;
+    unsigned int  /*port_us_ratectl_speed*/port_uprate;
+    unsigned int  /*port_ds_ratectl_speed*/port_downrate;
+    ONU_SWITCHPORT_RATE_CONTRL port_rate_control;
+}ONU_SWITCHPORT_MODE_CONFIG;
+
+typedef struct _onu_E1_entry_
+{
+    unsigned char tdm_cardno; /*1-8,11-18*/
+    unsigned char tdm_e1_index;/*1-63*/
+    unsigned char onu_e1_index;/*1-4*/
+    unsigned short onu_buffer_depth;
+    unsigned short olt_buffer_depth; 
+    unsigned char onu_e1_loop;
+}ONU_E1_ENTRY;
+#endif
+
+
+#define ALARM_MASK_MAX_LENGTH     3
+
+#if 0
+/*事件类型与相应omci消息的消息类型一致*/
+enum Event_Type
+{
+    Alarm =16,
+    Attribute_Value_change = 17,
+    Test_Result = 27
+};
+
+/*
+G984.4 表B. 2  告警掩码编码
+字节    Bit
+        8           7           6           5           4           3           2           1
+1   告警1       告警2       告警3       告警4       告警5       告警6       告警7       告警8
+2   告警9       告警10  告警11  告警12  告警13  告警14  告警15  告警16
+…..                                
+28  告警217 告警218 告警219 告警220 告警221 告警222 告警223 告警224
+*/
+
+struct Event_Data
+{
+    short   meIdentifier;                           /*受管实体标识符*/
+    short   instanceIdentifier;                     /*实例标识符*/
+    char        objectNo;                                   /*属性编号(avc通知)/告警编号(告警)/空(测试结果通知)*/
+    char        *appendInfo;                            /*属性值(avc通知)/产生(1)or消失(0)(告警)/测试结果(测试结果通知)*/
+    short        appendInfoLen;                         /*附加信息长度*/
+};
+
+/*事件消息队列结构*/
+typedef struct _omci_event_s{
+    enum Event_Type   EvType;  /*事件类型*/
+    void            *EvData;/*事件内容*/
+    short             evDateLen;/*事件内容的长度*/
+}omci_event_trap;
+#endif
+
+/*受管实体属性信息*/
+struct omci_variable {
+unsigned short magic;           /* 属性的编号 */
+/*unsigned char  type;  */          /* 属性的变量类型，包括后4位的基本类型和前4位的元素个数 */
+unsigned short type;            /* 2010.3.24  */
+unsigned char  attributelen;    /* 属性的长度 */
+short          acl;             /* 属性的访问类型 */
+};
+
+#if 0
+typedef struct dm_port_c
+{
+    uint64              UPOctetsTransferred;     
+    uint64              UPTotalFrame;           
+    uint64              UPUnicastFrames;        
+    uint64              UPBroadcastFrames;      
+    uint64              UPMulticastFrames;      
+    uint64              UPCRC_32Errors;     
+    uint64              UPUndersizeFrames;      
+    uint64              UPOversizeFrames;       
+    uint64              UPCollisions;           
+    uint64              UP64OctetFrames;        
+    uint64              UP65_127OctetFrames;    
+    uint64              UP128_255OctetFrames;
+    uint64              UP256_511OctetFrames;   
+    uint64              UP512_1023OctetFrames;  
+    uint64              UP1024_1518OctetFrames; 
+    uint64              UP1519OctetFrames;      
+    uint64              UPFramesDropped;        
+    uint64              UPBIP8;             
+    
+    uint64              DownOctetsTransferred;  
+    uint64              DownTotalFrame;     
+    uint64              DownUnicastFrames;      
+    uint64              DownBroadcastFrames;    
+    uint64              DownMulticastFrames;    
+    uint64              DownCRC_32Errors;       
+    uint64              DownUndersizeFrames;    
+    uint64              DownOversizeFrames; 
+    uint64              DownCollisions;         
+    uint64              Down64OctetFrames;  
+    uint64              Down65_127OctetFrames;  
+    uint64              Down128_255OctetFrames; 
+    uint64              Down256_511OctetFrames; 
+    uint64              Down512_1023OctetFrames;    
+    uint64              Down1024_1518OctetFrames;   
+    uint64              Down1519OctetFrames;        
+    uint64              DownFramesDropped;      
+    uint64              DownBIP8;   
+
+    uint64              LateCollisionCounter;
+    uint64              SingleCollisionFrameCounter;
+    uint64              MultipleCollisionsFrameCounter;
+    uint64              DeferredTransmissionCounter;
+    uint64              InMACRcvErr;
+    uint64              Fragments;
+    uint64              Jabber;
+}DM_PORT_C;
+/*end.*/
+
+/*wnagyang 0726*/
+typedef struct _GT_STATS_COUNTER_SET3
+{
+    unsigned long   InGoodOctetsLo; /* offset 0 */
+    unsigned long   InGoodOctetsHi; /* offset 1, not supported by 88E6065 */
+    unsigned long   InBadOctets;        /* offset 2 */
+    unsigned long   OutFCSErr;          /* offset 3 */
+    unsigned long   InUnicasts;         /* offset 4 */
+    unsigned long   Deferred;           /* offset 5 */
+    unsigned long   InBroadcasts;       /* offset 6 */
+    unsigned long   InMulticasts;       /* offset 7 */
+    
+    unsigned long   Octets64;       /* 64 Octets, offset 8 */
+    unsigned long   Octets127;      /* 65 to 127 Octets, offset 9 */
+    unsigned long   Octets255;      /* 128 to 255 Octets, offset 10 */
+    unsigned long   Octets511;      /* 256 to 511 Octets, offset 11 */
+    unsigned long   Octets1023;     /* 512 to 1023 Octets, offset 12 */
+    unsigned long   OctetsMax;      /* 1024 to Max Octets, offset 13 */
+    unsigned long   OutOctetsLo;    /* offset 14 */
+    unsigned long   OutOctetsHi;    /* offset 15, not supported by 88E6065 */
+    unsigned long   OutUnicasts;    /* offset 16 */
+    unsigned long   Excessive;      /* offset 17 */
+    unsigned long   OutMulticasts;  /* offset 18 */
+    unsigned long   OutBroadcasts;  /* offset 19 */
+    unsigned long   Single;         /* offset 20 */
+
+    unsigned long   OutPause;       /* offset 21 */
+    unsigned long   InPause;            /* offset 22 */
+    unsigned long   Multiple;       /* offset 23 */
+    unsigned long   Undersize;      /* offset 24 */
+    unsigned long   Fragments;      /* offset 25 */
+    unsigned long   Oversize;       /* offset 26 */
+    unsigned long   Jabber;         /* offset 27 */
+    unsigned long   InMACRcvErr;    /* offset 28 */
+    unsigned long   InFCSErr;       /* offset 29 */
+    unsigned long   Collisions;     /* offset 30 */
+    unsigned long   Late;               /* offset 31 */
+
+} GT_STATS_COUNTER_SET3;
+#endif
+
+typedef struct ONT_G
+{
+    unsigned char   Vendor_id[4];
+    unsigned char   Version[14];
+    unsigned char   Serial_Number[8];
+    unsigned char   Traffic_Management_Option;
+    unsigned char   Battery_backup;
+    unsigned char   Administrative_state;
+    unsigned char   Operational_State;
+    unsigned char   Onu_Surivival_Time;
+    
+    unsigned char   configured;
+    char            alarmMask[ALARM_MASK_MAX_LENGTH]; /*告警掩码*/
+}ONT_G;
+
+
+typedef struct ONT2_G
+{
+    unsigned char   Equipment_id[20];                 /*zhouxin,char->unsigned char*/
+    unsigned char   OMCC_Version;
+    unsigned short  Vendor_Product_Code;
+    unsigned char   Security_Capability;
+    unsigned char   Security_Mode;
+    unsigned short  Total_Priority_Queue_Number;
+    unsigned char   Total_Traffic_Scheduler_Number;
+    unsigned char   Mode;    
+    unsigned short  Total_GEM_PortId_Number;
+    unsigned int    SysUpTime;
+    unsigned short  connect_Capability;
+    unsigned char   current_connectMode;
+    unsigned short  QoS_configuration_flexibility;
+    unsigned short  Priority_queue_scale_factor;
+
+    unsigned char   configured;
+    char            alarmMask[ALARM_MASK_MAX_LENGTH]; /*告警掩码*/
+}ONT2_G;
+
+#if 0
+typedef struct ONT_FIBERHOME_G
+{
+short temperature_lower_limit;
+short temperature_upper_limit;
+short voltage_lower_limit;
+short voltage_upper_limit;
+short bias_lower_limit;
+short bias_upper_limit;
+unsigned short realtime_year;
+unsigned short realtime_month;
+unsigned short realtime_day;
+unsigned short realtime_hour;
+unsigned short realtime_min;
+unsigned short realtime_sec;
+unsigned short oltNo;
+unsigned short ponNo;
+unsigned short onuNo;
+unsigned char configured;
+char alarmMask[ALARM_MASK_MAX_LENGTH]; /*告警掩码*/
+}ONT_FIBERHOME_G;
+
+
+typedef struct ONT_FIBERHOME_G_2
+{
+unsigned short fan_start_temper;
+unsigned short fan_stop_temper;
+unsigned short MDU_temperature;
+unsigned short fan_rotational_speed;
+unsigned char pon_operator;
+unsigned char configured;
+/* 2010.6.23 added for alarms of inner temperature over high and low */
+char alarmMask[ALARM_MASK_MAX_LENGTH];
+}ONT_FIBERHOME_G_2;
+#endif
+
+typedef struct ANI_G
+{
+    unsigned short  Total_TCONT_number;
+    unsigned short  GEM_block_length;
+    unsigned short  Total_GEM_PortId_Number;
+    unsigned char   SR_Indication;
+    unsigned char   Piggyback_DBA_reporting;
+    unsigned char   Whole_ONU_DBA_reporting;
+    unsigned char   SF_threshold;
+    unsigned char   SD_threshold;
+    unsigned char   ARC;
+    unsigned char   ARC_Interval;
+    char            Optical_power_lower_limit;
+    char            Optical_power_upper_limit;
+    unsigned short  ont_response_time;
+    char            transmit_opticalPower_lower_limit;
+    char            transmit_opticalPower_upper_limit;
+
+    short           Optical_signal_power;
+    short           transmit_optical_power;
+
+    short           power_feed_voltage;
+    short           laser_bias_current;
+    short           temperature_degrees;
+     
+    unsigned char   configured;
+    char            alarmMask[ALARM_MASK_MAX_LENGTH]; /*告警掩码*/
+}ANI_G;
+
+#if 0
+/*add by xyjun , for olt, private define.*/
+typedef struct PON_TC
+{
+short olt_tx_power;
+short olt_rx_power;
+short olt_rx_min_limit;
+short olt_rx_max_limit;
+unsigned char configured;
+char alarmMask[ALARM_MASK_MAX_LENGTH]; /*告警掩码*/
+}PON_TC;
+#endif
+
+typedef struct THRESHOLD_DATA
+{
+    unsigned int    InCRCerro_thre;
+    unsigned int    OutCRCerro_thre;
+    
+    unsigned char   configured;
+}THRESHOLD_DATA;
+
+
+typedef struct T_CONT
+{
+    unsigned short  instanceIdentifier;
+    unsigned short  Alloc_Id;
+    /* pon protection */
+#if 1
+    unsigned char   Mode_indicator;
+    unsigned char   policy;
+    unsigned char   is_tdm;/*for broadlight*/
+#endif
+    unsigned char   configured;/*用于标记该条目是否生效,不用作get 实例的判断*/
+}T_CONT;
+
+typedef struct GEM_PORT_NETWORK_CTP
+{
+    unsigned short  instanceIdentify; /*实际的实例号*/
+    unsigned short  PortId;
+    unsigned short  Pon_TC_AdapterG_pointer;
+
+    /* pon protection */
+#if 1
+    unsigned char   Direction;
+    unsigned short  upstream_traffic_mamagement_pointer;
+    unsigned short  Traffic_Descriptor_Profile_pointer;
+    unsigned char   UNI_counter;
+    unsigned short  Priority_Queue_pointer_for_downstream;
+#endif
+    UINT8           encryptionState;
+    UINT8           encryptionKeyRing;
+
+    unsigned char   b_configed;
+}GEM_PORT_NETWORK_CTP;
+
+typedef struct GEM_IW_TP
+{
+    unsigned short  instanceIdentify; /*实际的实例号*/
+    unsigned short  GEM_Port_Networking_CTP_Pointer;
+#if 1   
+    unsigned char   iw_option;
+    unsigned short  traffic_profile_pointer;
+    unsigned short  iw_tp_pointer;
+    unsigned char   pptp_counter;
+    unsigned char   operationa_state;
+    unsigned short  gal_profile_pointer;
+    unsigned char   gal_loop_cfg;
+    unsigned char   full_range_vid_default_flow;/*表示该ｉｗ是否已创建ｆｌｏｗ，对于ｖｏｉｐ和ｉｐｔｖ流不特指缺省流*/
+    unsigned char   feid;     /* 2010.1.13 new04 新增物理端口属性，掩码对应第10位 */
+#endif
+    unsigned char   b_configed;
+}GEM_IW_TP;
+
+typedef struct MUTICAST_ADDRTABLE
+{
+    unsigned short  gemport;
+    unsigned short  secondIndex;
+    unsigned int    startIpAddr;
+    unsigned int    stopIpAddr;
+    
+    unsigned char   configured;
+}MUTICAST_ADDRTABLE;
+
+typedef struct MULTICAST_GEM_IW_TP
+{
+    unsigned short  instanceIdentifier;
+    unsigned short  GEM_Port_Networking_CTP_Pointer;
+    unsigned short  traffic_profile_pointer;
+    unsigned short  iw_tp_pointer;
+    unsigned short  gal_profile_pointer;
+    unsigned char   pptp_counter;
+    unsigned char   operationa_state;
+    unsigned char   iw_option;
+    unsigned char   gal_loop_cfg;
+    unsigned char   full_range_vid_default_flow;/*表示该ｉｗ是否已创建ｆｌｏｗ，对于ｖｏｉｐ和ｉｐｔｖ流不特指缺省流*/
+    unsigned char   configured;
+    MUTICAST_ADDRTABLE multicast_address_table[MAX_MULTICAST_ADDR_TABLE_SECONDINDEX];
+}MULTICAST_GEM_IW_TP;
+
+
+typedef struct PRIORITY_QUEUE_G
+{
+    unsigned short  instanceIdentifier;/**/
+    unsigned char   Queue_Configuration_Option;
+    unsigned short  Maximum_Queue_Size;
+    unsigned short  Allocated_Queue_Size;
+    unsigned short  Discard_cell_block_counter_Reset_Interval;
+    unsigned short  Buffer_Overflow_Discarded_Cells_or_Blocks_Threshold ;
+    unsigned int    associated_port;
+    unsigned short  Traffic_Scheduler_G_Pointer ;
+    unsigned short  weight;
+    unsigned short  Back_Pressure_Operation;
+    unsigned int    Back_Pressure_Time;
+    unsigned short  Back_Pressure_Occur_Queue_Threshold;
+    unsigned short  Back_Pressure_clear_Queue_Threshold;
+    unsigned char   b_configed;   /*用于标记该条目是否生效,不用作get 实例的判断*/
+}PRIORITY_QUEUE_G;
+
+typedef struct GEM_TRAFFIC_DESCRIPTOR
+{
+    unsigned short  instanceIdentify; /*实际的实例号*/
+    unsigned int    sir;
+    unsigned int    pir;
+    unsigned int    cbs;
+    unsigned int    pbs;
+
+    unsigned char   configured;
+}GEM_TRAFFIC_DESCRIPTOR;
+
+typedef struct GEM_PORT_PROTOCOL_MONITOR_HISTORY_DATA
+{
+    unsigned int    Impaired_Block;
+    unsigned int    Lost_Packets;
+    unsigned int    Misinserted_Packet;
+    unsigned char   Received_Blocks[5];
+    unsigned short  Threshold_Data1or2_id;
+    unsigned char   Received_Packets[5];
+    unsigned char   Transmitted_Blocks[5];
+    unsigned char   Interval_End_Time ;
+    unsigned char   configured;
+}GEM_PORT_PROTOCOL_MONITOR_HISTORY_DATA;
+
+
+
+typedef struct GEM_PORT_ETWORK_CTP_MONITOR_HISTORY_DATA
+{
+    unsigned char   IntervalEndTime ;
+    unsigned short  Thresholddata12id;
+    unsigned int    Transmitted_GEM_frames;
+    unsigned int    Received_GEM_frames;
+    unsigned char   Received_payload_bytes[8];
+    unsigned char   Transmitted_payload_bytes[8];
+
+    unsigned char configured;
+}GEM_PORT_ETWORK_CTP_MONITOR_HISTORY_DATA;
+
+
+typedef struct GAL_ETHERNET_PROFILE
+{
+    unsigned short  instanceIdentify; /*实际的实例号*/
+    unsigned short  gem_max_valid_payload_size;
+    unsigned char   configured;
+}GAL_ETHERNET_PROFILE;
+
+
+typedef struct VLAN_TAG_FILTER_DATA
+{
+    unsigned short  instanceIdentify; /*实际的实例号*/
+
+#if 1
+    unsigned short  vlanFilterTable[12] ;
+    unsigned char   forwardOperation;
+    unsigned char   numOfEntries;
+    /*unsigned char     flowidList[12];*//*上行flowid*/
+    /*unsigned char     downStream_flowidList[12];*/ /*下行flowid*/
+    UINT8           feid;     /* new04 物理端口，私有 */
+#endif
+unsigned char configured;
+}VLAN_TAG_FILTER_DATA;
+
+#define MAX_ITEM_NUM 4
+
+typedef struct VLAN_TAG_OPERATION_CFG_DATA
+{
+#if 1
+    unsigned short  Upstream_VLAN_tag_TCI_value[MAX_ITEM_NUM];
+    unsigned short  Associated_ME_pointer;   
+    /*unsigned char     Upstream_VLAN_tagging_operation_mode;*/
+    unsigned char   Upstream_VLAN_tagging_operation_mode[MAX_ITEM_NUM];
+    /*unsigned char     Downstream_VLAN_tagging_operation_mode;*/
+    unsigned char   Downstream_VLAN_tagging_operation_mode[MAX_ITEM_NUM];
+    unsigned char   Association_type;
+    UINT8           feid; /* new04 物理端口，私有 */
+#endif
+    unsigned char configured;
+}VLAN_TAG_OPERATION_CFG_DATA;
+
+
+#if 1
+typedef struct 
+{
+    unsigned short  outer_vid;
+    unsigned char   outer_priority;
+    unsigned char   outer_tpid_de;   
+    unsigned short  inner_vid;
+    unsigned char   inner_priority;
+    unsigned char   inner_tpid_de;
+    unsigned short  etherType;
+}ExtendedVLANTaggingOperation_Filter;
+
+
+typedef struct 
+{
+    unsigned short  outer_vid;
+    unsigned char   outer_priority;
+    unsigned char   outer_tpid_de;   
+    unsigned short  inner_vid;
+    unsigned char   inner_priority;
+    unsigned char   inner_tpid_de;
+    unsigned short  tags_to_remove;
+}ExtendedVLANTaggingOperation_Treatment;
+
+typedef struct 
+{
+    ExtendedVLANTaggingOperation_Filter     filter;
+    ExtendedVLANTaggingOperation_Treatment  treatment;
+    
+    unsigned char  configured;
+}ExtendedVLANTaggingOperation_vlanentry;
+
+#define  EXTENDED_VLAN_TAG_OP_MAX_VLAN_FILTER_ENTRY     12
+#define  EXTENDED_VLAN_TAG_OP_MAX_VLAN_ENTRY            64
+#define  EXTENDED_VLAN_TAG_OP_VLAN_ENTRY_LEN            16
+
+typedef enum 
+{
+    VLAN_TRANSPARENT    = 0,
+    VLAN_TAG            = 1,
+    VLAN_TRANSLATE      = 2,
+    VLAN_AGGREGATE      = 3,
+    VLAN_TRUNK          = 4,
+ }ETH_VLAN_MODE;
+
+typedef struct eth_vlan_config
+{
+    ETH_VLAN_MODE vlanState;
+    UINT32          vlanNum;    
+    UINT32          defVlan;
+    UINT32          vlanTlSrcVlan[8];
+    UINT32          vlanTlDstVlan[8];
+    UINT32          vlanTag;
+    UINT32          vlanTrunk[8];
+}eth_vlan_config;
+
+typedef struct EXTENDED_VLAN_TAG_OP_CFG_DATA
+{
+    unsigned short  instanceIdentify; /*实际的实例号*/
+    unsigned char   Association_type;
+    unsigned short  Rcv_Frm_table_maxsize;
+    unsigned short  Input_TPID;
+    unsigned short  Output_TPID;
+    unsigned char   DownStream_Mode;
+    unsigned short  Associated_ME_Pointer;
+    unsigned short  OutStandingCommandSequenceNumber;
+    unsigned int    RcvFrmTableSize;
+    ExtendedVLANTaggingOperation_vlanentry  RcvFrmTable[EXTENDED_VLAN_TAG_OP_MAX_VLAN_ENTRY];
+
+    unsigned char   vlanId;
+    unsigned char   vlan_mode;
+    unsigned char   configured;
+}EXTENDED_VLAN_TAG_OP_CFG_DATA;
+
+#endif
+
+typedef struct TDM_CFG_DATA
+{
+    unsigned char   E1_cfg[30];
+    unsigned char   tdmStatus[25];
+    unsigned char   E1_loopback[25];
+    unsigned short  time_mode;       /* liyang添加于2009.8.17，配置ONU时钟恢复方式 */
+    UINT8           onu_e1_status[25];    /*将所有状态都组在这个数组里面，个数+条目×个数*/
+    unsigned char   configured;
+    char            alarmMask[ALARM_MASK_MAX_LENGTH]; /*告警掩码*/
+}TDM_CFG_DATA;
+
+
+/*存储MAC 过滤或静态绑定信息*/
+typedef struct MAC_TABLE
+{
+    UINT8           mac[6];
+    UINT8           index;   
+    UINT8           configured;   
+}MAC_TABLE;
+
+typedef struct MAC_FILTER_TABLE
+{
+    //unsigned char     filterTable[24];
+    unsigned char   configured;
+    MAC_TABLE       macTable[8];/*存MAC 过滤或静态绑定信息*/
+}MAC_FILTER_TABLE;
+
+typedef struct MAC_BRIDGE_TABLE
+{
+    unsigned char   bridgeTable[ONU_MAX_PORT_MACADDR_NUM * 8];
+    unsigned int    bridgeTableSize;
+    unsigned short  OutStandingCommandSequenceNumber;
+    unsigned char   configured;
+}MAC_BRIDGE_TABLE;
+
+
+typedef struct SOFTWARE_IMAGE
+{
+    unsigned char   version[14];
+    unsigned char   isCommitted;
+    unsigned char   isActive;
+    unsigned char   isValid;
+    unsigned char   window_size;
+    unsigned char   configured;
+}SOFTWARE_IMAGE;
+
+typedef struct UNI_G
+{
+    unsigned short  configOptStatus;
+    unsigned char   adminState;
+}UNI_G;
+
+typedef struct CARD_HOLDER
+{
+    unsigned char   actual_plugin_type;
+    unsigned char   expected_plugin_type;
+    unsigned char   expected_port_count;
+    unsigned short  instanceIdentify; /*实际的实例号*/
+    unsigned char   configured;
+}CARD_HOLDER;
+
+
+typedef struct CIRCUIT
+{
+    unsigned short  instanceIdentify;/*实际的实例号*/
+    unsigned char   curcuitpack_type;
+    unsigned char   curcuitpack_sn[8];
+    unsigned char   curcuitpack_ver[14];
+    unsigned char   curcuitpack_adminState;
+    unsigned char   curcuitpack_cardCfg;
+    unsigned char   total_TCONT_buf_num;
+    unsigned char   total_priority_queue_num;
+    unsigned char   total_traffic_schedule_num;
+    unsigned char   configured;
+}CIRCUIT;
+
+typedef struct ETHERNET_UNI_PHYSICAL_TP
+{
+    unsigned short  instanceIdentifier;
+    unsigned short  MaxFrameSize;
+    unsigned short  PauseTime;
+    unsigned char   Expectedtype;
+    unsigned char   Sensedtype;
+    unsigned char   AutoDetectionConfiguration;
+    unsigned char   Ethernetloopbackconfiguration;
+    unsigned char   AdministrativeState;
+    unsigned char   OperationalState;
+    unsigned char   ConfigurationInd;
+    unsigned char   DTEorDCEInd;
+    unsigned char   BridgedorIPInd;
+    unsigned char   ARC;
+    unsigned char   ARCInterval;
+    unsigned char   PPPoEFilter;
+    unsigned char   Powercontrol;
+    unsigned char   feReset;
+    unsigned char   configured;
+    char            alarmMask[ALARM_MASK_MAX_LENGTH]; /*告警掩码*/
+}ETHERNET_UNI_PHYSICAL_TP;
+
+typedef struct VIRTUAL_ETHERNET_INTERFASE_POINT_
+{
+    unsigned short  instanceIdentifier;
+    unsigned char   AdministrativeState;
+    #if 0
+    unsigned char   operation_state;
+    unsigned char   interDomain_name[25];
+    unsigned short  tcp_udp_pointer;
+    #endif
+    unsigned short  lana_assignal_port;
+    unsigned char   configured;
+    char            alarmMask[ALARM_MASK_MAX_LENGTH]; /*告警掩码*/
+}VIRTUAL_ETHERNET_INTERFASE_POINT;
+
+typedef struct LOID_AUTHENTICATION_
+{
+    unsigned int    operator_ID;
+    unsigned char   LOID[24];
+    unsigned char   password[12];
+    unsigned char   authenticatior_state;
+    unsigned char   configured;
+}LOID_AUTHENTICATION;
+
+typedef struct FORMAT0_
+{
+    UINT16          tableControl;
+    UINT16          gem_id;
+    UINT16          down_vlan;
+    UINT32          imputed_group_bandwidth;
+    UINT16          previewLength;
+    UINT16          previewRepeatTime;
+    UINT16          previewRepeatCount;
+    UINT16          previewResetTime;
+    UINT32          vendorSpecificUse;
+    UINT8           reserved[8];
+}FORMAT0;
+
+typedef struct FORMAT1_
+{
+    UINT16          tableControl;
+    UINT8           destinationIPStart[16];
+    UINT8           reserved[12];
+}FORMAT1;
+
+typedef struct FORMAT2_
+{
+    UINT16          tableControl;
+    UINT8           destinationIPEnd[16];
+    UINT8           reserved[12];
+}FORMAT2;
+
+typedef struct FORMAT3_
+{
+    UINT16          tableControl;
+    UINT8           reserved[28];
+}FORMAT3;
+
+/*cxw add 2013 8 21*/
+typedef struct EXTEND_ACCESS_CTRL_TABLE
+{
+    FORMAT0         format0;
+    FORMAT1         format1;
+    FORMAT2         format2;
+    FORMAT3         format3;
+    UINT8           configured;
+}EXTEND_ACCESS_CTRL_TABLE;
+
+typedef struct EXTENDED_MULTICAST_OPERATIONS_PROFILES_
+{
+    unsigned char   IGMP_Version;
+    unsigned char   IGMP_Function; //  R,W, Set-by-create
+    unsigned char   Immediate_Leave;   
+    unsigned short  Upstream_IGMP_TCI;   
+    unsigned char   Upstream_IGMP_Tag_Control;
+    unsigned int    Upstream_IGMP_Rate;
+    EXTEND_ACCESS_CTRL_TABLE Dynamic_Access_Control_List_Table[ONU_MAX_ETHERNET_MULTICAST_GROUP_NUM];//R, W
+    EXTEND_ACCESS_CTRL_TABLE Static_Access_Control_List_Table[ONU_MAX_ETHERNET_MULTICAST_GROUP_NUM];  //R, W
+    unsigned char   Lost_Groups_List_Table[16];/*16N*/  //R
+    unsigned char   Robustness;
+    unsigned char   Querier_IP_Address[16];//R, W
+    unsigned int    Query_Interval;
+    unsigned int    Query_Max_Response_Time;
+    unsigned int    Last_Member_Query_Interval;//R, W
+    unsigned char   Unauthorized_Join_Request_Behaviour;//R, W
+    unsigned char   Downstream_IGMP_And_Multicast_TCI[3];
+    
+    char            alarmMask[ALARM_MASK_MAX_LENGTH]; /*告警掩码*/
+    unsigned char   b_configed;
+    UINT32          gGroupToOnu;
+}EXTENDED_MULTICAST_OPERATIONS_PROFILES;
+
+typedef struct ETHERNET_FRAME_EXTENDED_PM_ControlBlock
+{
+    unsigned short Threshold_data;
+    unsigned short Parent_ME_class;
+    unsigned short Parent_ME_instance;
+    unsigned short Accumulation_disable;
+    unsigned short TCA_disable;
+    unsigned short Control_fields;
+    unsigned short TCI;
+    unsigned short Reserved;/*用0填充*/
+
+    
+}ETHERNET_FRAME_EXTENDED_PM_ControlBlock;
+
+
+typedef struct ETHERNET_FRAME_EXTENDED_PM
+{
+    unsigned long   Dropevents;/*属性3*/
+    unsigned long   Octets;
+    unsigned long   Frames;
+    unsigned long   Broadcastpackets;
+    unsigned long   Multicastpackets;
+    unsigned long   CRCerroredframes;
+
+    unsigned long   Undersizeframes;
+    unsigned long   Oversizeframes;
+    unsigned long   Packets64octets;
+    unsigned long   Packets65to127octets;
+    unsigned long   Packets128to255octets;
+    unsigned long   Packets256to511octets;
+    unsigned long   Packets512to1023octets;
+    unsigned long   Packets1024to1518octets;
+    
+    unsigned char   IntervalEndTime;/*属性1*/
+    unsigned short  ControlBlock[8];/*属性2*/
+    ETHERNET_FRAME_EXTENDED_PM_ControlBlock ControlBlockstruct;/*属性2,分离结构*/
+
+    char            alarmMask[ALARM_MASK_MAX_LENGTH]; /*告警掩码*/
+    unsigned char   configured;
+}ETHERNET_FRAME_EXTENDED_PM;
+
+
+#if 1
+typedef struct ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA
+{
+    unsigned int    FCSErrors;
+    unsigned int    ExcessiveCollisionCounter;
+    unsigned int    LateCollisionCounter;
+    unsigned int    FrameTooLongs;
+    unsigned int    BufferOverflowsonReceive;
+    unsigned int    BufferOverflowsonTransmit;
+    unsigned int    SingleCollisionFrameCounter;
+    unsigned int    MultipleCollisionsFrameCounter;
+    unsigned int    SQECounter;
+    unsigned int    DeferredTransmissionCounter;
+    unsigned int    InternalMACTransmitErrorCounter;
+    unsigned int    CarrierSenseErrorCounter;
+    unsigned int    AlignmentErrorCounter;
+    unsigned int    InternalMACReceiveErrorCounter;
+    unsigned short  ThresholdDataid;
+    unsigned char   IntervalEndTime;
+    unsigned char   configured;
+}ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA;
+
+typedef struct ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA_3
+{
+    unsigned int    Dropevents;
+    unsigned int    Octets;
+    unsigned int    Packets;
+    unsigned int    Broadcastpackets;
+    unsigned int    Multicastpackets;
+    unsigned int    Undersizepackets;
+    unsigned int    Fragments;
+    unsigned int    Jabbers;
+    unsigned int    Packets64octets;
+    unsigned int    Packets65to127octets;
+    unsigned int    Packets128to255octets;
+    unsigned int    Packets256to511octets;
+    unsigned int    Packets512to1023octets;
+    unsigned int    Packets1024to1518octets;
+    unsigned short  Thresholddata12id;
+    unsigned char   IntervalEndTime;
+    unsigned char   configured;
+}ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA_3;
+
+typedef struct ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA_2
+{
+    unsigned int    PPPoEfilteredframecounter;
+    unsigned short  Thresholddata12id;
+    unsigned char   IntervalEndTime;
+    unsigned char   configured;
+}ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA_2;
+
+
+
+#endif
+
+typedef struct PORT_MAPPING_PACKAGE
+{
+    unsigned char   maxPort;
+    unsigned short  portList[8][8];
+    unsigned char   combinedPortTable[8][25];
+    
+    unsigned char   configured;
+}PORT_MAPPING_PACKAGE;
+
+
+typedef struct MANAGMED_ENTITY
+{
+    unsigned short  instancesTable[OMCI_MAX_ME_INSTANCE_NUM];
+    unsigned short  instancesTableSize;
+#if 0
+    unsigned char   name[20];
+    unsigned short  attributesTable[OMCI_MAX_ME_ATTRIBUTE_NUM];
+    unsigned char   alarmsTable[OMCI_MAX_ME_ALARM_TABLE_NUM];
+    unsigned char   AVCsTable[OMCI_MAX_ME_AVC_TABLE_NUM];
+    unsigned int    action;
+    unsigned short  attributesTableSize;
+    unsigned short  alarmsTableSize;
+    unsigned short  AVCsTableSize;
+    unsigned char   access;
+    unsigned char   support;
+#endif
+    unsigned char   configured;
+}MANAGMED_ENTITY;
+
+typedef struct OMCI
+{
+    unsigned short  METypeTable[OMCI_MAX_ME_TYPE_NUM];
+    unsigned char   MessageTypeTable[OMCI_MAX_ME_MESSAGE_TYPE_NUM];
+    unsigned int    METypeTableSize;
+    unsigned int    MessageTypeTableSize;
+    unsigned short  OutStandingCommandSequenceNumber;
+    unsigned char   configured;
+}OMCI;
+
+typedef struct MAC_BRIDGE_PORT_CFG_DATA
+{
+    unsigned short  instanceIdentify; /*实际的实例号*/
+    unsigned char   Port_MAC_address[MAC_ADDRESS_BYTE_NUM];
+    unsigned short  Bridge_id_pointer;
+    unsigned short  TP_pointer;
+    unsigned short  Port_priority;
+    unsigned short  Outbound_TD_pointer;
+    unsigned short  Inbound_TD_pointer;
+    unsigned short  Port_path_cost;
+    unsigned char   Port_num;
+    unsigned char   TP_type;
+    unsigned char   Port_spanning_tree_ind;
+    unsigned char   Encapsulation_method;
+    unsigned char   LAN_FCS_ind;
+    unsigned char   mac_limit;
+    unsigned char   configured;
+}MAC_BRIDGE_PORT_CFG_DATA;
+
+typedef struct ONT_DATA
+{
+    unsigned short  mibUpload_command_number;
+    unsigned char   mib_data_sync;
+    unsigned short  get_alarm_entryNum;
+}ONT_DATA;
+
+typedef struct IP_HOST_CONFIG_DATA
+{
+    unsigned char   ip_option;
+    unsigned char   mac_address[6];
+    unsigned char   ont_Identifier[25];
+    unsigned int    ip_address;
+    unsigned int    mask;
+    unsigned int    gateway;
+    unsigned int    primary_dns;
+    unsigned char   secondary_dns;
+    unsigned int    cur_ip_address;
+    unsigned int    cur_mask;
+    unsigned int    cur_gateway;
+    unsigned int    cur_primary_dns;
+    unsigned char   cur_secondary_dns;
+    unsigned char   domain_name[25];
+    unsigned char   host_name[25];
+    unsigned char   configured;
+}IP_HOST_CONFIG_DATA;
+
+
+typedef struct P_MAPPING_SERVICE_PROFILE
+{
+   unsigned short   instanceIdentify; /*实际的实例号*/
+   unsigned short   tp_pointer;
+   unsigned short   iw_tp_pointer[8];
+   unsigned char    unmarked_frame_option;
+   unsigned char    dscp_to_p_bit_mapping[24];
+   unsigned char    default_p_bit_marking;
+   unsigned char    tp_type;
+   unsigned char    configured;
+}P_MAPPING_SERVICE_PROFILE;
+
+typedef struct MAC_BRIDGE_SERVICE_PROFILE
+{
+    unsigned short  instanceIdentify; /*实际的实例号*/
+
+#if 1
+    unsigned short  priority;
+    unsigned short  max_age;
+    unsigned short  hello_time;
+    unsigned short  forward_delay;
+    unsigned char   spanning_tree_ind;
+    unsigned char   learning_ind;
+    unsigned char   atm_port_bridging_ind;
+    unsigned char   unknown_MAC_address_discard;
+    unsigned char   MAC_learning_depth;
+    unsigned int    dynamic_filtering_ageing_time;
+#endif
+    unsigned char   configured;
+}MAC_BRIDGE_SERVICE_PROFILE;
+
+typedef struct PPTP_POTS_UNI
+{
+    unsigned char   administrative_state;/*locks (1) ;unlocks (0)*/
+    unsigned char   configured;
+}PPTP_POTS_UNI;
+
+#if 0
+enum IGMP_CONTROL_AUTHRIZATION
+{
+    IGMP_CONTROL_AUTHRIZATION_PERMIT =1,  /*观看*/
+        
+    IGMP_CONTROL_AUTHRIZATION_PREVIEW =2,/*预览*/
+
+    IGMP_CONTROL_AUTHRIZATION_FORBIDDEN  =3 /*禁止*/
+};
+
+/*组播控制*/
+typedef struct IGMP_USER_AUTHRIZATION
+{
+    unsigned int    multicastIpaddr;
+    enum IGMP_CONTROL_AUTHRIZATION authrization;
+    unsigned char   configured;
+}IGMP_USER_AUTHRIZATION;
+#endif
+
+typedef struct FB_MANAGE_VLAN
+{
+    unsigned char   vlan_num;
+    unsigned char   vlan_info1_part1[25];
+    unsigned char   vlan_info1_part2[20];
+    unsigned char   vlan_info2_part1[25];
+    unsigned char   vlan_info2_part2[20];
+    unsigned char   vlan_info3_part1[25];
+    unsigned char   vlan_info3_part2[20];
+    unsigned char   vlan_info4_part1[25];
+    unsigned char   vlan_info4_part2[20];
+    unsigned char   configured;
+}FB_MANAGE_VLAN;
+
+/* liyang新定义的ME */
+typedef struct FH_IGMP_ONU_VLAN_CFG_DATA
+{
+    /* pon protection */
+#if 0
+    unsigned short  Upstream_VLAN_tag_TCI_value;        //上行协议vlan值
+    unsigned short  Downstream_VLAN_tag_TCI_value;       //下行协议vlan值(新增)
+    unsigned short  Associated_ME_pointer;
+    unsigned char   Protocol_VLAN_tagging_operation_mode ;    //协议vlan模式(上下行都是这个)
+    unsigned char   Data_VLAN_tagging_operation_mode;    //组播数据vlan模式
+    unsigned char   Association_type;
+    unsigned short  Data_VLAN_vlaue; //组播数据vlan值(新增)
+#endif
+    unsigned char   configured;
+}FH_IGMP_ONU_VLAN_CFG_DATA;
+
+#define ACCESS_CTRL_TABLE_MAXNUM 24
+#define INDEX_NO_SET ACCESS_CTRL_TABLE_MAXNUM
+
+typedef struct ACCESS_CTRL_TABLE
+{
+    UINT16  index;
+    UINT16  gem_id;
+    UINT16  down_vlan;
+    UINT8   src_ip[4];
+    UINT8   group_addr_range_start[4];
+    UINT8   group_addr_range_end[4];
+    UINT32  imputed_group_bandwidth;
+    UINT16  reserved;
+    UINT8   configured;
+}ACCESS_CTRL_TABLE;
+#if 0
+typedef struct MULTI_OPERATION_PROFILE
+{
+    UINT8   igmp_version;
+    UINT8   igmp_function;
+    UINT8   imme_leave;
+    UINT16  up_igmp_tci;
+    ACCESS_CTRL_TABLE dyn_access_ctrl_table[ACCESS_CTRL_TABLE_MAXNUM];
+    UINT8   robustness;
+    UINT32  query_interval;
+    UINT32  query_max_resp_time;
+    UINT32  last_member_query_interval;
+    UINT32  member_aging_time;    /*属性16：成员老化时间*/
+    UINT8   b_configed;
+}MULTI_OPERATION_PROFILE;
+#endif
+
+typedef struct MULTI_OPERATION_PROFILE
+{
+    unsigned short  instanceIdentify; /*实际的实例号*/
+    unsigned char   IGMP_Version;
+    unsigned char   IGMP_Function; //  R,W, Set-by-create
+    unsigned char   Immediate_Leave;   
+    unsigned short  Upstream_IGMP_TCI;   
+    unsigned char   Upstream_IGMP_Tag_Control;
+    unsigned int    Upstream_IGMP_Rate;
+    ACCESS_CTRL_TABLE Dynamic_Access_Control_List_Table[16];//R, W
+    ACCESS_CTRL_TABLE Static_Access_Control_List_Table[16];  //R, W
+    unsigned char   Lost_Groups_List_Table[20];/*10N*/  //R
+    unsigned char   Robustness;
+    unsigned char   Querier_IP_Address[4];//R, W
+    unsigned int    Query_Interval;
+    unsigned int    Query_Max_Response_Time;
+    unsigned int    Last_Member_Query_Interval;//R, W
+    unsigned char   Unauthorized_Join_Request_Behaviour;//R, W
+    
+    char            alarmMask[ALARM_MASK_MAX_LENGTH]; /*告警掩码*/
+    unsigned char   b_configed;
+}MULTI_OPERATION_PROFILE;
+
+
+typedef struct MULTI_SUBSCRIBER_CONFIG_INFO
+{
+    unsigned short   instanceIdentify; /*实际的实例号*/
+    UINT8   me_type;
+    UINT16  multi_operation_profile_pointer;
+    UINT16  max_simultaneous_groups; /* 属性3，端口最大在线组个数 */
+    UINT8   b_configed;
+}MULTI_SUBSCRIBER_CONFIG_INFO;
+
+typedef struct PM_WINDOW_TIME
+{
+    unsigned short  start_year;         
+    unsigned short  start_month; 
+    unsigned short  start_day;
+    unsigned short  start_hour;  
+    unsigned short  start_min;       
+    unsigned short  start_sec;
+    unsigned short  end_year;           
+    unsigned short  end_month;   
+    unsigned short  end_day;
+    unsigned short  end_hour;    
+    unsigned short  end_min;     
+    unsigned short  end_sec;
+    unsigned char   configured;
+}PM_WINDOW_TIME;
+
+typedef struct FH_MAC_BRIDGE_SERVICE_PROFILE
+{
+    UINT8   spanning_tree_ind;    /* RSTP使能 */
+    UINT8   learning_ind;
+    UINT8   port_bridging_ind;
+    UINT16  priority;
+    UINT16  max_age;         /* 桥最大老化时间 */
+    UINT16  hello_time;      /* Hello包时间间隔*/
+    UINT16  forward_delay;   /* 转发延迟 */
+    UINT8   unknown_mac_addr_discard;
+    UINT32  bridge_no;        /* 序号为1 */
+    UINT8   bridge_name[20];  /* 桥名字 */
+    UINT8   force_version;    /* 强制版本：1：STP，2：RSTP */
+}FH_MAC_BRIDGE_SERVICE_PROFILE;
+
+typedef struct MAC_BRIDGE_CFG_DATA
+{
+    UINT8   bridge_mac[6];        /* 桥MAC地址 */
+    UINT16  bridge_priority;     /* 桥优先级 */
+    UINT8   designated_root[8];   /* 根桥优先级（2），根桥MAC（6） */
+    UINT32  root_path_cost;   
+    UINT8   bridge_port_count;
+    UINT16  root_port_num;       /* 根端口号 */
+    UINT16  hello_time;          /* 根桥Hello包时间间隔 */
+    UINT16  forward_delay;       /* 根桥转发时延 */
+    UINT32  root_bridge_max_age;  /* 根桥最大老化时间 */
+}MAC_BRIDGE_CFG_DATA;
+
+typedef struct MAC_BRIDGE_PORT_DESIGNATION_DATA
+{
+    struct BRIDGE_ROOT_COST_PORT
+    {
+        UINT16  root_port_priority;  /*指定根的端口优先级*/
+        UINT8   root_mac[6];          /*指定根的MAC地址*/
+        UINT32  path_cost;            /*指定的路径花费*/
+        UINT16  port_num;            /*指定端口的端口号*/
+        UINT16  port_priority;       /*指定端优先级*/
+        UINT16  bridge_priority;     /*指定桥的优先级*/
+        UINT8   bridge_mac[6];        /*指定桥的MAC地址*/
+    }bridge_root_coat_port;
+    UINT8   port_state;       /* 端口状态 */
+    UINT8   port_function;    /* 端口角色 */
+}MAC_BRIDGE_PORT_DESIGNATION_DATA;
+
+typedef struct FE_LOOPCHECK_PARAMS
+{
+/* pon protection */
+#if 0
+    UINT8   fe_loopcheck_status;      /* 环路检测使能:1-disable/2-enable */
+    UINT16  fe_loopcheck_interval;   /* 时间间隔 */
+#endif
+    UINT8   b_configed;               /* 配置标记:true-配置过/false-没有配置过 */
+}FE_LOOPCHECK_PARAMS;
+
+typedef struct UP_QOS_ACTION
+{
+/* pon protection */
+#if 0
+    UINT16  rule_count;
+    UINT32  assure_speed;
+    UINT32  burst_speed;
+    UINT8   mapping_enable;
+    UINT16  mapping_queue;
+    UINT16  remark_enable;
+    UINT16  priority;
+    struct UP_RULE_ENTRY    /*属性8   10N，N为4*/
+    {
+        UINT8   index;
+        UINT16  rule_field;
+        UINT8   rule_field_vaule[6];
+        UINT8   rule_operator;
+    }up_rule_entry[4];
+#endif
+    UINT8   b_configed;   /* 是否配置的标识 */
+}UP_QOS_ACTION;
+
+typedef struct DOWN_QOS_ACTION
+{
+/* pon protection */
+#if 0
+    UINT16  rule_count;
+    UINT32  assure_speed;
+    UINT32  burst_speed;
+    UINT8   mapping_enable;
+    UINT16  mapping_queue;
+    UINT16  remark_enable;
+    UINT16  priority;
+    struct DOWN_RULE_ENTRY  /*属性8   10N，N为4*/
+    {
+        UINT8   index;
+        UINT16  rule_field;
+        UINT8   rule_field_vaule[6];
+        UINT8   rule_operator;
+    }down_rule_entry[4];
+#endif
+    UINT8   b_configed;   /* 是否配置的标识 */
+}DOWN_QOS_ACTION;
+
+/* QoS规则指针，与端口对应 */
+typedef struct QOS_RULE_POINTER
+{
+/* pon protection */
+#if 0
+    UINT8   up_qos_rule_num;      /* 上行qos规则条目数 */
+    UINT8   down_qos_rule_num;    /* 下行qos规则条目数 */
+#endif
+}QOS_RULE_POINTER;
+
+typedef struct OMCI_SWITCH_PORT_PACKET_CONTROL
+{
+/* pon protection */
+#if 0
+    UINT8   broadcast_enable;         /*属性1*/
+    UINT32  broadcast_rate_limit; /*属性2*/
+    UINT8   multicast_enable;         /*属性3*/
+    UINT32  multicast_rate_limit; /*属性4*/
+    UINT8   unknown_enable;           /*属性5*/
+    UINT32  unknown_rate_limit;       /*属性6*/
+#endif
+}OMCI_SWITCH_PORT_PACKET_CONTROL;
+
+#if 0
+typedef struct _schedule_queue_config_
+{
+    unsigned char   queue_priority;
+    unsigned char   queue_mode;
+    unsigned short  queue_weight;
+}SCHEDULE_QUEUE_CONFIG;
+#endif
+
+typedef struct OMCI_SCHEDULE_QUEUE_CONFIG
+{
+/* pon protection */
+#if 0
+    UINT8   queue_priority;   /*队列优先级：0-7*/
+    UINT8   queue_mode;       /*队列调度算法：0～2；0：加权优先级算法 (WRR)，
+                                                  1：严格优先级算法 (P)，
+                                                  2: 混合优先级算法 (SP + WRR)*/
+    UINT16  queue_weight;    /*权值：0-15，0XFF */
+#endif
+    UINT8   b_configed;
+}OMCI_SCHEDULE_QUEUE_CONFIG;
+
+typedef struct  _E1_LINK_STATUS
+{
+    unsigned short  e1_index;
+    unsigned short  recv_status;
+    unsigned short  send_status;
+}E1_LINK_STATUS;
+
+#if 0
+typedef struct QOS_RULE_POINTER
+{
+    UINT8   up_qos_rule_num;    /* 上行qos规则条目数 */
+    UINT8   down_qos_rule_num;  /* 下行qos规则条目数 */
+}QOS_RULE_POINTER;
+
+typedef struct ACL_RULE_POINTER
+{
+    UINT8   acl_rule_num;       /* ACL规则条目数 */
+}ACL_RULE_POINTER;
+#endif
+
+typedef struct MUTICAST_MONITOR
+{
+    unsigned int    join_success_times;
+    unsigned int    join_fail_times;
+    unsigned int    leave_times;
+    unsigned int    send_comm_search_times;
+    unsigned int    send_designated_search_times;
+    unsigned int    receive_invalid_igmp_times;    
+}MUTICAST_MONITOR;
+
+/* 静态路由 */
+#if 0
+typedef struct ROUTE_INFO
+{
+    unsigned int    route_destination;
+    unsigned int    gateway;
+}ROUTE_INFO;
+#endif
+
+typedef struct OMCI_SW_PORT_RULE_ENTRY
+{
+    UINT8   index;
+    UINT16  rule_field;
+    UINT8   rule_field_vaule[6];
+    UINT8   rule_operator;
+}OMCI_SW_PORT_RULE_ENTRY;
+
+typedef struct OMCI_SW_PORT_ACL_RULE
+{
+#if 0
+    UINT8   us_acl_action;
+    UINT8   us_acl_count;
+    OMCI_SW_PORT_RULE_ENTRY us_port_acl_entry[4];
+    UINT8   ds_acl_action;
+    UINT8   ds_acl_count;
+    OMCI_SW_PORT_RULE_ENTRY ds_port_acl_entry[4];
+#endif
+    UINT8   b_configed;
+}OMCI_ME_STRUCT_sw_port_acl_rule;
+
+typedef struct ACL_RULE_POINTER
+{
+#if 0
+    UINT8   acl_rule_num;     /* ACL规则条目数 */
+#endif
+    UINT8   b_configed;
+}OMCI_ME_STRUCT_acl_rule_pointer;
+
+#define MAX_STATIC_ROUTE_NUM 8
+typedef struct STATIC_ROUTE
+{
+    unsigned short  route_num;
+    unsigned int    route_destination[MAX_STATIC_ROUTE_NUM];
+    unsigned int    gateway[MAX_STATIC_ROUTE_NUM];
+    unsigned int    mask[MAX_STATIC_ROUTE_NUM];
+    unsigned char   b_configed;
+}OMCI_ME_STRUCT_static_route;
+
+#define OMCI_ME_rsrc_enable_sw 65292
+typedef struct RSRC_ENABLE_SW
+{
+#if 0
+    UINT8   enable_sw;        /* 资源系统互通使能 */
+#endif
+    UINT8   b_configed;
+}OMCI_ME_STRUCT_rsrc_enable_sw;
+
+typedef struct _hg_mac_entry_
+{
+    unsigned char   mac_begin[6];
+    unsigned char   mac_end[6];
+}HG_MAC_ENTRY;
+
+
+struct OMCI_HG_MAC_ENTRY
+{
+    UINT8   index;
+    UINT8   mac_begin[6];
+    UINT8   mac_end[6];
+};
+
+#define MAC_NUM 32
+
+#define OMCI_ME_rsrc_hg_mac 65293
+typedef struct RSRC_HG_MAC
+{
+#if 0
+    UINT16  hg_mac_num;      // HG MAC地址范围配置
+    struct  OMCI_HG_MAC_ENTRY hg_mac_entry[MAC_NUM]; // HG MAC地址范围配置
+#endif
+    UINT8   b_configed;
+}OMCI_ME_STRUCT_rsrc_hg_mac;
+
+#define OMCI_ME_rsrc_onu_state 65294
+typedef struct RSRC_ONU_STATE
+{
+#if 0
+    UINT8   state;    //下发ONU入网
+#endif
+    UINT8   b_configed;
+}OMCI_ME_STRUCT_rsrc_onu_state;
+
+#define OMCI_ME_rsrc_onufe_state 65295
+typedef struct RSRC_ONUFE_STATE
+{
+#if 0
+    UINT8   state;    //下发HG入网回应
+#endif
+    UINT8   b_configed;
+}OMCI_ME_STRUCT_rsrc_onufe_state;
+
+#define OMCI_ME_rsrc_onufe_hg_depatch 65296
+typedef struct RSRC_ONUFE_HG_DEPATCH
+{
+#if 0
+    UINT8   hg_mac_id[6]; 
+    UINT16  datavlan;
+#endif
+    UINT8   b_configed;
+}OMCI_ME_STRUCT_rsrc_onufe_hg_depatch;
+
+/* 新增联通测试需求 */
+#define OMCI_ME_rsrc_hg_register 65301
+#define OMCI_ME_rsrc_onuport_state_change 65302
+
+#define OMCI_ME_onu_opt_threshold 65297
+typedef struct _optical_alarm_threshold_entry_
+{
+    char            alarm_threshold[6];
+    char            clear_threshold[6];
+    unsigned short  alarm_open_enable;/*新告警方案需要added by fz,2010.8.10*/
+}OPTICAL_ALARM_THRESHOLD_ENTRY;
+
+typedef struct OMCI_ONU_OPT_THRESHOLD
+{
+#if 0
+    UINT16  alarm_code;
+    UINT8   alarm_threshold[6];
+    UINT8   clear_threshold[6];
+#endif
+    UINT8   b_configed;
+}OMCI_ME_STRUCT_onu_opt_threshold;
+
+#define OMCI_ME_onu_dos_attack_alarm_config 65298
+#if 0
+typedef struct _onu_dos_attack_alarm_config_
+{
+    unsigned char   land_attack_alarm;
+    unsigned char   tcp_syn_fin_alarm;
+    unsigned char   overflow_alarm;
+    unsigned char   tcp_syn_alarm;
+    unsigned char   null_scan_alarm;
+    unsigned char   l4_port_error_alarm;
+    unsigned char   frag_attack_alarm;
+    unsigned char   ping_attack_alarm;
+    unsigned char   syn_flooding_alarm;
+    unsigned char   tcp_deceive_alarm;
+}ONU_DOS_ATTACK_ALARM_CONFIG;
+
+typedef struct _onu_dos_attack_alarm_config_
+{
+    unsigned char   mac_land_attack_alarm;
+    unsigned char   ip_land_attack_alarm;
+    unsigned char   tcp_blat_attack_alarm;
+    unsigned char   udp_blat_attack_alarm;
+    unsigned char   tcp_null_scan_attack_alarm;
+    unsigned char   tcp_xmas_scan_attack_alarm;
+    unsigned char   tcp_syn_fin_alarm;
+    unsigned char   tcp_syn_err_alarm;
+    unsigned char   tcp_short_hdr_alarm;
+    unsigned char   tcp_frag_err_alarm;
+    unsigned char   icmpv4_frag_attack_alarm;
+    unsigned char   icmpv6_frag_attack_alarm;
+    unsigned char   imcpv4_longping_attack_alarm;
+    unsigned char   imcpv6_longping_attack_alarm;
+}ONU_DOS_ATTACK_ALARM_CONFIG;
+#endif
+
+typedef struct OMCI_ONU_DOS_ATTACK_ALARM_CONFIG
+{
+#if 0
+    UINT8 mac_land_attack_alarm;
+    UINT8 ip_land_attack_alarm;
+    UINT8 tcp_blat_attack_alarm;
+    UINT8 udp_blat_attack_alarm;
+    UINT8 tcp_null_scan_attack_alarm;
+    UINT8 tcp_xmas_scan_attack_alarm;
+    UINT8 tcp_syn_fin_alarm;
+    UINT8 tcp_syn_err_alarm;
+    UINT8 tcp_short_hdr_alarm;
+    UINT8 tcp_frag_err_alarm;
+    UINT8 icmpv4_frag_attack_alarm;
+    UINT8 icmpv6_frag_attack_alarm;
+    UINT8 imcpv4_longping_attack_alarm;
+    UINT8 imcpv6_longping_attack_alarm;
+#endif
+    UINT8 b_configed;
+}OMCI_ME_STRUCT_onu_dos_attack_alarm_config;
+
+#define OMCI_ME_onu_mac_aging 65299
+typedef struct OMCI_ONU_MAC_AGING
+{
+#if 0
+    UINT16          aging_time;
+#endif
+    UINT8           b_configed;
+}OMCI_ME_STRUCT_onu_mac_aging;
+
+#define OMCI_ME_onu_vlan_mapping_rule 65300
+#if 0
+typedef struct _onu_vlan_mapping_entry_
+{
+    unsigned short  rule_entry_code;
+    unsigned short  vlan_id;
+}ONU_VLAN_MAPPING_ENTRY;
+#endif
+
+
+#define VLAN_MAPPING_ENTRY_NUM 32
+struct omci_rule_entry
+{
+    UINT8           index;
+    UINT16          rule_entry_code;
+    UINT16          vlan_id;
+};
+
+typedef struct OMCI_ONU_VLAN_MAPPING_RULE
+{
+#if 0
+    UINT16          rule_catalog;
+    struct          omci_rule_entry rule_entry[VLAN_MAPPING_ENTRY_NUM];
+    UINT8           entry_num;
+#endif
+    UINT8           b_configed;
+}OMCI_ME_STRUCT_onu_vlan_mapping_rule;
+
+/* 管理IP */
+#define OMCI_ME_olt_manage_ip 65303
+typedef struct
+{
+    /*UINT8                num;*/
+#if 0
+    UINT32          olt_manage_ip;
+#endif
+    UINT8           b_configed;
+}OMCI_ME_STRUCT_olt_manage_ip;
+
+/*  电源管理 */
+#define OMCI_ME_onu_battery_info 65304
+typedef struct
+{
+    /*char alarmMask[ALARM_MASK_MAX_LENGTH];*/ /*告警掩码*/
+    UINT8           power_supply;     /* 供电方式 */
+    UINT8           backup_presence;  /* 后备电源 */
+    UINT8           backup_status;    /* 后备电源状态 */
+}OMCI_ME_STRUCT_onu_battery_info;
+
+#define OMCI_ME_onu_mapping_method_ethertype 65305
+typedef struct 
+{
+#if 0
+    UINT8           mapping_method;
+    UINT16          inner_ether_type;
+    UINT16          outer_ether_type;
+#endif
+    UINT8           b_configed;
+}OMCI_ME_STRUCT_onu_mapping_method_ethertype;
+
+#define SERVICE_NUM_PER_UNI     16
+#define RULE_NUM                (ONU_MAX_ETHERNET_UNI_PORTS * SERVICE_NUM_PER_UNI * 2)
+
+#define OMCI_ME_fe_service_rule 65306
+typedef struct OMCI_ME_STRUCT_fe_service_rule
+{
+#if 0
+    //UINT16        portid;  /* UNI或IW */
+    UINT8           num_of_rule;
+    SERVICE_DIFFER_ENTRY rule[4];
+#endif
+    UINT8 b_configed;
+}OMCI_ME_STRUCT_fe_service_rule;
+
+typedef struct
+{
+    UINT8           table[16];
+    UINT8           b_configed;
+}vlan_tagging;
+
+
+#define OMCI_ME_extVlanTagging 171
+typedef struct OMCI_ME_STRUCT_extVlanTagging
+{
+    UINT8           association_type;
+    /*UINT16              tagging_table_max_size;*/
+#if 1
+    UINT16          input_tpid;
+    UINT16          output_tpid;
+    UINT8           downstream_mode;
+#endif
+    vlan_tagging    tagging_table[SERVICE_NUM_PER_UNI];
+    UINT16          associated_me_pointer;
+    UINT8           b_configed;
+}OMCI_ME_STRUCT_extVlanTagging;
+
+typedef struct OMCI_alarm_state
+{
+    unsigned char   ONT_G_EquipmentAlarm;
+    unsigned char   ONT_G_PoweringAlarm;
+    unsigned char   ONT_G_BatteryMissing;
+    unsigned char   ONT_G_BatteryFailure;
+    unsigned char   ONT_G_BatteryLow;
+    unsigned char   ONT_G_PhysicalIntrusionAlarm;
+    unsigned char   ONT_G_ONUSelfTestFailure;
+    unsigned char   ONT_G_ONUDyingGasp;
+    unsigned char   ONT_G_ONUTemperatureYellow;
+    unsigned char   ONT_G_ONUTemperatureRed;
+    unsigned char   ONT_G_ONUVoltageYellow;
+    unsigned char   ONT_G_ONUVoltageRed;
+    unsigned char   ONT_G_ONUmanualpoweroff;
+
+    unsigned char   ANI_G_LowReceivedOpticalPowerAlarm;
+    unsigned char   ANI_G_HighReceivedOpticalPowerAlarm;
+    unsigned char   ANI_G_SF;
+    unsigned char   ANI_G_SD;
+    unsigned char   ANI_G_LowTransmitOpticalPowerAlarm;
+    unsigned char   ANI_G_HighTransmitOpticalPowerAlarm;
+    unsigned char   ANI_G_LaserBiasCurrentAlarm;
+    
+    unsigned char   OMCI_ME_ETHERNET_UNI_PHYSICAL_TP_LanLosAlarm[ONU_MAX_ETHERNET_UNI_PORTS];
+
+    unsigned char   OMCI_ME_MAC_BRIDGE_PORT_CONFIG_DATA_PortblockingFoLoopdetectionAlarm[ONU_MAX_ETHERNET_UNI_PORTS];
+}OMCI_alarm_state;
+
+#define OMCI_ME_onu_switchport_config 65307
+typedef struct OMCI_ME_STRUCT_onu_switchport_config
+{
+#if 0
+    unsigned char   xi_enable;
+    unsigned char   xi_adptive;
+    unsigned char   xi_speed;
+    unsigned char   xi_duplex;
+    unsigned char   xi_flowctrl;
+    unsigned char   us_limit_enable; 
+    unsigned int    us_limit_speed; 
+    unsigned char   ds_limit_enable; 
+    unsigned int    ds_limit_speed;
+
+    unsigned char   upstream_rate_control_enable;
+    unsigned int    upstream_assure_rate;
+    unsigned int    upstream_burst_rate;
+    unsigned int    upstream_extra_bytes;
+    unsigned char   downstream_rate_control_enable;
+    unsigned int    downstream_assure_rate;
+    unsigned int    downstream_peak_rate;
+#endif
+    UINT8 b_configed;
+}OMCI_ME_STRUCT_onu_switchport_config;
+
+#define OMCI_ME_LARGE_STRING   157
+typedef struct _OMCI_ME_STRUCT_LARGE_STRING_
+{
+    unsigned char   numberparts;
+    char            part1[25];
+    char            part2[25];
+    char            part3[25];
+    char            part4[25];
+    char            part5[25];
+    char            part6[25];
+    char            part7[25];
+    char            part8[25];
+    char            part9[25];
+    char            part10[25];
+    char            part12[25];
+    char            part13[25];
+    char            part14[25];
+    char            part15[25];
+    char            b_configed;
+}OMCI_ME_STRUCT_LARGE_STRING;
+
+#pragma pack()
+
+typedef struct ONU_OMCI_CLASS_
+{
+    OMCI_TX_QUEUE_LINKS         tx_queue[OMCI_PRIORITY_NUM];    /*olt 侧的发送队列，用于消息流的控制发送*/
+    UINT32                      current_filled_window_size[OMCI_PRIORITY_NUM];/*本端已发送且未确认的控制包数*/
+    OMCIQMsg                    omciMsg[OMCI_PRIORITY_NUM];     /*onu侧的最后发送的应答包的副本，用于应答消息的重传*/
+    ONT_G                       ont_g;  /*ONT_G 受管实体信息*/
+    ONT2_G                      ont2_g; /*ONT_G 受管实体信息*/
+#if 0    
+    ONT_FIBERHOME_G             ont_fb_g;
+#endif
+    ANI_G                       ani_g;
+#if 0
+    PON_TC                      pon_tc;
+#endif
+    T_CONT                      t_cont[OMCI_MAX_ONU_T_CONT_NUM];
+    GEM_PORT_NETWORK_CTP        gem_port_network_ctp[OMCI_MAX_ONU_CONNECTION_NUM];
+    GEM_IW_TP                   gem_iw_tp[OMCI_MAX_ONU_CONNECTION_NUM];
+    GAL_ETHERNET_PROFILE        gal_ethernet_profile[OMCI_MAX_ONU_CONNECTION_NUM];
+    GEM_PORT_PROTOCOL_MONITOR_HISTORY_DATA  gem_port_protocol_monitor_history_data[OMCI_MAX_ONU_CONNECTION_NUM];
+    GEM_PORT_PROTOCOL_MONITOR_HISTORY_DATA  gem_port_protocol_monitor_current_data[OMCI_MAX_ONU_CONNECTION_NUM];
+
+
+    PRIORITY_QUEUE_G             priority_queue[2][OMCI_MAX_ONU_T_CONT_NUM*OMCI_MAX_ONU_PRIORITY_QUEUE_NUM];
+    /* PRIORITY_QUEUE_G   priority_queue[OMCI_MAX_ONU_PRIORITY_QUEUE_NUM];*/
+
+    VLAN_TAG_FILTER_DATA        vlan_tag_filter_data[OMCI_MAX_ONU_BRIDGE_PORT_NUM];
+    MULTICAST_GEM_IW_TP         multicast_gem_iw_tp[OMCI_MAX_ONU_CONNECTION_NUM];
+    SOFTWARE_IMAGE              software_image[2];
+    ETHERNET_UNI_PHYSICAL_TP    ethernet_uni_physical_tp[ONU_MAX_ETHERNET_UNI_PORTS+1];
+    VIRTUAL_ETHERNET_INTERFASE_POINT    virtual_eth_internet_point[ONU_MAX_VEIP_PORTS];
+    LOID_AUTHENTICATION         LOID_authentication;
+    ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA    ethernet_performance_monitoring_histroy_data[ONU_MAX_ETHERNET_UNI_PORTS+1];/*  +1 for onu pon performance statatis.*/
+    ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA    ethernet_performance_monitoring_current_data[ONU_MAX_ETHERNET_UNI_PORTS+1];
+    ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA_3  ethernet_performance_monitoring_histroy_data_3[ONU_MAX_ETHERNET_UNI_PORTS+1];
+    ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA_3  ethernet_performance_monitoring_current_data_3[ONU_MAX_ETHERNET_UNI_PORTS+1];
+    ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA_2  ethernet_performance_monitoring_histroy_data_2[ONU_MAX_ETHERNET_UNI_PORTS+1];
+    ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA_2  ethernet_performance_monitoring_current_data_2[ONU_MAX_ETHERNET_UNI_PORTS+1];
+
+    ETHERNET_FRAME_EXTENDED_PM  ethernet_frame_extended_PM_histroy_data[ONU_MAX_Ethernet_Frame_Extended_PM_Instance];/* 用于以太口统计*/
+    ETHERNET_FRAME_EXTENDED_PM  ethernet_frame_extended_PM_current_data[ONU_MAX_Ethernet_Frame_Extended_PM_Instance];
+
+    PORT_MAPPING_PACKAGE        portMappingPackage;
+    MANAGMED_ENTITY             me[OMCI_MAX_ME_TYPE_NUM];
+    OMCI                        omci;
+    VLAN_TAG_OPERATION_CFG_DATA vlan_tag_operation_cfg_data[OMCI_MAX_ONU_BRIDGE_PORT_NUM];
+    GEM_TRAFFIC_DESCRIPTOR      gem_traffic_descriptor[OMCI_MAX_ONU_CONNECTION_NUM*2+2];
+    MAC_BRIDGE_PORT_CFG_DATA    bridge_port_cfg_data[OMCI_MAX_ONU_BRIDGE_PORT_NUM];
+    ONT_DATA                    ont_data; /*for olt ,存放从onu实时get的值*/
+    IP_HOST_CONFIG_DATA         ip_host_config_data[OMCI_MAX_IP_HOST_CONFIG_DATA_INSTANCE_NUM];
+    P_MAPPING_SERVICE_PROFILE   p_mapping_service_profile[OMCI_MAX_8021P_MAPPPING_SERVICE_PROFILE_NUM];
+    MAC_BRIDGE_SERVICE_PROFILE  mac_bridge_service_profile[OMCI_MAX_MAC_BRIDGE_SERVICE_PROFILE_NUM];
+    PPTP_POTS_UNI               pptp_pots_uni[ONU_MAX_POTS_UNI_PORTS];
+    char                        response_code[OMCI_PRIORITY_NUM];/*应答处理结果*/
+    short                       mibUpload_entry_num;
+    short                       Transaction_Correlation_Identifier;
+    unsigned char               mib_data_sync; /*mib数据同步属性*/
+    char                        alarm_info_count; /*告警信息计数器*/
+    unsigned char               log_flag;
+    EXTENDED_VLAN_TAG_OP_CFG_DATA extended_vlan_tag_op_cfg_data[OMCI_MAX_ONU_BRIDGE_PORT_NUM];/*add by xujun.*//*cxw 2012.11.22*/
+    TDM_CFG_DATA                tdm_cfg_data[MAX_E1_CFG_NUM];/*MAX_E1_CFG_NUM defined only for E1 alarm index,add by xujun.*/
+    MAC_BRIDGE_TABLE            bridge_table;/*add by xujun.*/
+    THRESHOLD_DATA              threshold[ONU_MAX_ETHERNET_UNI_PORTS];
+    MAC_FILTER_TABLE            filter_table[ONU_MAX_ETHERNET_UNI_PORTS];
+    UNI_G                       uni_g[ONU_MAX_ETHERNET_UNI_PORTS];
+    CARD_HOLDER                 card_holder[MAX_CARD_HOLDER_INST_NUM];
+    CIRCUIT                     circuit[MAX_CIRCUIT_PACK_INST_NUM];
+
+    PRIORITY_QUEUE_G            priority_queue_upload[OMCI_MAX_ONU_T_CONT_NUM * OMCI_MAX_ONU_PRIORITY_QUEUE_NUM];
+    unsigned char               mibSyned_flag;/*mib 同步的标志，用于判断new onu*/
+
+    /*IGMP_USER_AUTHRIZATION igmp_user_authrization_table[IGMP_USER_AUTHRIZATION_TABLE_MAX_NUM];*/
+
+    FB_MANAGE_VLAN                      manage_vlan;
+#if 0
+    FH_IGMP_ONU_VLAN_CFG_DATA           fh_igmp_onu_vlan_cfg_data[ONU_MAX_ETHERNET_UNI_PORTS];
+#endif
+    PM_WINDOW_TIME                      pm_window_time;
+    MULTI_OPERATION_PROFILE             multi_operation_profile[OMCI_MAX_ONU_BRIDGE_PORT_NUM];
+    MULTI_SUBSCRIBER_CONFIG_INFO        multi_subscriber_cfg_info[OMCI_MAX_ONU_BRIDGE_PORT_NUM];
+#if 0    
+    FH_MAC_BRIDGE_SERVICE_PROFILE       fh_mac_bridge_service_profile;
+#endif
+    MAC_BRIDGE_CFG_DATA                 mac_bridge_cfg_data;
+    MAC_BRIDGE_PORT_DESIGNATION_DATA    mac_bridge_port_designation_data[ONU_MAX_ETHERNET_UNI_PORTS];
+    FE_LOOPCHECK_PARAMS                 fe_loopcheck_params[ONU_MAX_ETHERNET_UNI_PORTS];
+    UP_QOS_ACTION                       up_qos_action[MAX_QOS_RULE_INSTANCE_NUM];
+    DOWN_QOS_ACTION                             down_qos_action[MAX_QOS_RULE_INSTANCE_NUM];
+    QOS_RULE_POINTER                            qos_rule_pointer[ONU_MAX_ETHERNET_UNI_PORTS];
+    OMCI_SWITCH_PORT_PACKET_CONTROL             omci_switch_port_packet_control[ONU_MAX_ETHERNET_UNI_PORTS];
+    OMCI_SCHEDULE_QUEUE_CONFIG                  schedule_queue_config[MAX_QUEUE_NUM];
+    OMCI_ME_STRUCT_sw_port_acl_rule             sw_port_acl_rule[MAX_ACL_RULE_INSTANCE_NUM];
+    OMCI_ME_STRUCT_acl_rule_pointer             acl_rule_pointer[ONU_MAX_ETHERNET_UNI_PORTS];
+#if 0
+    ONT_FIBERHOME_G_2 ont_fb_g_2;
+#endif
+    MUTICAST_MONITOR                            multicast_monitor;
+
+    OMCI_ME_STRUCT_static_route                 static_route[1];
+
+    OMCI_ME_STRUCT_rsrc_enable_sw               rsrc_enable_sw[1];
+    OMCI_ME_STRUCT_rsrc_hg_mac                  rsrc_hg_mac[1];
+    OMCI_ME_STRUCT_rsrc_onu_state               rsrc_onu_state[1];
+    OMCI_ME_STRUCT_rsrc_onufe_state             rsrc_onufe_state[ONU_MAX_ETHERNET_UNI_PORTS];
+    OMCI_ME_STRUCT_rsrc_onufe_hg_depatch        rsrc_onufe_hg_depatch[ONU_MAX_ETHERNET_UNI_PORTS];
+
+    /* 新增联通测试 */
+    OMCI_ME_STRUCT_onu_opt_threshold            onu_opt_threshold[1];
+    OMCI_ME_STRUCT_onu_dos_attack_alarm_config  onu_dos_attack_alarm_config[1];
+    OMCI_ME_STRUCT_onu_mac_aging                onu_mac_aging[1];
+    OMCI_ME_STRUCT_onu_vlan_mapping_rule        onu_vlan_mapping_rule[1];
+
+    OMCI_ME_STRUCT_olt_manage_ip                olt_manage_ip[1];
+    OMCI_ME_STRUCT_onu_battery_info             onu_battery_info[1];
+    OMCI_ME_STRUCT_onu_mapping_method_ethertype onu_mapping_method_ethertype[1];
+    
+    /*  存放WAN 连接名和索号与ONU_HG_WAN_CONNECTIONS_ENTRY对应   */
+#if 0
+    /* FiberHome : service rule */
+    OMCI_ME_STRUCT_fe_service_rule fe_service_rule[RULE_NUM];
+#endif
+
+    /* Standard: ext vlan tagging operation */
+    OMCI_ME_STRUCT_extVlanTagging               extVlanTagging[ONU_MAX_ETHERNET_UNI_PORTS];
+
+    /* Private: switch port config */
+    OMCI_ME_STRUCT_onu_switchport_config        onu_switchport_config[ONU_MAX_ETHERNET_UNI_PORTS];
+
+    /* add for omci alarm */
+    OMCI_alarm_state            onu_alarm_state;
+    UINT32                      omci_traffic_flag;
+    UINT8                       onu_mac_state;  /*0 -绑定, 1-过滤 */
+    eth_vlan_config             ethVlanCfg;
+}ONU_OMCI_CLASS;
+
+
+typedef struct OLT_OMCI_CLASS_
+{
+    UINT32        remote_receive_window_size;/*停等协议的窗口值，协议中为1，便于后续协议扩展*/
+    short       maximum_retransmission_count[OMCI_PRIORITY_NUM];/*最大重传次数*/
+    short       maximum_retransmission_timer[OMCI_PRIORITY_NUM];/*最大重传间隔,单位秒*/
+    /*ONU_OMCI_CLASS        *onu_info[MAX_OLT_PON_NUM * MAX_ONU_NUM];*//*onu 信息*/
+    ONU_OMCI_CLASS **onu_info;  /* 2010.2.23 liyang为兼容8PON口线卡修改 */
+    unsigned char  log_flag;
+    short       bridge_port_id;
+    unsigned char onu_public_confg_buffer[ONU_PUBLIC_CONFG_BUFFER_MAX_LEN];
+
+    ETHERNET_FRAME_EXTENDED_PM ethernet_frame_extended_PM_histroy_data_gem[ONU_MAX_Ethernet_Frame_Extended_PM_Instance_Gem];
+    ETHERNET_FRAME_EXTENDED_PM ethernet_frame_extended_PM_current_data_gem[ONU_MAX_Ethernet_Frame_Extended_PM_Instance_Gem];
+    GEM_PORT_ETWORK_CTP_MONITOR_HISTORY_DATA gem_port_network_ctp_monitor_history_data[ONU_MAX_Gem_Network_CTP_PM_NUM];
+    GEM_PORT_ETWORK_CTP_MONITOR_HISTORY_DATA gem_port_network_ctp_monitor_current_data[ONU_MAX_Gem_Network_CTP_PM_NUM];
+}OLT_OMCI_CLASS;
+
+typedef struct MIBUPLOAD_ENTRY_
+{
+    char        attributeValue[OMCI_MAX_MIBUPLOAD_ENTRY_NUM][MBIUPLOADNEXT_CONTENT_LENGTH];
+    short              entryNum;
+}MIBUPLOAD_ENTRY; 
+
+
+
+/*设计结构时务必保证结构对齐*/
+#ifndef WIN32
+typedef  unsigned long long     U64;
+#else
+typedef  INT64     U64;
+#endif
+#if 0
+typedef struct dm_onu_pon_port_c
+{
+    U64             UPOctetsTransferred;        /*101*/
+    U64             UPTotalFrame;               /*102*/
+    U64             UPUnicastFrames;            /*103*/
+    U64             UPBroadcastFrames;          /*104*/
+    U64             UPMulticastFrames;          /*105*/
+    U64             UPCRC_32Errors;             /*106*/
+    U64             UPUndersizeFrames;          /*107*/
+    U64             UPOversizeFrames;           /*108*/
+    U64             UPCollisions;               /*109*/ 
+    U64             UP64OctetFrames;            /*110*/
+    U64             UP65_127OctetFrames;        /*111*/
+    U64             UP128_255OctetFrames;       /*112*/
+    U64             UP256_511OctetFrames;       /*113*/
+    U64             UP512_1023OctetFrames;      /*114*/
+    U64             UP1024_1518OctetFrames;     /*115*/
+    U64             UP1519OctetFrames;          /*116*/
+    U64             UPFramesDropped;            /*117*/
+    U64             UPBIP8;                     /*118*/
+    
+    U64             DownOctetsTransferred;      /*201*/
+    U64             DownTotalFrame;             /*202*/
+    U64             DownUnicastFrames;          /*203*/
+    U64             DownBroadcastFrames;        /*204*/
+    U64             DownMulticastFrames;        /*205*/
+    U64             DownCRC_32Errors;           /*206*/
+    U64             DownUndersizeFrames;        /*207*/
+    U64             DownOversizeFrames;         /*208*/
+    U64             DownCollisions;             /*209*/
+    U64             Down64OctetFrames;          /*210*/
+    U64             Down65_127OctetFrames;      /*211*/
+    U64             Down128_255OctetFrames;     /*212*/
+    U64             Down256_511OctetFrames;     /*213*/
+    U64             Down512_1023OctetFrames;    /*214*/
+    U64             Down1024_1518OctetFrames;   /*215*/
+    U64             Down1519OctetFrames;        /*216*/ 
+    U64             DownFramesDropped;          /*217*/
+    U64             DownBIP8;                   /*218*/
+}
+DM_ONU_PON_PORT_C;
+
+typedef struct dm_onu_comm_port_c
+{
+    U64             UPOctetsTransferred;        /*101*/
+    U64             UPTotalFrame;               /*102*/
+    U64             UPUnicastFrames;            /*103*/
+    U64             UPBroadcastFrames;          /*104*/
+    U64             UPMulticastFrames;          /*105*/
+    U64             UPCRC_32Errors;             /*106*/
+    U64             UPUndersizeFrames;          /*107*/
+    U64             UPOversizeFrames;           /*108*/
+    U64             UPCollisions;               /*109*/ 
+    U64             UP64OctetFrames;            /*110*/
+    U64             UP65_127OctetFrames;        /*111*/
+    U64             UP128_255OctetFrames;       /*112*/
+    U64             UP256_511OctetFrames;       /*113*/
+    U64             UP512_1023OctetFrames;      /*114*/
+    U64             UP1024_1518OctetFrames;     /*115*/
+    U64             UP1519OctetFrames;          /*116*/
+    U64             UPFramesDropped;            /*117*/
+    
+    U64             DownOctetsTransferred;      /*201*/
+    U64             DownTotalFrame;             /*202*/
+    U64             DownUnicastFrames;          /*203*/
+    U64             DownBroadcastFrames;        /*204*/
+    U64             DownMulticastFrames;        /*205*/
+    U64             DownCRC_32Errors;           /*206*/
+    U64             DownUndersizeFrames;        /*207*/
+    U64             DownOversizeFrames;         /*208*/
+    U64             DownCollisions;             /*209*/
+    U64             Down64OctetFrames;          /*210*/
+    U64             Down65_127OctetFrames;      /*211*/
+    U64             Down128_255OctetFrames;     /*212*/
+    U64             Down256_511OctetFrames;     /*213*/
+    U64             Down512_1023OctetFrames;    /*214*/
+    U64             Down1024_1518OctetFrames;   /*215*/
+    U64             Down1519OctetFrames;        /*216*/ 
+    U64             DownFramesDropped;          /*217*/
+}
+DM_COMM_PORT_C;
+
+/* 2010.2.24 liyang del */
+/*ONU_PORT Performance Statisitic,控制粒度为ONU的端口*/
+typedef struct PORT_PERFORMANCE_HISTORY1
+{
+    union
+    {
+        DM_COMM_PORT_C  onu_fe_port_performance;
+        DM_ONU_PON_PORT_C onu_pon_port_performance;
+    }u;
+    unsigned int UPOctetsSpeed;     /*上行速率 单位0.01Mb/s*/
+    unsigned int DownOctetsSpeed;   /*下行速率 单位0.01Mb/s*/
+}ONU_PORT_PERFORMANCE_HISTORY;
+
+
+/*Record the history performance statistic*/
+typedef struct PERFORMANCE_ARRAY1
+{ 
+    unsigned char   order;  /*存贮数组索引*/
+    unsigned char   used;   /*是否已使用*/
+    unsigned short  spare;  /*冗余*/
+}PERFORMANCE_ARRAY;
+
+/***** Time Window *****/
+typedef struct WINDOW_TIME1
+{
+    unsigned long int start_year;       /*窗口的开始时间*/
+    unsigned long int start_month;
+    unsigned long int start_day;
+    unsigned long int start_hour;
+    unsigned long int start_minute;
+    unsigned long int start_second;
+
+    unsigned long int end_year;         /*窗口的结束时间*/
+    unsigned long int end_month;
+    unsigned long int end_day;
+    unsigned long int end_hour;
+    unsigned long int end_minute;
+    unsigned long int end_second;
+
+    unsigned long int start_run_day;    /*窗口的开始时间对应的系统运行时间*/
+    unsigned long int start_run_hour;
+    unsigned long int start_run_minute;
+    unsigned long int start_run_second;
+
+    unsigned long int end_run_day;      /*窗口的结束时间对应的系统运行时间*/
+    unsigned long int end_run_hour;
+    unsigned long int end_run_minute;
+    unsigned long int end_run_second;
+
+}WINDOW_TIME;
+#endif
+
+typedef struct ONU_PM_TIME1
+{ 
+unsigned short  start_year;/*（2B）：*/ 
+unsigned short start_month;/*（2B）：*/
+unsigned short start_day;/*（2B）：*/
+unsigned short start_hour;/*（2B）：*/
+unsigned short start_minute;/*（2B）：*/
+unsigned short start_second;/*（2B）：*/
+unsigned short end_year;/*（2B）：*/
+unsigned short end_month;/*（2B）：*/
+unsigned short end_day;/*（2B）：*/
+unsigned short end_hour;/*（2B）：*/
+unsigned short end_minute;/*（2B）：*/
+unsigned short end_second;/*（2B）：*/
+}ONU_PM_TIME;
+
+#if 0
+#define max_15minute_history_performance_number     16
+#define max_24hour_history_performance_number       2
+#define max_48hour_history_performance_number       1
+
+#define GPON_15MIN_PERFORM_MONITOR      1
+#define GPON_24HOUR_PERFORM_MONITOR     2
+#define GPON_48HOUR_PERFORM_MONITOR     3
+#define GPON_REALTIME_PERFORM_MONITOR   4
+
+typedef struct WINDOW_TIME_MONITOR1
+{
+    char window_time_15min_copy_flag;
+    char window_time_24hour_copy_flag;
+    char window_time_48hour_copy_flag;  
+
+    char spare;                             /*冗余*/
+
+    unsigned int day;                               /*记录运行天数*/
+
+    /*Record the Data 15min/24hour/48hour*/
+    WINDOW_TIME window_time_15m[max_15minute_history_performance_number+1];
+    WINDOW_TIME window_time_24h[max_24hour_history_performance_number+1];
+    WINDOW_TIME window_time_48h[max_48hour_history_performance_number+1];
+    
+    PERFORMANCE_ARRAY window_time_ArraySort_15min[max_15minute_history_performance_number+1];
+    PERFORMANCE_ARRAY window_time_ArraySort_24hour[max_24hour_history_performance_number+1];
+    PERFORMANCE_ARRAY window_time_ArraySort_48hour[max_48hour_history_performance_number+1];
+
+}WINDOW_TIME_MONITOR;
+
+/* 2010.2.24 liyang del */
+/*********ONU PORT  性能监视的结构体***************/
+typedef struct ONU_PORT_PERFORMANCE_MONITOR1
+{
+    ONU_PORT_PERFORMANCE_HISTORY  onu_port_real_record;         /*ONU PORT实时性能，用于计数翻转处理*/
+
+    ONU_PORT_PERFORMANCE_HISTORY  onu_port_last_record;         /*ONU PORT上一次的计数保存*/
+
+    char performance_flag;                          /*性能开关，对ONU的每个端口进行性能监控*/
+    /*char  spare;*/                                /*冗余*/
+
+    char performance_15min_copy_flag;
+    char performance_24hour_copy_flag;
+    char performance_48hour_copy_flag;
+    
+    ONU_PORT_PERFORMANCE_HISTORY onu_port_15minute_history_performance[max_15minute_history_performance_number+1];
+    ONU_PORT_PERFORMANCE_HISTORY onu_port_24hour_history_performance[max_24hour_history_performance_number+1];
+    ONU_PORT_PERFORMANCE_HISTORY onu_port_48hour_history_performance[max_48hour_history_performance_number+1];
+
+    /*we will not use index 0 ,count from index 1,align with history performance structure*/
+    PERFORMANCE_ARRAY ArraySort_15min[max_15minute_history_performance_number+1];
+    PERFORMANCE_ARRAY ArraySort_24hour[max_24hour_history_performance_number+1];
+    PERFORMANCE_ARRAY ArraySort_48hour[max_48hour_history_performance_number+1];
+
+}ONU_PORT_PERFORMANCE_MONITOR;
+
+#define COUNTER_32BIT 4294967296L
+
+/*
+    如果real_data记录为0，则认为是首次计数，仅将当前记录保存。    
+    
+    如果record大于src,则认为交换芯片计数翻转,进行32bit的数值补偿,
+    在交换芯片为64Bit时,在数据翻转时则会导致计数错误，
+    考虑到很长时间才会产生此错误，可以忽略。
+    将数据累加到real和dst之中
+*/
+#define GET_RUN_TIME_DATA(record_data,dst_data,src_data,real_data)  \
+{                                                                   \
+    U64 temp_data;                                                  \
+    if(real_data==0)/*首次计数*/                                    \
+    {                                                               \
+        record_data=src_data;                                       \
+        real_data=src_data;                                         \
+    }                                                               \
+    else if(record_data > src_data)/*翻转计数*/                     \
+    {                                                               \
+        temp_data=src_data+COUNTER_32BIT-record_data;               \
+        record_data=src_data;                                       \
+        dst_data+=temp_data;                                        \
+        real_data+=temp_data;                                       \
+    }                                                               \
+    else                                                            \
+    {                                                               \
+        temp_data=src_data-record_data;                             \
+        record_data=src_data;                                       \
+        dst_data+=temp_data;                                        \
+        real_data+=temp_data;                                       \
+    }                                                               \
+}
+
+/*
+    根据需要获取两次取值间的差值，用于某些校验判断  
+*/
+
+
+#define GET_RUN_TIME_DATA_AND_DIFF(record_data,dst_data,src_data,real_data,_diff)   \
+{                                                                   \
+    if(real_data==0)/*首次计数*/                                    \
+    {                                                               \
+        record_data=src_data;                                       \
+        real_data=src_data;                                         \
+    }                                                               \
+    else if(record_data > src_data)/*翻转计数*/                     \
+    {                                                               \
+        _diff=src_data+COUNTER_32BIT-record_data;                   \
+        record_data=src_data;                                       \
+        dst_data+=_diff;                                            \
+        real_data+=_diff;                                           \
+    }                                                               \
+    else                                                            \
+    {                                                               \
+        _diff=src_data-record_data;                                 \
+        record_data=src_data;                                       \
+        dst_data+=_diff;                                            \
+        real_data+=_diff;                                           \
+    }                                                               \
+}
+#endif
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif/*_OMCI_STRUCTURES_H*/

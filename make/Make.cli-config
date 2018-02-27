@@ -1,0 +1,38 @@
+#  Name         : Makefile
+#  Version      : V2.00
+#  Author       : keith.gong (kizerg@163.com)
+#  Time         : 2014.12.18
+#  Description  : Config for FD1508GS CLI
+#                 Copyright (c) 2009-2015 C-Data Co.,Ltd.
+#                 All Rights Reserved.
+#  Modification : 2014.12.18, keith.gong, created
+
+CLI_OBJ_DIR          = $(PRJ_OBJ_DIR)/cli
+CLI_LIB_DIR          = $(PRJ_LIB_DIR)/cli
+                   
+COMMON               = $(CLI_DIR)/sys/common
+OCB                  = $(CLI_DIR)/sys/ocb
+ROS                  = $(CLI_DIR)/sys/ros
+RCC                  = $(CLI_DIR)/sys/rcc
+USER                 = $(CLI_DIR)/user
+                   
+COMMON_OBJ           = rc_access.o rc_auth.o rc_base64.o rc_binsrch.o rc_compare.o \
+                       rc_convert.o rc_enum.o rc_hash.o rc_linklist.o rc_md5.o rc_msghdlr.o \
+                       rc_rlstdlib.o rc_sizeof.o rc_tcpd.o rc_tree.o 
+OCB_OBJ              = rc_cache.o rc_database.o rc_environ.o rc_ocb_init.o
+ROS_OBJ              = rc_ansifs.o rc_crc32.o rc_decomp.o rc_filemgr.o rc_inflate.o \
+                       rc_memmgr.o rc_posix.o rc_sktposix.o rc_sockif.o rc_ssl.o 
+RCC_OBJ              = rcc_cmd.o rcc_db.o rcc_rcb.o rcc_telnetd.o rcc_ext.o rcc_task.o \
+                       rcc_help.o rcc_util.o rcc_hist.o rcc_telnet.o rcc_system.o 
+USER_OBJ             = rc_ignition.o rcc_cli.o rcc_handlers.o rcc_misc.o rcc_user.o rcc_prompt.o rcc_init.o \
+                       cli_onura.o cli_onura_diag.o cli_onucfg.o cli_srvprofile.o cli_lineprofile.o cli_dbaprofile.o cli_pon_cfg.o\
+                       cli_switch_port.o cli_switch_mac_address.o cli_switch_rstp.o cli_switch_trunk.o \
+                       cli_switch_vlan.o cli_switch_igmp.o cli_port_vif.o cli_system.o cli_device_manufacture.o cli_switch_cfg.o
+                   
+CLI_INCLUDE          := -I$(PRJ_ROOT_DIR)/include -I$(USER)/include -I$(CLI_DIR)/sys/include -I$(RCC)/include -I$(COM_DIR)/include
+CLI_INCLUDE          += -I$(SWAPP_DIR)/include -I$(APP_DIR)/include -I$(SWSDK_DIR)/include
+APP_DEP_LIBS         :=	$(CLI_LIB_DIR)/libcli.a \
+			$(PRJ_LIB_DIR)/common/libcommon.a \
+			$(PRJ_LIB_DIR)/ipc/libipc_if.a \
+			$(PRJ_LIB_DIR)/sysctrl/libsysMacCrypt.a
+

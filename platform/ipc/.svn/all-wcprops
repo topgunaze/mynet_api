@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/gpon/!svn/ver/1682/olt/branches/FD1504GSV1/application/ipc
+END
+ipc_if.c
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/gpon/!svn/ver/1682/olt/branches/FD1504GSV1/application/ipc/ipc_if.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/gpon/!svn/ver/1682/olt/branches/FD1504GSV1/application/ipc/Makefile
+END
+ipc_ker.c
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/gpon/!svn/ver/1682/olt/branches/FD1504GSV1/application/ipc/ipc_ker.c
+END

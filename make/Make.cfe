@@ -1,0 +1,59 @@
+#  Name         : Makefile
+#  Version      : V2.00
+#  Author       : keith.gong (kizerg@163.com)
+#  Time         : 2014.12.18
+#  Description  : Makefile for FD1508GS CFE
+#                 Copyright (c) 2009-2015 C-Data Co.,Ltd.
+#                 All Rights Reserved.
+#  Modification : 2014.12.18, keith.gong, created
+
+CFE_DIR              ?= $(shell pwd)
+PRJ_ROOT_DIR         ?= $(shell cd ..; pwd)
+
+CFE_BUILD_DATE       := $(shell date '+%y%m%d')
+
+BOOT_PLATFORM        := bcm953003c
+BOOT_MAKE_DIR        := $(CFE_DIR)/build/broadcom/$(BOOT_PLATFORM)
+
+#  Choice the right cross-compile-tools.
+BOOT_TOOL_DIR        := /opt/specifix/broadcom_2006a_410/i686-pc-linux-gnu/bin
+BOOT_TOOL_PREFIX     := $(BOOT_TOOL_DIR)/sb1-elf-
+CROSS_COMPILE        := $(BOOT_TOOL_PREFIX)
+
+#  Include GPON project configure file
+include $(PRJ_ROOT_DIR)/make/Make.config
+
+#  Include the project version config file
+include $(PRJ_ROOT_DIR)/make/Make.version
+
+#  Create some dependency directory 
+$(shell $(MKDIR) $(RELEASE_DIR))
+
+.PHONY: boot clean
+boot: boot_make_check hosttolls_check
+	$(MAKE) TOOLPREFIX=$(BOOT_TOOL_PREFIX) CFG_LITTLE=0 CFG_SPI=0 CFG_DPLL=0 CFG_ALTA=0 -C $(BOOT_MAKE_DIR)
+	$(STRIP) $(BOOT_MAKE_DIR)/be/cfe 
+	@timestamp=`(date "+%y%m%d_%H%M")`; \
+	timestamp2=`(date "+%y-%m-%d-%H-%M-%S")`; \
+	$(CP) $(BOOT_MAKE_DIR)/be/cfe.bin $(RELEASE_DIR)/$(IMAGE_PREFIX)_Cfe_V$(CFE_VERSION)_$$timestamp.BIN; \
+	$(MKIMG) -v -T 0x01 -V $(CFE_VERSION) -D $$timestamp2 $(BOOT_MAKE_DIR)/be/cfe.bin $(RELEASE_DIR)/$(IMAGE_PREFIX)_Cfe_V$(CFE_VERSION)_$$timestamp.img; 
+
+boot_make_check:
+	@if [ ! -d '$(BOOT_TOOL_DIR)' ] ; then \
+		echo 'Error: Cannot find directory $(BOOT_TOOL_DIR)!'; exit 1; \
+	fi
+	
+hosttolls_check:
+	@if [ ! -f $(MKIMG) -o ! -f $(MKFBOX) ] ; then \
+		$(MAKE) -C $(HOSTTOOLS_DIR); \
+	fi
+	
+clean:
+	$(MAKE) clean -C $(BOOT_MAKE_DIR)
+	$(RM) $(RELEASE_DIR)/*_Cfe_*
+
+test:
+	@$(ECHO) BOOT_MAKE_DIR=$(BOOT_MAKE_DIR)
+	@$(ECHO) TOOLPREFIX=$(BOOT_TOOL_PREFIX) CFG_LITTLE=0 CFG_SPI=0 CFG_DPLL=0 CFG_ALTA=0 -C $(BOOT_MAKE_DIR) 
+	@$(ECHO) $(STRIP) $(BOOT_MAKE_DIR)/be/cfe 
+

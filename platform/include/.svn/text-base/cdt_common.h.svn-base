@@ -1,0 +1,84 @@
+/**************************************************************
+ * 文件名称:  cdt_common.h
+ * 作           者:  keith.gong
+ * 日           期:  2014.12.20
+ * 文件描述:  工程通用数据定义
+ * 版           本:  V1.00
+ * 修改历史:  
+ *     <修改者>   <时间>    <版本 >   <描述>
+**************************************************************/
+#ifndef __CDT_COMMON_H__
+#define __CDT_COMMON_H__
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include "cdt_types.h"
+
+
+#define CDT_OMCI_TRACE(fmt, args...) do{printf("\r\n>> [%s:%d] ", __FUNCTION__, __LINE__);printf(fmt"\r\n", ##args);}while(0)
+
+#define SLEEP(sec)              sleep(sec)
+#define MSLEEP(msec)            usleep((msec) * 1000)
+#define USLEEP(usec)            usleep(usec)
+
+#define READ_UINT8(var, buf)    {(var) = *((UINT8*)buf);  buf += sizeof(UINT8);}
+#define READ_UINT16(var, buf)   {(var) = *((UINT16*)buf); buf += sizeof(UINT16);}
+#define READ_UINT32(var, buf)   {(var) = *((UINT32*)buf); buf += sizeof(UINT32);}
+
+#define WRITE_UINT8(buf, var)   {*((UINT8*)buf)  = (UINT8)(var);  buf += sizeof(UINT8);}
+#define WRITE_UINT16(buf, var)  {*((UINT16*)buf) = (UINT16)(var); buf += sizeof(UINT16);}
+#define WRITE_UINT32(buf, var)  {*((UINT32*)buf) = (UINT32)(var); buf += sizeof(UINT32);}
+
+#define WRITE_BUF(dest, src, n) {memmove(dest, src, n); dest += n;}
+#define WRITE_ZERO(buf, n)      {memset(buf, 0, n); buf += n;}
+#define CPY_BUF(dst, src, n)    {memmove(dst, src, n);}
+
+#define MY_MALLOC(p, TYPE)      {p = (TYPE*)malloc(sizeof(TYPE));}
+#define MY_MALLOC_BUF(p, TYPE, n) {p = (TYPE*)malloc(n * sizeof(TYPE));}
+
+#define MY_CALLOC(p, TYPE)      {p = (TYPE*)calloc(1, sizeof(TYPE));}
+#define MY_CALLOC_BUF(p, TYPE, n) {\
+    p = (TYPE*)calloc(n, sizeof(TYPE));\
+    if(p == NULL){\
+        printf("MY_CALLOC_BUF Failed\r\n");\
+        return;}\
+}
+
+#define NEW_BUF(TYPE, n)        (TYPE*)calloc(n, sizeof(TYPE))
+#define CREATE_BUF()            ((UINT8*)calloc(50, sizeof(UINT8)))
+
+#define SLEEP(sec)              sleep(sec)
+#define MSLEEP(msec)            usleep((msec) * 1000)
+#define USLEEP(usec)            usleep(usec)
+
+#define MY_STRNCPY(dest, src, n)    {strncpy(dest, src, n); dest[n-1] = '\0';}
+#define MY_MEMNCPY(dest, src, n)    {menncpy(dest, src, n); dest[n-1] = '\0';}
+
+
+#if 0
+#include <arpa/inet.h>
+#define MY_NTOH_S(x)    ntohs(x)
+#define MY_NTOH_L(x)    ntohl(x)
+
+#define MY_HTON_S(x)    htons(x)
+#define MY_HTON_L(x)    htonl(x)
+
+#else
+#define MY_NTOH_S(x)    (x)
+#define MY_NTOH_L(x)    (x)
+
+#define MY_HTON_S(x)    (x)
+#define MY_HTON_L(x)    (x)
+
+#endif
+
+typedef struct  LINK
+{
+    struct  LINK    *sptr_forward_link;
+    struct  LINK    *sptr_backward_link;
+} LINK;
+
+
+#endif
+

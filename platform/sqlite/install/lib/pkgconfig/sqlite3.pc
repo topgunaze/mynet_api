@@ -1,0 +1,13 @@
+# Package Information for pkg-config
+
+prefix=/home/keith/Project/gpon1/olt_trunk/buildroot/platform/sqlite/install
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=/home/keith/Project/gpon1/olt_trunk/buildroot/platform/sqlite/include
+
+Name: SQLite
+Description: SQL database engine
+Version: 3.15.2
+Libs: -L${libdir} -lsqlite3
+Libs.private: -lpthread 
+Cflags: -I${includedir}

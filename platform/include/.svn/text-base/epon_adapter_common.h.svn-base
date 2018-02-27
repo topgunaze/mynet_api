@@ -1,0 +1,1576 @@
+/******************************************************************************
+ * FILE   : epon_adapter_common.h
+ * Description : 
+ * Author : Gerhard Lao
+ * Date   : 2015/12/17
+ * Copyright (c) 2015-2025 by C-Data Tech. Co., Ltd. All Rights Reserved.
+ ******************************************************************************/
+#ifndef _EPON_HW_ADAPTOR_LAYER_H
+#define _EPON_HW_ADAPTOR_LAYER_H
+
+#include "sys_common.h"
+#include "eponSyslog.h"
+
+#define EPON_SDK_TASK_PRIORITY 80
+
+
+#ifdef EPON_NO_DEBUG
+#define EPON_DEBUG(fmt,args...)
+#else
+#define EPON_DEBUG(fmt,args...)     printf("[%s:%d] " fmt,__FUNCTION__, __LINE__, ##args)
+#endif
+
+
+/*****************************************************\
+ ********                                                                   ********
+ ********     适配层注册回调函数                 ********
+ ********                                                                   ********
+\*****************************************************/
+
+typedef struct
+{
+	void (*regHandler)();
+	void (*deregHandler)();
+    void (*deleteHandler)();
+    void (*onuIdGetHandler)();
+	void (*alarmHandler)();
+	void (*omciPktHandler)();
+	void (*loidGetHandler)();
+	void (*igmpPktHandler)();
+}ponMsgHandler_t;
+
+typedef struct
+{
+	void (*getVirtualPonByAnyPonHandler)();
+	void (*getRealPonByAnyPonHandler)();
+	void (*switchProtectGroupHandler)();
+	void (*updateProtectGroupHandler)();	
+}ponProtectHandler_t;
+
+typedef struct
+{
+	void(*ponHwPonNoPhy2Log) ();
+	void(*ponHwPonNoLog2Phy) ();
+	void(*ponHwPonNo2Port) ();
+}ponHwAlPonNoTransHandler_t;
+
+
+/***************************************************\
+ ********                                                               ********
+ ********                配置类型枚举                ********
+ ********                                                               ********
+\***************************************************/
+
+/* 适配层对OLT 局端芯片的配置类型*/
+typedef enum
+{
+	PON_AL_LINK_OPEN,
+	PON_AL_LINK_CLOSE,
+	PON_AL_LINK_STATUS_GET,
+	PON_AL_LINK_DDM_INFO_GET,
+	PON_AL_LINK_PORT_ISOLATE_SET,
+	PON_AL_LINK_OPERATIONAL_PROCESS_GET,
+	PON_AL_LINK_CONFIGURATION_SET,
+	PON_AL_LINK_CONFIGURATION_PART_SET,
+	PON_AL_LINK_CONFIGURATION_GET,
+
+	PON_AL_LINK_TRANSCEIVER_MODIFY,
+	PON_AL_LINK_KEY_EXCHANGE_START,
+	PON_AL_LINK_KEY_EXCHANGE_STOP,
+	PON_AL_LINK_FEC_DS_SET,
+	PON_AL_LINK_FEC_US_SET,
+
+	PON_AL_LINK_DESTRUCTIVE_ROGUE_ONU_CONFIGURE_MAP,
+	PON_AL_LINK_ROGUE_ONU_DETECTION_PROCESS_SET,
+	PON_AL_LINK_DESTRUCTIVE_ROGUE_ONU_TEST_START,
+	PON_AL_LINK_DESTRUCTIVE_ROGUE_ONU_TEST_STOP,
+	PON_AL_LINK_ROGUE_ONU_DETECTION_PROCESS_START,
+	PON_AL_LINK_ROGUE_ONU_DETECTION_PROCESS_STOP,
+	PON_AL_LINK_ROGUE_ONU_DETECTION_SET,
+	PON_AL_LINK_ROGUE_ONU_DETECTION_MANUAL_START,
+	PON_AL_LINK_MAC_TABLE_SET,
+	PON_AL_LINK_MAC_TABLE_FLUSH,
+
+	PON_AL_LINK_DS_VLAN_HEADER_PARAMS_MODIFY_SET,
+	PON_AL_LINK_DS_HEADER_MANIPULATION_METHOD_SET,
+	PON_AL_LINK_DS_HEADER_MANIPULATION_COMMAND_SET,
+	PON_AL_LINK_DS_PRIORITY_TABLE_TRANSLATION_SET,
+	PON_AL_LINK_DS_ETHER_TYPE_ASSIGNMENT_SET,
+	PON_AL_LINK_US_HEADER_MANIPULATION_COMMAND_SET,
+	PON_AL_LINK_US_PRIORITY_TO_PBITS_SET,
+	PON_AL_LINK_US_ETHER_TYPE_ASSIGNMENT_SET,
+	PON_AL_LINK_MAC_ENTRY_ADD,
+	PON_AL_LINK_MAC_ENTRY_REMOVE,
+	PON_AL_LINK_AUTOMATIC_MAC_LEARNING_MODE_SET,
+	PON_AL_LINK_INTERWORK_METHOD_SET,
+	PON_AL_LINK_TRX_TEMPERATURE_THRESHOLD_SET,
+	PON_AL_LINK_TRX_VOLTAGE_THRESHOLD_SET,
+	PON_AL_LINK_TRX_CURRENT_THRESHOLD_SET,
+	PON_AL_LINK_TRX_TX_POWER_THRESHOLD_SET,
+	PON_AL_LINK_TRX_RX_POWER_THRESHOLD_SET,
+
+	PON_AL_LINK_TRX_WORK_PARAM_GET,
+	PON_AL_LINK_TRX_TEMPERATURE_THRESHOLD_GET,
+	PON_AL_LINK_TRX_VOLTAGE_THRESHOLD_GET,
+	PON_AL_LINK_TRX_CURRENT_THRESHOLD_GET,
+	PON_AL_LINK_TRX_TX_POWER_THRESHOLD_GET,
+	PON_AL_LINK_TRX_RX_POWER_THRESHOLD_GET,
+	PON_AL_LINK_ROGUE_ONU_GET,
+
+	PON_AL_OLT_CFG_QINQ_SETTING,
+	PON_AL_OLT_CFG_QINQ_DELETE,	
+
+    PON_AL_OLT_CFG_AUTOFIND_SET, 
+
+	PON_AL_LINK_PROTECTION_MODE_MODIFY,
+
+    PON_AL_ONU_CFG_REDISCOVER_SILENT,
+    PON_AL_ONU_CFG_REDISCOVER_DESILENT,
+    PON_AL_ONU_CFG_MAC_AUTH_ADDR_SYNC,
+    PON_AL_RX_ONU_POWER_GET,
+
+	PON_AL_OLT_CFG_RESERVE = 255
+} PON_AL_OLT_CFG_TYPE;
+
+/* 适配层对ONU  对象的配置类型*/
+typedef enum
+{
+    PON_AL_ONU_CFG_SERIAL_NUM = 1,
+    PON_AL_ONU_CFG_FW_VER = 2,
+    PON_AL_ONU_CFG_CHIPSET_ID = 3,
+    PON_AL_ONU_CFG_CAPA1 = 4,
+    PON_AL_ONU_CFG_CAPA2 = 5,
+    PON_AL_ONU_CFG_INFO_GET = 6,/*包括SN、FW、CHIP ID、CAP1/CAP2*/
+    PON_AL_ONU_CFG_RTT = 7,
+    PON_AL_ONU_CFG_MAC = 8,
+    PON_AL_ONU_CFG_OPTICAL_TRANSCEIVER_DIAGNOSIS = 9, // 光功率检测
+    PON_AL_ONU_CFG_ENCRYP_STATUS = 10,
+    PON_AL_ONU_CFG_FEC_ABILITY = 11,
+    PON_AL_ONU_CFG_FEC_STATUS = 12,
+    PON_AL_ONU_CFG_SLA_QUE_PARAM = 13,
+    PON_AL_ONU_CFG_SLA_LINK_PARAM = 14,
+    PON_AL_ONU_CFG_SNMP_GLOBAL = 15,
+    PON_AL_ONU_CFG_SNMP_PROTOCAL = 16,  
+
+    PON_AL_ONU_CFG_IMAGE_TRANSFER = 17,         // ONU的CTC模式升级
+    PON_AL_ONU_CFG_IMAGE_TRANSFER_END = 18,
+    PON_AL_ONU_CFG_IMAGE_ACTIVATE = 19,        // ONU的CTC模式升级
+    PON_AL_ONU_CFG_IMAGE_COMMIT = 20,          // ONU的CTC模式升级
+
+    PON_AL_ONU_CFG_MCAST_MODE = 21,                 /*IGMP 协议模式,  可控和snooping*/
+    PON_AL_ONU_CFG_MCAST_FAST_LEAVE_ABILITY = 22, /*快速离开支持能力*/
+    PON_AL_ONU_CFG_MCAST_FAST_LEAVE_STATUS = 23, /*快速离开功能, 1 使能 0 去使能*/
+    PON_AL_ONU_CFG_MCAST_GROUP_CLR = 24,        /*清除所有组播组*/
+
+    PON_AL_ONU_CFG_ALARM_ADMIN_STATUS = 25,     /* 告警开关*/
+    PON_AL_ONU_CFG_ALARM_ADMIN_THRESHOLD = 26, /* 告警门限*/
+
+    PON_AL_ONU_CFG_LLID_MAC_LIMIT = 27, 
+
+    PON_AL_ONU_CFG_CAPA3 = 28,
+
+    PON_AL_ONU_CFG_PATHID = 29,
+    PON_AL_ONU_CFG_LINK = 30,
+
+    PON_AL_ONU_CFG_DBA_QUEUE_SETS = 31,
+
+    PON_AL_ONU_CFG_PONIF_STATISTIC = 32,
+    PON_AL_ONU_CFG_UNI_STATISTIC = 33,
+
+    PON_AL_ONU_CFG_LINK_REDISCOVER = 34,
+    PON_AL_ONU_CFG_AUTHENTICATION = 35,
+
+    PON_AL_ONU_CFG_REDISCOVER_DELETE,
+
+    PON_AL_ONU_CFG_LOOPBACK_STATUS,
+    PON_AL_ONU_CFG_LOOPBACK_TEST,
+
+    PON_AL_ONU_CFG_MAC_AGINGTIME,
+
+    PON_AL_ONU_LINK_RX_OPTICAL_POWER,
+
+    PON_AL_ONU_CFG_DEACTIVE_ONU,
+	
+	PON_AL_ONU_ENABLE,
+	PON_AL_ONU_DISABLE, 
+	PON_AL_ONU_ADD, 
+	PON_AL_ONU_MODIFY,
+	PON_AL_ONU_ACTIVATE,
+	PON_AL_ONU_STATE_SET,
+	PON_AL_ONU_STATE_GET,
+	PON_AL_ONU_BER_INTERVAL_SET,
+	PON_AL_ONU_PASSWORD_SET,
+	PON_AL_ONU_FEC_SET,
+	PON_AL_ONU_MC_FAST_LEAVE_SET,
+	PON_AL_ONU_RANGE_TIME_SET,
+	PON_AL_ONU_AES_KEY_SET,
+	PON_AL_ONU_PER_ONU_RX_POWER_GET,
+	PON_AL_ONU_EQD_GET,
+    PON_AL_ONU_CFG_MGNT_SET,
+    PON_AL_ONU_CFG_MGNT_GET,
+	PON_AL_ONU_CFG_PM_DATA_GET,
+	PON_AL_ONU_CFG_PM_DATA_RESET,
+	PON_AL_ONU_CFG_PM_STATUS_SET,
+    PON_AL_ONU_CFG_PM_STATUS_GET,
+    PON_AL_ONU_CATV_SET,
+    PON_AL_ONU_CATV_GET,
+    PON_AL_ONU_PORT_ISOLATE_SET,
+    PON_AL_ONU_PORT_ISOLATE_GET,
+
+    PON_AL_ONU_MC_GROUP_GET,
+
+	PON_AL_ONU_CFG_RESERVE = 255
+} PON_AL_ONU_CFG_TYPE;
+
+/* 适配层对DBA  的配置类型*/
+typedef enum
+{
+	PON_AL_DBA_US_TOTAL_BANDWIDTH_SET,
+	PON_AL_DBA_US_TOTAL_BANDWIDTH_GET,
+    PON_AL_DBA_LLID_US_BANDWIDTH_SET,
+    PON_AL_DBA_LLID_US_BANDWIDTH_GET,
+    PON_AL_DBA_LLID_DS_BANDWIDTH_SET,
+    PON_AL_DBA_LLID_DS_BANDWIDTH_GET,   
+    
+	PON_AL_DBA_CFG_RESERVE = 255
+
+}PON_AL_DBA_CFG_TYPE;
+
+
+/* 适配层对ONU  子接口对象的配置类型*/
+typedef enum
+{
+	PON_AL_ONU_SUBIF_CFG_ETH_ADMIN_CTRL = 1,
+    PON_AL_ONU_SUBIF_CFG_ETH_NEGO_CTRL,
+    PON_AL_ONU_SUBIF_CFG_ETH_NEGO_RESTART,
+	PON_AL_ONU_SUBIF_CFG_ETH_NEGO_STATUS,
+	PON_AL_ONU_SUBIF_CFG_ETH_NEGO_LOC_ABILITY,
+	PON_AL_ONU_SUBIF_CFG_ETH_NEGO_ADV_ABILITY,
+	PON_AL_ONU_SUBIF_CFG_ETH_LINK_STATUS,
+	PON_AL_ONU_SUBIF_CFG_ETH_FLOW_CTRL,
+	PON_AL_ONU_SUBIF_CFG_LOOP_DETECT,
+	PON_AL_ONU_SUBIF_CFG_DISABLE_LOOP,
+	PON_AL_ONU_SUBIF_CFG_ETH_US_RATE_LIMIT,
+	PON_AL_ONU_SUBIF_CFG_ETH_DS_RATE_LIMIT,
+	PON_AL_ONU_SUBIF_CFG_ETH_VLAN_TP,
+	PON_AL_ONU_SUBIF_CFG_ETH_VLAN_TAG,
+	PON_AL_ONU_SUBIF_CFG_ETH_VLAN_TL,
+	PON_AL_ONU_SUBIF_CFG_ETH_VLAN_AG,
+	PON_AL_ONU_SUBIF_CFG_ETH_VLAN_TRUNK,
+	PON_AL_ONU_SUBIF_CFG_ETH_MAX_MAC,
+	PON_AL_ONU_SUBIF_CFG_ETH_MAC_AGING_OLD, /*为了兼容旧版本*/
+	PON_AL_ONU_SUBIF_CFG_ETH_MAC_AGING,
+	PON_AL_ONU_SUBIF_CFG_ETH_MAC_TABLE,
+	PON_AL_ONU_SUBIF_CFG_ETH_MAC_CLEAR,
+	PON_AL_ONU_SUBIF_CFG_ETH_CLASSIFIC_MARK, /*流分类和标记*/
+	PON_AL_ONU_SUBIF_CFG_ETH_CLASSIFIC_MARK_CLR, 
+	PON_AL_ONU_SUBIF_CFG_POTS_ADMIN_CTRL,
+	PON_AL_ONU_SUBIF_CFG_POTS_USER_SET,
+	PON_AL_ONU_SUBIF_CFG_POTS_STATUS,
+	PON_AL_ONU_SUBIF_CFG_E1_STATUS,
+	PON_AL_ONU_SUBIF_CFG_ETH_PORT_INFO, /*include info for LINK_STATUS/US_RATE_LIMIT/DS_RATE_LIMIT/VLAN*/
+	PON_AL_ONU_SUBIF_CFG_ETH_PHY_INFO,  /*include info for ADMIN/NEGO_STATUS/NEGO_LOC_ABILITY/NEGO_ADV_ABILITY*/
+	
+	PON_AL_ONU_SUBIF_CFG_MCAST_GROUP_NUM, /*最大组播组数量,  snooping 模式下有效*/
+	PON_AL_ONU_SUBIF_CFG_MCAST_VLAN, 		/*组播VLAN ,  snooping 模式下有效*/
+	PON_AL_ONU_SUBIF_CFG_MCAST_VLAN_STRIP, /*组播VLAN 剥除,  任何模式下有效*/
+	PON_AL_ONU_SUBIF_CFG_MCAST_SWITCH, 
+	PON_AL_ONU_SUBIF_CFG_MCAST_GROUP, 		/*组播组操作,  可控模式下有效*/
+	PON_AL_ONU_SUBIF_CFG_MCAST_CTRL_SET,  
+
+	PON_AL_ONU_SUBIF_CFG_ALARM_ADMIN_STATUS,  /* 告警开关*/
+	PON_AL_ONU_SUBIF_CFG_ALARM_THRESHOLD, 		/* 告警门限*/
+	
+	PON_AL_ONU_SUBIF_CFG_RESERVE = 255
+} PON_AL_ONU_SUBIF_CFG_TYPE;
+
+
+/* 适配层对各级对象控制类的操作类型*/
+typedef enum
+{
+	PON_AL_OBJ_CTRL_RESET_OLT = 1,
+	PON_AL_OBJ_CTRL_RESET_ONU,
+	PON_AL_OBJ_CTRL_ONU_DIST_GET,
+	PON_AL_OBJ_CTRL_UPGRADE_ONU,
+	PON_AL_OBJ_CTRL_ACTIVATE_ONU,
+	PON_AL_OBJ_CTRL_DEACTIVATE_ONU,
+	PON_AL_OBJ_CTRL_DEREGISTER_ONU,
+	PON_AL_OBJ_CTRL_ONU_AUTH_RESULT,
+	PON_AL_OBJ_CTRL_ONU_UPGRADE_STATUS,
+	PON_AL_OBJ_CTRL_ONU_UPGRADE,
+	PON_AL_OBJ_CTRL_ONU_UPGRADE_COMMIT,
+	PON_AL_OBJ_CTRL_ONU_IMAGE_LOAD,
+	PON_AL_OBJ_CTRL_ONU_IMAGE_RELEASE,
+	
+	PON_AL_OBJ_CTRL_RESERVE = 255,
+} PON_AL_OBJ_CTRL_TYPE;
+
+/* 适配层对PON 芯片注册消息处理函数的类型*/
+typedef enum
+{
+	PON_AL_EVENT_HANDLER_ONU_REGISTRATION = 1,
+	PON_AL_EVENT_HANDLER_ONU_DEREGISTRATION = 2,
+	PON_AL_EVENT_HANDLER_OLT_LOAD_FINISH = 3,
+	PON_AL_EVENT_HANDLER_OLT_RESET = 4,
+	PON_AL_EVENT_HANDLER_PON_LOSS = 5,
+	PON_AL_EVENT_HANDLER_ALARM = 6,
+	PON_AL_EVENT_HANDLER_ILLEGAL_ONU_REG = 7,
+	PON_AL_EVENT_HANDLER_IGMP_PKT = 8,
+	PON_AL_EVENT_HANDLER_CTC_EXT = 9,
+	PON_AL_EVENT_HANDLER_PONNO_P2L = 10,
+	PON_AL_EVENT_HANDLER_PONNO_L2P = 11,
+	PON_AL_EVENT_HANDLER_PONNO_NO2PORT = 12,
+	PON_AL_EVENT_HANDLER_LINE_ID = 13,
+	PON_AL_EVENT_HANDLER_PON_PROTECT = 14,
+	PON_AL_EVENT_HANDLER_OMCI_PKT = 15,
+	PON_AL_EVENT_HANDLER_LOID_GET = 16,
+    PON_AL_EVENT_HANDLER_ONU_REMOVE,
+
+
+	PON_AL_EVENT_HANDLER_RESERVE = 255,
+
+} PON_AL_EVENT_HANDLER_TYPE;
+
+typedef enum
+{
+    PON_AL_PS_GET_VIRTUAL_PON_BY_ANY_PON = 1,
+	PON_AL_PS_GET_REAL_PON_BY_ANY_PON = 2,
+
+	PON_AL_PS_PROTECT_GROUP_SWITCH,
+	PON_AL_PS_PROTECT_GROUP_UPDATE,
+
+
+    PON_AL_PS_RESERVE = 255
+}eponPsHandleParam_t;
+
+typedef enum
+{
+	PON_HW_AL_ALARM_STATE_OFF=0,
+	PON_HW_AL_ALARM_STATE_ON,
+}EPON_HW_AL_ALARM_STATE_TYPE;
+
+/*适配层对事件上报类型的定义*/
+typedef enum
+{
+    PON_HW_AL_ALARM_STANDARD_DYING_GASP,      // onu 断电告警
+    PON_HW_AL_ALARM_REPORT_TIME_OUT,          // onu 掉线告警
+    PON_HW_AL_ALARM_ILLEGAL_ONU_REG,          // 非法 onu 注册
+    PON_HW_AL_ALARM_PON_LOS,                  // olt pon 口 LOS 告警
+    PON_HW_AL_ALARM_LOOP_BACK,                // 换回告警 
+    PON_HW_AL_ALARM_PORT_DISABLE,             // 端口Disable告警
+    PON_HW_AL_ALARM_TX_POWER,                 // 发送光功率异常告警
+    PON_HW_AL_ALARM_TX_VCC,                   // 光模块供电电压异常告警
+    PON_HW_AL_ALARM_TX_BIAS,                  // 光模块供电电流异常告警
+    PON_HW_AL_ALARM_TX_TEMP,                  // 光模块温度异常告警
+    PON_HW_AL_ALARM_RX_POWER,                 // 接收光功率异常告警
+    PON_HW_AL_ALARM_LASER_IDLE_POWER,         // 长发光告警
+
+    PON_HW_AL_ALARM_TEMPRATURE_TOO_HIGH,
+    PON_HW_AL_ALARM_VOLTAGE_TOO_HIGH,
+    PON_HW_AL_ALARM_CURRENT_TOO_HIGH,
+    PON_HW_AL_ALARM_TRX_TX_POWER_TOO_HIGH,
+		
+    PON_HW_AL_ALARM_ONU_ALARM_OLT_RX_TOO_HIGH,
+    PON_HW_AL_ALARM_ONU_ALARM_OLT_RX_TOO_LOW,
+		
+    PON_HW_AL_ALARM_TEMPRATURE_TOO_LOW,
+    PON_HW_AL_ALARM_VOLTAGE_TOO_LOW,
+    PON_HW_AL_ALARM_CURRENT_TOO_LOW,
+    PON_HW_AL_ALARM_TRX_TX_POWER_TOO_LOW, 
+
+}ponHwAlPonChipAlarmId;
+
+/*CTC标准ONU告警类型定义*/
+typedef enum
+{
+    PON_CTC_ONU_EQUIPMENT_ALARM = 0x0001,
+    PON_CTC_ONU_POWER_ALARM,
+    PON_CTC_ONU_BATTERY_MISSING,
+    PON_CTC_ONU_BATTERY_FAILURE,
+    PON_CTC_ONU_BATTERY_VOLT_LOW,
+    PON_CTC_ONU_PHY_INTRUSION_ALARM = 0x0006,
+    PON_CTC_ONU_SELF_TEST_FAILURE,
+    PON_CTC_ONU_TEMP_HIGH_ALARM,
+    PON_CTC_ONU_TEMP_LOW_ALARM,
+    PON_CTC_ONU_IAD_CONNECT_FAILURE,
+    PON_CTC_ONU_PON_IF_SWITCH = 0x000C,
+    PON_CTC_ONU_SLEEP_STATUS_UPDATE,
+
+    PON_CTC_ONU_PON_IF_RX_POWER_HIGH_ALARM = 0x0101,
+    PON_CTC_ONU_PON_IF_RX_POWER_LOW_ALARM,
+    PON_CTC_ONU_PON_IF_TX_POWER_HIGH_ALARM,
+    PON_CTC_ONU_PON_IF_TX_POWER_LOW_ALARM,    
+    PON_CTC_ONU_PON_IF_TX_BIAS_HIGH_ALARM,
+    PON_CTC_ONU_PON_IF_TX_BIAS_LOW_ALARM = 0x0106, 
+    PON_CTC_ONU_PON_IF_VCC_HIGH_ALARM,
+    PON_CTC_ONU_PON_IF_VCC_LOW_ALARM,
+    PON_CTC_ONU_PON_IF_TEMP_HIGH_ALRM,
+    PON_CTC_ONU_PON_IF_TEMP_LOW_ALARM,
+    
+    PON_CTC_ONU_PON_IF_RX_POWER_HIGH_WARNING = 0x010B,
+    PON_CTC_ONU_PON_IF_RX_POWER_LOW_WARNING,
+    PON_CTC_ONU_PON_IF_TX_POWER_HIGH_WARNING,
+    PON_CTC_ONU_PON_IF_TX_POWER_LOW_WARNING,    
+    PON_CTC_ONU_PON_IF_TX_BIAS_HIGH_WARNING = 0x010F,
+    PON_CTC_ONU_PON_IF_TX_BIAS_LOW_WARNING, 
+    PON_CTC_ONU_PON_IF_VCC_HIGH_WARNING,
+    PON_CTC_ONU_PON_IF_VCC_LOW_WARNING,
+    PON_CTC_ONU_PON_IF_TEMP_HIGH_WARNING = 0x0113,
+    PON_CTC_ONU_PON_IF_TEMP_LOW_WARNING,
+    
+    PON_CTC_ONU_PON_IF_DN_DROP_EVENT_ALARM,
+    PON_CTC_ONU_PON_IF_UP_DROP_EVENT_ALARM,
+    PON_CTC_ONU_PON_IF_DN_CRC_ERROR_ALARM,
+    PON_CTC_ONU_PON_IF_DN_UNDERSIZE_ALARM = 0x0118,
+    PON_CTC_ONU_PON_IF_UP_UNDERSIZE_ALARM,
+    PON_CTC_ONU_PON_IF_DN_OVERSIZE_ALARM,
+    PON_CTC_ONU_PON_IF_UP_OVERSIZE_ALARM,
+    PON_CTC_ONU_PON_IF_DN_FRAGMENT_ALARM,
+    PON_CTC_ONU_PON_IF_DN_JABBER_ALARM = 0x011D,
+    PON_CTC_ONU_PON_IF_DN_COLLISION_ALARM,
+    PON_CTC_ONU_PON_IF_DN_DISCARD_ALARM,
+    PON_CTC_ONU_PON_IF_UP_DISCARD_ALARM,
+    PON_CTC_ONU_PON_IF_DN_ERROR_ALARM,
+
+    PON_CTC_ONU_PON_IF_DN_DROP_EVENT_WARNING = 0x0122,
+    PON_CTC_ONU_PON_IF_UP_DROP_EVENT_WARNING,
+    PON_CTC_ONU_PON_IF_DN_CRC_ERROR_WARNING,
+    PON_CTC_ONU_PON_IF_DN_UNDERSIZE_WARNING,
+    PON_CTC_ONU_PON_IF_UP_UNDERSIZE_WARNING,
+    PON_CTC_ONU_PON_IF_DN_OVERSIZE_WARNING = 0x0128,
+    PON_CTC_ONU_PON_IF_UP_OVERSIZE_WARNING,
+    PON_CTC_ONU_PON_IF_DN_FRAGMENT_WARNING,
+    PON_CTC_ONU_PON_IF_DN_JABBER_WARNING,
+    PON_CTC_ONU_PON_IF_DN_COLLISION_WARNING,
+    PON_CTC_ONU_PON_IF_DN_DISCARD_WARNING = 0x012C,
+    PON_CTC_ONU_PON_IF_UP_DISCARD_WARNING,
+    PON_CTC_ONU_PON_IF_DN_ERROR_WARNING,  
+
+    PON_CTC_ONU_PORT_ETH_AUTO_NEG_FAILURE = 0x0301,
+    PON_CTC_ONU_PORT_ETH_LOS,
+    PON_CTC_ONU_PORT_ETH_FAILURE,
+    PON_CTC_ONU_PORT_ETH_LOOPBACK,
+    PON_CTC_ONU_PORT_ETH_CONGESTION,
+    
+    PON_CTC_ONU_PORT_ETH_DN_DROP_EVENT_ALARM = 0x0306,
+    PON_CTC_ONU_PORT_ETH_UP_DROP_EVENT_ALARM,
+    PON_CTC_ONU_PORT_ETH_DN_CRC_ERROR_ALARM,
+    PON_CTC_ONU_PORT_ETH_DN_UNDERSIZE_ALARM,
+    PON_CTC_ONU_PORT_ETH_UP_UNDERSIZE_ALARM,
+    PON_CTC_ONU_PORT_ETH_DN_OVERSIZE_ALARM = 0x030B,
+    PON_CTC_ONU_PORT_ETH_UP_OVERSIZE_ALARM,
+    PON_CTC_ONU_PORT_ETH_DN_FRAGMENT_ALARM,
+    PON_CTC_ONU_PORT_ETH_DN_JABBER_ALARM,
+    PON_CTC_ONU_PORT_ETH_DN_COLLISION_ALARM,
+    PON_CTC_ONU_PORT_ETH_DN_DISCARD_ALARM = 0x0310,
+    PON_CTC_ONU_PORT_ETH_UP_DISCARD_ALARM,
+    PON_CTC_ONU_PORT_ETH_DN_ERROR_ALARM,
+    PON_CTC_ONU_PORT_ETH_STATUS_CHANGE_TIMES_ALARM,
+
+    PON_CTC_ONU_PORT_ETH_DN_DROP_EVENT_WARNING,
+    PON_CTC_ONU_PORT_ETH_UP_DROP_EVENT_WARNING = 0x0315,
+    PON_CTC_ONU_PORT_ETH_DN_CRC_ERROR_WARNING,
+    PON_CTC_ONU_PORT_ETH_DN_UNDERSIZE_WARNING,
+    PON_CTC_ONU_PORT_ETH_UP_UNDERSIZE_WARNING,
+    PON_CTC_ONU_PORT_ETH_DN_OVERSIZE_WARNING,
+    PON_CTC_ONU_PORT_ETH_UP_OVERSIZE_WARNING = 0x031A,
+    PON_CTC_ONU_PORT_ETH_DN_FRAGMENT_WARNING,
+    PON_CTC_ONU_PORT_ETH_DN_JABBER_WARNING,
+    PON_CTC_ONU_PORT_ETH_DN_COLLISION_WARNING,
+    PON_CTC_ONU_PORT_ETH_DN_DISCARD_WARNING,
+    PON_CTC_ONU_PORT_ETH_UP_DISCARD_WARNING = 0x031F,
+    PON_CTC_ONU_PORT_ETH_DN_ERROR_WARNING, 
+    PON_CTC_ONU_PORT_ETH_STATUS_CHANGE_TIMES_WARNING,
+
+    PON_CTC_ONU_PORT_POTS_FAILURE = 0x0401,
+    
+    PON_CTC_ONU_PORT_E1_FAILURE = 0x0501,
+    PON_CTC_ONU_PORT_E1_TIMING_UNLOCK,
+    PON_CTC_ONU_PORT_E1_LOS,
+}
+PON_CTC_ONU_ALARM_TYPE;
+
+typedef UINT8 onuMac[6];
+
+#pragma pack(4)
+
+/*****************************************************\
+ ********                                                                   ********
+ ********                   配置数据结构                 ********
+ ********                                                                   ********
+\*****************************************************/
+
+typedef struct
+{
+    UINT32 summaryStatus;/*1-IN_PROGRESS 2-SUCCESS 3-FAIL*/
+	UINT32 totalProgress;
+}
+OLT_EPON_ONU_UPGRADE_STATUS_DTE;
+
+typedef struct
+{
+    UINT8 mode;/*0-disable 1-enable*/
+	UINT32 cir;
+	UINT32 cbs;
+	UINT32 ebs;
+}
+OLT_EPON_ONU_PORT_UP_RATE_DTE; 
+
+typedef struct
+{
+    UINT8 mode;/*0-disable 1-enable*/
+	UINT32 cir;
+	UINT32 pir;
+}
+OLT_EPON_ONU_PORT_DS_RATE_DTE; 
+
+#define ONU_PORT_MAX_VLAN_ENTRY    	( 8 )
+
+typedef struct
+{
+	UINT32 tagVlan;/*bit1-12:VLAN bit17-32:tpid*/
+}OLT_EPON_ONU_PORT_VLAN_TAG_DTE;
+
+
+typedef struct
+{
+	UINT32 defTag;/*bit1-12:VLAN bit17-32:tpid*/
+	UINT32 tlNum;
+    UINT32 tlPairs[ONU_PORT_MAX_VLAN_ENTRY][2];/*bit1-12:VLAN bit17-32:tpid*/
+}OLT_EPON_ONU_PORT_VLAN_TL_DTE; 
+
+
+typedef struct
+{
+	UINT32 agNum;
+	UINT32 dstVlan;/*bit1-12:VLAN bit17-32:tpid*/
+    UINT32 srcVlan[ONU_PORT_MAX_VLAN_ENTRY];/*bit1-12:VLAN bit17-32:tpid*/
+}OLT_EPON_ONU_PORT_VLAN_AG_TBL; 
+
+typedef struct
+{
+	UINT32 defTag;/*bit1-12:VLAN bit17-32:tpid*/
+	UINT32 agTblNum;
+	OLT_EPON_ONU_PORT_VLAN_AG_TBL agTable[4];
+}OLT_EPON_ONU_PORT_VLAN_AG_DTE; 
+
+
+typedef struct
+{
+	UINT32 defTag;/*bit1-12:VLAN bit17-32:tpid*/
+	UINT32 trunkNum;
+	UINT32 trunkTag[ONU_PORT_MAX_VLAN_ENTRY];/*bit1-12:VLAN bit17-32:tpid*/
+}OLT_EPON_ONU_PORT_VLAN_TRUNK_DTE; 
+
+typedef struct
+{
+	UINT16 mode;
+	UINT16 tlNum;
+	UINT16 *pTlPairs;
+}ponAlOnuMcastVlanStrip;
+
+typedef struct
+{
+	UINT16 operat;/*1:add;  2:delete*/
+    UINT16 vlanNum;
+    UINT16 *pVlanId;
+}ponAlOnuMcastVlan;
+
+
+typedef struct
+{
+	UINT16 operat;/*1:add;  2:delete*/
+	UINT16 vlanId;
+	UINT8  mcastAddr[6];
+}ponAlOnuMcastGroup;
+
+typedef struct
+{
+	UINT16 domainId;
+	UINT16 gQueryInterval;
+	UINT16 gQueryRespTimeout;
+	UINT16 startQueryCount;
+	UINT16 startQueryInterval;
+	UINT16 lastMemQueryCount;
+	UINT16 lastMemQueryInterval;
+	UINT32 proxyIpv4Addr;
+}ponAlOltIgmpDomainProxyProvision;
+
+typedef struct
+{
+	UINT16 maxGroup;
+	long gBwPool;
+}ponAlOltIgmpGlobalProvision;
+
+typedef struct
+{
+	UINT16 domainId;
+	UINT16  mVlan;
+}ponAlOltIgmpDomainSelector;
+
+typedef struct
+{
+	UINT16 domainId;
+	UINT16  mVlan;
+}ponAlOltIgmpDomain;
+
+
+typedef struct
+{
+	UINT32 mac_aging_time;	
+	UINT8 mac_learning_mode;
+}
+OLT_EPON_MAC_TABLE_CONFIGURATION_DTE;
+
+typedef struct
+{
+	UINT8 link_status;
+    UINT8 flow_ctrl;
+	OLT_EPON_ONU_PORT_UP_RATE_DTE up_rate;
+    OLT_EPON_ONU_PORT_DS_RATE_DTE ds_rate;
+    UINT8 vlan_mode;
+    union {
+        OLT_EPON_ONU_PORT_VLAN_TAG_DTE tag;
+        OLT_EPON_ONU_PORT_VLAN_TL_DTE tl;
+        OLT_EPON_ONU_PORT_VLAN_AG_DTE ag;
+        OLT_EPON_ONU_PORT_VLAN_TRUNK_DTE trunk;
+    }vlan_config;
+}
+OLT_EPON_PORT_STATUS_DTE;
+
+#define ONU_PORT_AUTONEG_ABILITY_MAX_NUM    	( 64 )
+
+typedef struct
+{
+	UINT32 ability_num;
+	UINT32 ability[ONU_PORT_AUTONEG_ABILITY_MAX_NUM];
+}
+OLT_EPON_PORT_AUTONEG_ABILITY_DTE;
+
+typedef struct
+{
+	UINT8 port_admin;
+	UINT8 port_autoneg_admin;
+    OLT_EPON_PORT_AUTONEG_ABILITY_DTE port_autoneg_localabt;
+    OLT_EPON_PORT_AUTONEG_ABILITY_DTE port_autoneg_advabt;
+}
+OLT_EPON_PORT_PHY_INFO_DTE;
+
+typedef struct
+{
+	double trx_temperature;
+	double trx_voltage;
+	double trx_current;
+	double trx_tx_power;
+}OLT_EPON_PORT_TRX_WORK_PARAM_DTE;
+
+typedef struct
+{
+    int temp;/* 0.1degree */
+    int vcc;/* 0.01V */
+    int bias;/* 1mA */
+    int txPower;/* 0.01dBm */
+    int rxPower;/* 0.01dBm */
+}OLT_EPON_PORT_DDM_INFO_DTE;
+
+typedef struct
+{
+    UINT16 onuPhyId;
+    int txPower;/* 0.01dBm */
+}OLT_EPON_PORT_ONU_TX_POWER_DTE;
+
+
+#define CDT_ETHER_MACADDR_LEN 6
+#define CDT_CTC_MC_CONTROL_MAX_ENTRY 128
+#define CDT_MC_TABLE_MSG    300
+
+typedef struct onuMcControlMsg_st
+{
+    unsigned short ponId;
+    unsigned short onuId;
+    unsigned char action;
+    unsigned char mcType;
+    unsigned char entries;
+    unsigned short userId;
+    unsigned short vlanId;
+    unsigned char mc_da[CDT_ETHER_MACADDR_LEN];
+}onuMcControlMsg_t;
+
+typedef struct {
+        unsigned short userId;
+        unsigned short vlanId;
+        unsigned char mc_da[CDT_ETHER_MACADDR_LEN];
+}oam_ctc_onu_mc_control_struct;
+
+typedef struct onuMcControlGetMsg_st
+{
+    unsigned char entries;
+    oam_ctc_onu_mc_control_struct Entry[CDT_CTC_MC_CONTROL_MAX_ENTRY];
+
+}onuMcControlGetMsg_t;
+
+typedef struct onuMcTableMsg_st
+{
+    unsigned char mc[CDT_MC_TABLE_MSG];
+}onuMcTableMsg_t;
+
+typedef struct
+{
+	UINT32 onu_us_fec;
+}
+OLT_EPON_ONU_STATE_DTE;
+
+#define ONU_VENDOR_ID_FIELD_SIZE    	( 4 )
+#define ONU_MODEL_FIELD_SIZE 			( 4 )
+#define ONU_MAC_ADDR_FIELD_SIZE			( 6 )
+#define ONU_HW_VER_FIELD_SIZE			( 8 )
+#define ONU_SW_VER_FIELD_SIZE			( 16 )
+#define ONU_LOID_FIELD_SIZE				( 25 )
+#define ONU_PASSWD_FIELD_SIZE			( 13 )
+#define ONU_CHIPID_VID_SIZE             ( 2 )
+#define ONU_CHIPID_MODEL_SIZE           ( 2 )
+#define ONU_CHIPID_DATE_SIZE            ( 3 )
+#define ONU_FW_VERSION_SIZE             ( 32 )
+
+typedef struct
+{
+    UINT8 vendor_id[ONU_VENDOR_ID_FIELD_SIZE];/*ONU厂商*/
+    UINT8 model[ONU_MODEL_FIELD_SIZE];/*ONU型号*/
+    UINT8 hw_ver[ONU_HW_VER_FIELD_SIZE];/*硬件版本号*/
+    UINT8 sw_ver[ONU_SW_VER_FIELD_SIZE];/*软件版本号*/
+    UINT8 mac_address[ONU_MAC_ADDR_FIELD_SIZE];	
+}
+ONU_SERIAL_NUMBER_DTE;
+
+typedef struct 
+{
+    UINT8 venderId[ONU_CHIPID_VID_SIZE];/*芯片厂商*/
+    UINT8 chipModel[ONU_CHIPID_MODEL_SIZE];/*芯片型号*/
+    UINT8 Revision;/*芯片修订情况*/
+    UINT8 Date[ONU_CHIPID_DATE_SIZE];/*芯片的版本*/
+}ONU_CHIP_ID_DTE;
+
+typedef struct
+{     
+    UINT32 onu_type;
+	UINT8 ge_ports_num;
+	UINT8 fe_ports_num;
+	UINT8 pots_ports_num;
+	UINT8 catv_num;
+	UINT8 backup_battery;
+    UINT8 multillid;
+    UINT8 up_queues_num;
+    UINT8 up_max_queues_num;
+    UINT8 ds_queues_num;
+    UINT8 ds_max_queues_num;    
+    UINT64 ge_bit_map;
+    UINT64 fe_bit_map;
+}
+OLT_EPON_ONU_CAP_DTE;
+
+typedef struct
+{
+	ONU_SERIAL_NUMBER_DTE onu_sn;
+    UINT8 fwVersion[ONU_FW_VERSION_SIZE];/*Firmware版本*/
+    ONU_CHIP_ID_DTE chip_id;
+    OLT_EPON_ONU_CAP_DTE cap;
+}
+OLT_EPON_ONU_INFO_DTE;
+
+typedef struct
+{
+	UINT8 loid[ ONU_LOID_FIELD_SIZE ];
+	UINT8 passwd[ ONU_PASSWD_FIELD_SIZE ];    
+}OLT_EPON_LOID_INFO_DTE;
+
+typedef struct
+{
+	//UINT32 onu_eqd;
+	//UINT32 onu_zero_eqd;
+	UINT32 onu_phisical_distance;
+}
+OLT_EPON_ONU_DISTANCE_DTE;
+
+typedef struct
+{
+	UINT32 ip_addr;
+	UINT32 ip_mask;
+	UINT32 gateway;
+	UINT16 cvlan;
+	UINT16 svlan;
+	UINT8 priority;
+}
+OLT_EPON_ONU_MNG_IP_VLAN_DTE;
+
+#define ONU_DBA_THRESHOLD_MAX_QUEUE               ( 8 )
+#define ONU_DBA_THRESHOLD_MAX_QUEUE_SET           ( 4 )
+
+typedef struct {
+    UINT8  reportBitmap;
+    UINT16 queueThreshold[ONU_DBA_THRESHOLD_MAX_QUEUE];
+} OLT_EPON_ONU_DBA_THRESHOLD_QUEUE_DTE;
+
+typedef struct{
+    UINT8 numQueueSet;
+    OLT_EPON_ONU_DBA_THRESHOLD_QUEUE_DTE dbaQueueSet[ONU_DBA_THRESHOLD_MAX_QUEUE_SET];
+}
+OLT_EPON_ONU_DBA_THRESHOLD_DTE;
+
+#define OLT_EPON_ONU_SLA_MAX_SRV_NUM            ( 8 )
+
+typedef struct
+{
+    UINT16                          fixPktSize;
+    UINT32                          fixBandwidth;
+    UINT32                          assureBandwidth;
+    UINT32                          maxBandwidth;
+    UINT8                           wrrWeight;
+}OLT_EPON_ONU_SLA_SRV_DTE;
+
+typedef struct
+{
+    UINT32                          cycleLength;
+    UINT8                           serviceNum;
+    UINT8                           serviceMode;
+    OLT_EPON_ONU_SLA_SRV_DTE        service[OLT_EPON_ONU_SLA_MAX_SRV_NUM];
+}OLT_EPON_ONU_SLA_DTE;
+
+typedef struct
+{
+    UINT32                          alarmId;
+    UINT32                          alarmMode;
+    UINT32                          alarmThreshold;
+    UINT32                          clearThreshold;
+}
+OLT_EPON_ONU_ALARM_DATE;
+
+typedef struct
+{
+    /* FEC mode */
+    UINT32 ds_fec_mode ;
+}
+OLT_PON_TX_PARAMETERS_DTE ;
+
+typedef struct {
+    UINT32 DownstreamDropEvents;
+    UINT32 UpstreamDropEvents;
+    UINT32 DownstreamOctets;
+    UINT32 UpstreamOctets;
+    UINT32 DownstreamFrames;
+    UINT32 UpstreamFrames;
+    UINT32 DownstreamBroadcastFrames;
+    UINT32 UpstreamBroadcastFrames;
+    UINT32 DownstreamMulticastFrames;
+    UINT32 UpstreamMulticastFrames;
+    UINT32 DownstreamCRCerroredframes;
+    UINT32 DownstreamUndersizeFrames;
+    UINT32 UpstreamUndersizeFrames;
+    UINT32 DownstreamOversizeFrames;
+    UINT32 UpstreamOversizeFrames;
+    UINT32 DownstreamFragments;
+    UINT32 DownstreamJabbers;
+    UINT32 DownstreamCollisions;
+    UINT32 DownstreamFrames64octets;
+    UINT32 DownstreamFrames65to127octets;
+    UINT32 DownstreamFrames128to255octets;
+    UINT32 DownstreamFrames256to511octets;
+    UINT32 DownstreamFrames512to1023octets;
+    UINT32 DownstreamFrames1024to1518octets;
+    UINT32 UpstreamFrames64octets;
+    UINT32 UpstreamFrames65to127octets;
+    UINT32 UpstreamFrames128to255octets;
+    UINT32 UpstreamFrames256to511octets;
+    UINT32 UpstreamFrames512to1023octets;
+    UINT32 UpstreamFrames1024to1518octets;
+    UINT32 DownstreamDiscardFrames;
+    UINT32 UpstreamDiscardFrames;
+    UINT32 DownstreamerrorFrames;
+    UINT32 StatusChangetimes;
+}OLT_EPON_ONU_PM_DATA_CONTAINER_DTE_OLD;
+
+typedef struct {
+    UINT64 DownstreamDropEvents;
+    UINT64 UpstreamDropEvents;
+    UINT64 DownstreamOctets;
+    UINT64 UpstreamOctets;
+    UINT64 DownstreamFrames;
+    UINT64 UpstreamFrames;
+    UINT64 DownstreamBroadcastFrames;
+    UINT64 UpstreamBroadcastFrames;
+    UINT64 DownstreamMulticastFrames;
+    UINT64 UpstreamMulticastFrames;
+    UINT64 DownstreamCRCerroredframes;
+    UINT64 UpstreamCRCerroredframes;    
+    UINT64 DownstreamUndersizeFrames;
+    UINT64 UpstreamUndersizeFrames;
+    UINT64 DownstreamOversizeFrames;
+    UINT64 UpstreamOversizeFrames;
+    
+    UINT64 DownstreamFragments;
+    UINT64 UpstreamFragments;    
+    UINT64 DownstreamJabbers;
+    UINT64 UpstreamJabbers;    
+    //UINT64 DownstreamCollisions;
+    UINT64 DownstreamFrames64octets;
+    UINT64 DownstreamFrames65to127octets;
+    UINT64 DownstreamFrames128to255octets;
+    UINT64 DownstreamFrames256to511octets;
+    UINT64 DownstreamFrames512to1023octets;
+    UINT64 DownstreamFrames1024to1518octets;
+    UINT64 UpstreamFrames64octets;
+    UINT64 UpstreamFrames65to127octets;
+    UINT64 UpstreamFrames128to255octets;
+    UINT64 UpstreamFrames256to511octets;
+    UINT64 UpstreamFrames512to1023octets;
+    UINT64 UpstreamFrames1024to1518octets;
+    
+    UINT64 DownstreamDiscardFrames;
+    UINT64 UpstreamDiscardFrames;
+    UINT64 DownstreamErrorFrames;
+    UINT64 UpstreamErrorFrames;    
+    UINT64 StatusChangetimes;
+}OLT_EPON_ONU_PM_DATA_CONTAINER_DTE;
+
+typedef struct
+{
+    UINT8 portId;
+    UINT8 isPonPort;
+    UINT8 currentFlag; /*0: current, ~0: history*/
+    OLT_EPON_ONU_PM_DATA_CONTAINER_DTE pmData;
+}
+OLT_EPON_ONU_PM_DATA_DTE;
+
+typedef struct
+{
+    UINT8  portId;
+    UINT8  isPonPort;
+
+    UINT16 status;
+    UINT32 period;
+}
+OLT_EPON_ONU_PM_STATUS_DTE;
+
+#define ONU_SNMP_STRING_SIZE               ( 32 )
+
+typedef struct
+{
+    UINT8   version;/*snmp version, default 2*/
+    UINT8   ip_version;/*0:ipv4 1:ipv6*/
+    UINT16  trap_port;/*default 162*/
+    UINT16  snmp_port;/*default 161*/
+    union
+    {
+        UINT32 ip_v4;
+        UINT8  ip_v6[16];    
+    }trap_ip;    
+    UINT8   name[ONU_SNMP_STRING_SIZE];
+    UINT8   com_rd[ONU_SNMP_STRING_SIZE];
+    UINT8   com_wr[ONU_SNMP_STRING_SIZE];
+}
+OLT_EPON_ONU_SNMP_DTE;
+
+typedef struct
+{
+	UINT32  link_state;
+	UINT32  sn_acquisition_state;
+	UINT32  key_exchange_state;
+	UINT32  rogue_detection_state;
+	UINT32  rouge_destructive_state;
+	UINT32  los_status;
+	UINT32  sn_acquisition_interval;
+	UINT32  key_exchange_interval;
+}LINK_STATE_DTE;
+
+typedef struct
+{
+	UINT32 gpio_pin_number;
+	UINT32 interval;
+}LINK_CONTINUOUS_MONITORING_DTE;
+
+typedef struct
+{
+	INT32 trx_temperature_max_alarm_threshold;
+	INT32 trx_temperature_min_alarm_threshold;
+}LINK_TRX_TEMPERATURE_THRESHOLD_DTE;
+
+typedef struct
+{
+	INT32 trx_vol_max_alarm_threshold;
+	INT32 trx_vol_min_alarm_threshold;
+}LINK_TRX_VOLTAGE_THRESHOLD_DTE;
+
+typedef struct
+{
+	INT32 trx_current_max_alarm_threshold;
+	INT32 trx_current_min_alarm_threshold;
+}LINK_TRX_CURRENT_THRESHOLD_DTE;
+
+typedef struct
+{
+	INT32 trx_tx_power_max_alarm_threshold;
+	INT32 trx_tx_power_min_alarm_threshold;
+}LINK_TRX_TX_POWER_THRESHOLD_DTE;
+
+typedef struct
+{
+	INT32 trx_rx_power_max_alarm_threshold;
+	INT32 trx_rx_power_min_alarm_threshold;
+}LINK_TRX_RX_POWER_THRESHOLD_DTE;
+
+typedef struct
+{
+	double trx_temperature;
+	double trx_voltage;
+	double trx_current;
+	double trx_tx_power;
+}LINK_TRX_WORK_PARAM_DTE;
+
+
+/* 适配层对ONU  管理  的数据结构*/
+
+typedef struct  SERIAL_ONUID
+{
+    ONU_SERIAL_NUMBER_DTE   onu_sn;
+    UINT32 onu_id;
+}
+ONU_SERIAL_NUMBER_AND_ONUID_DTE;
+
+
+#define ONU_PLOAM_PASSWORD_BYTE_FIELD_SIZE ( 12 )	/*10->12*/
+typedef struct
+{
+    /* Password Byte */
+    UINT8 password_byte [ ONU_PLOAM_PASSWORD_BYTE_FIELD_SIZE ] ;
+}
+ONU_PLOAM_PASSWORD_DTE ;
+
+typedef struct
+{
+    ONU_PLOAM_PASSWORD_DTE onu_ploam_password;
+    UINT32 onu_auto_learning;
+}
+ONU_PLOAM_PASSWORD_AND_AUTO_LEARN_DTE ;
+
+typedef struct
+{
+	UINT32 onu_state;
+	UINT32 enable_onu_db;
+}
+ONU_SET_STATE_DTE;
+
+typedef struct
+{
+	UINT32 onu_primary_status;
+	UINT32 onu_secondary_status;
+	ONU_SERIAL_NUMBER_DTE onu_serial_number;
+	ONU_PLOAM_PASSWORD_DTE onu_ploam_password;
+	UINT32 onu_disabled_due_to_discovery;
+	UINT32 onu_omci_port_id;
+	UINT32 onu_ber_interval;
+	UINT32 onu_last_equalization_delay;
+	UINT32 onu_us_fec;
+	UINT32 onu_deactivate_reason;
+}
+ONU_STATE_DTE ;
+
+typedef struct
+{
+	UINT32 omci_buffer_size;
+	UINT8 *omci_buffer;
+}ONU_OMCI_BUFFER_DTE;
+
+#define ONU_ENCRYPTION_KEY_FIELD_SIZE ( 16 )
+typedef struct
+{
+    /* Encryption key */
+    UINT8 key [ ONU_ENCRYPTION_KEY_FIELD_SIZE ] ;
+}
+ONU_ENCRYPTION_KEY_DTE ;
+
+
+typedef struct
+{
+    /* LOSi */
+    UINT8 losi ;
+
+    /* LOFi */
+    UINT8 lofi ;
+
+    /* LOAMi */
+    UINT8 loami ;
+
+    /* LCDGi */
+    UINT8 lcdgi ;
+
+    /* RDIi */
+    UINT8 rdii ;
+
+    /* SUFi */
+    UINT8 sufi ;
+                                                                          
+    /* LOAi */                                                            
+    UINT8 loai;
+                                                                          
+    /* DGi */                                                           
+    UINT8 dgi;
+
+    /* DFi */                                                           
+    UINT8 dfi;
+                                                                          
+    /* DOWi */                                                           
+    UINT8 dowi;
+                                                                           
+    /* TIWi */                                                            
+    UINT8 tiwi;
+
+    /* SFi */                                                           
+    UINT8 sfi;
+                                                                          
+    /* SDi */                                                            
+    UINT8 sdi;
+                                                                          
+    /* LOKi */                                                            
+    UINT8 loki;
+
+}
+OLT_PON_ONU_ALARMS_DTE ;
+
+typedef struct
+{
+	UINT32 interval;
+	UINT32 min_alloc_range_1;
+	UINT32 max_alloc_range_1;
+	UINT32 min_alloc_range_2;
+	UINT32 max_alloc_range_2;
+	UINT8 alloc_type;
+}
+OLT_PON_ROGUE_ONU_DETECTION_PROCESS_DTE;
+
+typedef struct
+{
+	UINT32 functional_mode;
+	UINT32 start_offset;
+	UINT32 end_offset;
+	UINT32 minimum_pulse;
+	UINT32 maximum_pulse;
+	UINT8 polarity;	
+}
+OLT_PON_ONU_RSSI_CONFIGURE_DTE;
+
+typedef struct
+{
+	UINT32  gem_port_id;
+	UINT32  onu_id;
+	ONU_SERIAL_NUMBER_DTE onu_sn;
+	UINT8 mac_address[8];
+}
+OLT_PON_ONU_INFO_DTE;
+
+typedef struct
+{
+	UINT32 onu_eqd;
+	UINT32 onu_zero_eqd;
+	UINT32 onu_phisical_distance;
+}
+OLT_PON_ONU_DISTANCE_DTE;
+
+/* 适配层对DBA  的数据结构*/
+
+typedef struct
+{
+    /* ONU ID */
+    UINT32 phy_id ;
+
+	/* fixed BW */
+  	UINT32 fixed_bw ;
+
+	/* assured BW */
+  	UINT32 assured_bw ;
+
+	/* maximum BW */
+  	UINT32 maximum_bw ;
+
+	/* weight */
+  	UINT32 weight ;
+
+	/* DBA type */
+  	UINT32 dba_type ;
+    
+}
+OLT_PON_DBA_ALLOC_ID_CONFIGURATION_DTE ;
+
+typedef struct
+{
+    /* ONU ID */
+    UINT32 phy_id ;
+
+	/* fixed BW */
+  	UINT32 maximum_bw ;
+    
+}OLT_PON_DS_ALLOC_ID_CONFIGURATION_DTE ;
+
+typedef struct
+{
+	UINT32 alloc_id;
+	UINT32 gbw;
+	UINT32 cbr_type;
+}
+OLT_PON_DBA_ALLOC_ID_CBR_DTE;
+
+typedef struct
+{
+	UINT32 alloc_id;
+	UINT32 gbw;
+}
+OLT_PON_DBA_ALLOC_ID_UBR_DTE;
+
+typedef struct
+{
+	UINT32 alloc_id;
+	UINT32 fixed_bw_cbr;
+	UINT32 fixed_bw_ubr;
+	UINT32 assured_bw;
+	UINT32 maximum_bw;
+	UINT32 weight;
+	UINT32 dba_type;
+	UINT32 additional_bw_eligibility;
+}
+OLT_PON_DBA_ALLOC_ID_DYNAMIC_DTE;
+
+
+typedef struct
+{
+	UINT32 alloc_id;
+	UINT8 alloc_id_state;
+}
+OLT_PON_DBA_ALLOC_ID_STATE_DTE;
+
+typedef struct
+{
+    /* ONU ID */
+    UINT32 onu_id ;
+
+	/* guaranteed BW */
+	UINT32 gbw ;
+
+	/* CBR type */
+	UINT32 cbr_type ;
+}
+OLT_PON_CBR_ALLOC_ID_CONFIGURATION_DTE ;
+
+typedef struct
+{
+    /* ONU ID */
+    UINT32 onu_id ;
+
+	/* guaranteed BW */
+	UINT32 gbw ;
+}
+OLT_PON_UBR_ALLOC_ID_CONFIGURATION_DTE ;
+
+
+typedef struct
+{
+    /* Alloc id */
+    UINT32  alloc_id ;
+
+    /* Alloc type */
+    UINT32 alloc_type ;
+
+    union
+    {
+        OLT_PON_CBR_ALLOC_ID_CONFIGURATION_DTE cbr_configuration ;
+
+        OLT_PON_UBR_ALLOC_ID_CONFIGURATION_DTE ubr_configuration ;
+
+        OLT_PON_DBA_ALLOC_ID_CONFIGURATION_DTE dba_configuration ;
+
+        OLT_PON_DBA_ALLOC_ID_CONFIGURATION_DTE default_configuration ;
+    }
+    alloc_id_configuration ;
+
+    UINT8 alloc_state ;
+}
+OLT_PON_ALLOC_ID_CONFIGURATION_DTE ;
+
+typedef struct
+{
+	INT32  total_available_bw;
+	UINT32 bw_for_compensated_alloc;
+}
+OLT_PON_AVAILABLE_BANDWIDTH_DTE ;
+
+typedef struct
+{
+     /* guaranteed BW of all BE alloc IDs must be zero */
+    UINT32 be_gbw_is_zero ;
+
+    /* fairness method for Best Effort alloc IDs */
+    UINT32 be_fairness_method ;
+}
+OLT_PON_BW_SCHEDULER_CONFIGURATION_DTE ;
+
+
+/* 适配层对TM  的数据结构*/
+
+typedef struct
+{
+	UINT32 default_gem_port_id;
+	UINT32 mac_aging_time;
+	UINT8 miss_fallback_type;	
+	UINT8 mac_learning_mode;
+}
+OLT_PON_MAC_TABLE_CONFIGURATION_DTE ;
+
+typedef struct
+{
+	UINT32 vlan_tag;
+	UINT8 mapping_method;
+}
+OLT_PON_TM_DS_GEM_PORT_MAPPING_METHOD_PER_VID_DTE ;
+
+typedef struct
+{
+	UINT32 vlan_modify_priority;
+	UINT32 vlan_modify_vid;
+}
+OLT_PON_TM_DS_VLAN_HEADER_PARAMS_MODIFY_DTE ;
+
+typedef struct
+{
+	UINT32 vid_or_gem;
+	UINT8 outer_vlan_command;
+	UINT8 inner_vlan_command;
+}
+OLT_PON_TM_DS_VLAN_HEADER_MANIPULATION_COMMAND_DTE ;
+
+typedef struct
+{
+	UINT32 original_priority;
+	UINT32 required_priority;
+}
+OLT_PON_TM_DS_PRIORITY_TABLE_TRANSLATION_DTE ;
+
+typedef struct
+{
+	UINT32 flow_id;
+	UINT32 modify_pbits;	
+	UINT8 vlan_us_modify_command;
+}
+OLT_PON_TM_US_VLAN_HEADER_MANIPULATION_COMMAND_DTE ;
+
+typedef struct
+{
+	UINT32 priority;
+	UINT32 pbits;
+}
+OLT_PON_TM_US_PRIORITY_TO_PBITS_TRANSLATION_DTE ;
+
+#define MAC_ADDRESS_FIELD_SIZE ( 30 )
+typedef struct
+{
+    /* address */
+    UINT8 address [ MAC_ADDRESS_FIELD_SIZE ] ;
+}
+OLT_PON_MAC_DTE ;
+
+
+typedef struct
+{
+	OLT_PON_MAC_DTE mac_address;
+	UINT32 vlan_tag;
+	UINT32 gem_port_id;
+	UINT32 static_address_flag;
+	UINT32 index_ptr;
+}
+OLT_PON_TM_MAC_ENTRY_DTE ;
+
+typedef struct
+{
+	UINT32 control_mode;
+	UINT32 static_address;
+}
+OLT_PON_TM_AUTOMATIC_MAC_LEARNING_MODE_DTE ;
+
+typedef struct
+{
+	UINT8 ds_method;
+	UINT8 us_method;
+	UINT8 ds_key;
+}
+OLT_PON_TM_INTERWORK_METHOD_DTE ;
+
+
+/*****************************************************\
+ ********                                                                   ********
+ ********       PON  硬件适配层核心结构      ********
+ ********                                                                   ********
+\*****************************************************/
+typedef struct
+{
+    RTN_STATUS (*ponHwOltGet) (UINT32 ponId, UINT32 cmd, void * var);
+    RTN_STATUS (*ponHwOltSet) (UINT32 ponId, UINT32 cmd, void * var);
+	RTN_STATUS (*ponHwOnuReg) (UINT32 ponId, UINT32 phyId, UINT32 cmd, void * var);
+    RTN_STATUS (*ponHwOnuGet) (UINT32 ponId, UINT32 phyId, UINT32 cmd, void * var);
+    RTN_STATUS (*ponHwOnuSet) (UINT32 ponId, UINT32 phyId, UINT32 cmd, void * var);
+    RTN_STATUS (*ponHwDbaGet) (UINT32 ponId, UINT32 cmd, void * var);
+    RTN_STATUS (*ponHwDbaSet) (UINT32 ponId, UINT32 cmd, void * var);		
+    RTN_STATUS (*ponHwOnuCardGet) (UINT32 ponId, UINT32 subInstance, int cmd, void * var);
+    RTN_STATUS (*ponHwOnuCardSet) (UINT32 ponId, UINT32 subInstance, int cmd, void * var);
+    RTN_STATUS (*ponHwOnuSubIfGet) (UINT32 ponId, UINT32 phyId, UINT32 subInstance, UINT32 cmd, void * var);
+    RTN_STATUS (*ponHwOnuSubIfSet) (UINT32 ponId, UINT32 phyId, UINT32 subInstance, UINT32 cmd, void * var);
+    RTN_STATUS (*ponHwObjCtrl) (UINT32 instanceRef, UINT32 subInstance, UINT32 cmd, void * var);
+    RTN_STATUS (*ponHwAssignHandler) (void *param, void (*pFun)(), int assignType);/*向PON  芯片分配事件接收函数*/
+    RTN_STATUS (*ponHwDeleteHandler) (void *param, void (*pFun)(), int assignType);/*向PON  芯片解除分配事件接收函数*/
+} ponAlHwApiFuncts_t; 
+
+/*改成抽象层定义，ONU注册授权模块引用*/ 
+/*--------------  ONU  注册、去注册消息数据结构-------------- */
+typedef enum
+{
+    ONU_DEREG_MSG=1,
+    ONU_REG_MSG,
+}REG_MSG_TYPE_EN;
+#if 0
+typedef struct
+{
+    REG_MSG_TYPE_EN             msgType;
+    unsigned int                ponId;
+    unsigned int                regId; 
+    unsigned char               phyAddr[8]; 
+    unsigned char               snPwd[ONU_MAX_SN_PWD_LEN];/*用于校验SN的10字节password*/ 
+	unsigned char 				loid[24];
+	unsigned char 				loidpwd[12];
+    unsigned char               extra[128];
+}REG_MSG_ST;
+#endif
+
+//typedef onura_core_msg_t ponAlOnuRegReport;
+
+
+/*事件上报的数据结构*/
+typedef enum
+{  
+	PON_HWAL_ALARM_OBJ_TYPE_ONU=1,
+	PON_HWAL_ALARM_OBJ_TYPE_OLT,
+
+	PON_HWAL_ALARM_OBJ_TYPE_RESERVE=255,
+}PON_HWAL_ALARM_OBJ_TYPE;
+
+typedef enum
+{
+	PON_HWAL_CONTROL_DISABLE=0,
+	PON_HWAL_CONTROL_ENBALE,
+	
+}PON_HWAL_CONTROL_MODE_TYPE;
+
+typedef struct
+{
+    UINT32 ulPonId;
+    UINT32 ulObjType;      // 1-onu; 2-olt
+    UINT32 ulRegId;		  //onu reg id
+    UINT8 ucOnuId[8];     // epon-mac; gpon-sn
+    UINT32 ulAlarmId;      // 本地定义的 ID
+    UINT32 ulAlarmState;   // 0-report, 1-clear
+    UINT8 ucAlarmInfo[32];
+}ponHwAlAlarmReport;
+
+
+
+
+typedef struct _ponAlOltQinqRule
+{
+    UINT32       authId;   	/*未用到*/
+    UINT32       ruleId;    	/*规则ID*/
+    UINT32       ruleType; 	/*规则类型详见QinqRuleType*/
+    UINT32       cvlan0; 		/*内层cvlan0*/
+    UINT32       cvlan1; 		/*内层cvlan1*/
+    UINT32       ccos0; 		/* 内层cvlan0的cos*/
+    UINT32       ccos1; 		/*内层cvlan1的cos*/
+    UINT32       svlan0; 		/*外层svlan0*/
+    UINT32       svlan1; 		/*外层svlan1*/
+    UINT32       scos0; 		/*外层svlan0的cos*/
+    UINT32       scos1; 		/*外层svlan1的cos*/
+    UINT32       ethertype; 	/* 以太网类型值*/
+}ponAlOltQinqRule; 	
+
+
+typedef enum _qinqRuleType
+{
+	cmdAddSvlanByCvlan=1,  				/*通过内层vlan加外层vlan*/
+	cmdAddSvlanByCvlanRange,  			/* 不支持*/
+	cmdAddSvlanByCvlanCos,    			/*通过内层valn cos来加外层vlan*/
+	cmdAddSvlanByEtherType,			/*通过EtherType 来添加外层vlan*/
+	cmdAddSvlanByCvlanAndEtherType,	/*通过EtherType和内层vlan来加外层vlan*/
+	cmdAddSvlanByCvlanAndCos,			/*通过内层vlan和cos值来加外层vlan*/
+	cmdAddSvlanByCRCosEtCp=15,    		/* 不支持*/
+	cmdAddSvlanByCRCosEtRp=16,    		/* 不支持*/
+	cmdAddSvlanByNothing = 255,			/*直接添加外层vlan*/
+	cmdTranslateCvlanOnetoOne = 256,	/*内层vlan 替换*/
+	cmdTranslateCvlanAddSvlan = 257		/*内层vlan替换后再加外层vlan*/
+}QinqRuleType;
+
+#define MAX_RULUS_PER_PON  32
+
+typedef struct RuleIdAllPon_s
+{
+    int    RuleIdPerPon[MAX_RULUS_PER_PON];   
+}RuleIdAllPon_t;
+
+
+typedef struct
+{
+	UINT16 sec;
+    UINT16 phyId;
+	UINT8  phyAddr[PHY_ADDR_LENGTH];
+}OLT_SILENCE_ONU_DTE;
+
+
+typedef struct
+{
+	UINT8 operate;  /*0:del; 1:add*/
+	UINT8 phyAddr[PHY_ADDR_LENGTH];
+}OLT_MAC_AUTH_ONU_SYNC_DTE;
+
+
+#pragma pack()
+
+
+/*****************************************************\
+ ********                                                                   ********
+ ********                  外部接口声明                  ********
+ ********                                                                   ********
+\*****************************************************/
+extern ponMsgHandler_t g_ponMsgHandler;
+
+
+/* External interface */
+extern RTN_STATUS eponHwAlSetDebugMode(int);
+extern RTN_STATUS eponHwAlGetDebugMode(int *);
+
+RTN_STATUS eponHwAdapterOltGet(UINT32 ponId, UINT32 cmd, void * var);
+RTN_STATUS eponHwAdapterOltSet(UINT32 ponId, UINT32 cmd, void * var);
+RTN_STATUS eponHwAdapterOnuGet(UINT32 ponId, UINT32 onuUnit, UINT32 cmd, void * var);
+RTN_STATUS eponHwAdapterOnuSet(UINT32 ponId, UINT32 onuUnit, UINT32 cmd, void * var);
+RTN_STATUS eponHwAdapterOnuSubIfGet(UINT32 ponId, UINT32 onuUnit, UINT32 cmd, void * var);
+RTN_STATUS eponHwAdapterOnuSubIfSet(UINT32 ponId, UINT32 onuUnit, UINT32 cmd, void * var);
+RTN_STATUS eponHwAdapterObjCtrl(UINT32 ponId, UINT32 onuUnit, UINT32 cmd, void * var);
+RTN_STATUS eponHwAdapterAssignHandler(void *param, void (*pFun)(), int assignType);
+RTN_STATUS eponHwAdapterDeleteHandler(void *param, void (*pFun)(), int assignType);
+
+RTN_STATUS 
+eponHwAdapterDbaSet(
+                UINT32 ponId, 
+                UINT32 cmd, 
+                void * var);
+
+RTN_STATUS 
+eponHwAdapterDbaGet(
+                UINT32 ponId,  
+                UINT32 cmd, 
+                void * var);
+
+
+#endif
+
+

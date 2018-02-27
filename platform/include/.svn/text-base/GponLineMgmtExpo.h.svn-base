@@ -1,0 +1,531 @@
+/**************************************************************
+ * 文件名称:  GponLineMgmtExpo.h
+ * 作           者:  keith.gong
+ * 日           期:  2015.05.13
+ * 文件描述:  ONU 线路模板系统层头文件
+ * 版           本:  V1.00
+ * 修改历史:  
+ *     <修改者>     <时间>      <版本 >   <描述>
+        keith.gong          2015.05.13      V1.00           Create
+**************************************************************/
+
+#ifndef __GPON_LINE_MGMT_EXPO_H__
+#define __GPON_LINE_MGMT_EXPO_H__
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif 
+
+
+#include "sys_common.h"
+
+#define INVALID_PROFILE_ID                      0xFFFF
+#define INVALID_DBA_PROFILE_ID                  0xFFFF
+
+#define MAX_LINE_PROFILE_NUM                    513
+#define MAX_ALLOC_ID_SINGLE_ONU                 3
+#define MAX_GEM_PORT_SINGLE_ONU                 24
+#define MAX_GEM_MAPPING_NUM_SINGLE_GEMPORT      8
+
+#define MAX_VID_PER_GEMPORT                     12
+
+#define LINE_PROFILE_NAME_LEN                   32
+
+#define INVALID_TCONT_ID                        0xFF
+#define INVALID_8021P_PRIORITY                  0xFF
+#define INVALID_VLAN_ID                         0xFFFF
+
+#define MAX_DBA_PROFILE_NUM                     129
+
+typedef enum{
+    GEM_MAPPING_MODE_PRIORITY,
+    GEM_MAPPING_MODE_VLAN,
+    GEM_MAPPING_MODE_VLAN_PRIORITY,
+}GEM_MAPPING_MODE;
+
+
+
+
+
+typedef enum{
+    LINEMGMT_NO_ERROR,
+
+    /* 模板错误*/
+    LINEMGMT_ERROR_PROFILE_ID_OUT_OF_RANGE,
+    LINEMGMT_ERROR_PROFILE_TABLE_FULL,
+    LINEMGMT_ERROR_PROFILE_MALLOC_FAIL,
+    LINEMGMT_ERROR_PROFILE_EXIST,
+    LINEMGMT_ERROR_PROFILE_NOT_EXIST,
+    LINEMGMT_ERROR_PROFILE_NAME_EXIST,
+    LINEMGMT_PROFILE_NAME_REPEATLY,
+    LINEMGMT_ERROR_DEFAULT_PROIFLE_MODIFY,
+
+    /* 模板绑定错误*/
+    LINEMGMT_ERROR_NO_BIND_PROFILE_FOUND,
+    LINEMGMT_ERROR_PROFILE_IN_BIND_STATE,
+    LINEMGMT_PROFILE_BIND_LINK_ID_OUT_OF_RANGE,
+    LINEMGMT_PROFILE_BIND_ONU_ID_OUT_OF_RANGE,
+
+    /* T-CONT 错误*/
+    LINEMGMT_ERROR_PROFILE_TCONTID_OUT_OF_RANGE,
+    LINEMGMT_ERROR_PROFILE_TCONTID_EXIST,
+    LINEMGMT_ERROR_PROFILE_TCONTID_NOT_EXIST,
+    LINEMGMT_ERROR_PROFILE_TCONT_CONFIG_DEFAULT_TCONT,
+    LINEMGMT_ERROR_PROFILE_TCONT_IN_BIND_STATE,
+
+    /* Gem Port 错误*/
+    LINEMGMT_ERROR_PROFILE_TCONT_GEMPORTINDEX_OUT_OF_RANGE,
+    LINEMGMT_ERROR_PROFILE_GEMPORT_FULL,
+    LINEMGMT_ERROR_PROFILE_TCONT_GEMPORT_EXIST,
+    LINEMGMT_ERROR_PROFILE_TCONT_GEMPORT_NOT_EXIST,
+    LINEMGMT_ERROR_PROFILE_TCONT_GEMPORT_IN_BIND_STATE,
+
+    /* Gem Port Mapping 错误*/
+    LINEMGMT_ERROR_PROFILE_TCONT_GEMPORT_GEMMAPPING_OUT_OF_RANGE,
+    LINEMGMT_ERROR_PROFILE_TCONT_GEMPORT_GEMMAPPING_MALLOC_FAIL,
+    LINEMGMT_ERROR_PROFILE_TCONT_GEMPORT_GEMMAPPING_EXIST,
+    LINEMGMT_ERROR_PROFILE_TCONT_GEMPORT_GEMMAPPING_NOT_EXIST,
+
+    /* DBA 错误*/
+    LINEMGMT_ERROR_WRONG_DBA_CONFIG,
+
+    /* ONU 能力匹配错误*/
+    LIENMGMT_ERROR_ONU_ABILITY_VID_OUT_OF_RANGE,
+    LINEMGMT_ERROR_PROFILE_BIND_ONU_ABILITY_WRONG,
+    LINEMGMT_ERROR_ONU_ABILITY_GET_FAIL,
+    LINEMGMT_ERROR_ONU_ABILITY_TCONT_SUM,
+    LINEMGMT_ERROR_ONU_ABILITY_GEMPORT_SUM,
+    LINEMGMT_ERROR_ONU_ABILITY_TCONT_GEMPORT_SUM,
+    LINEMGMT_ERROR_NO_ENOUGH_ALLCO_ID,
+    LINEMGMT_ERROR_NO_ENOUGH_GEMPORT_ID,
+
+    /* ONU 绑定错误 */
+    LINEMGMT_ERROR_ONU_HAS_NO_PROFILE_BIND,
+    LINEMGMT_PROFILE_HAS_BEEN_BIND_TO_ONU_ALREADY,
+    LINEMGMT_ERROR_PROFILE_ONLINE_BIND_FAIL,
+    LINEMGMT_ERROR_PROFILE_OFFLINE_BIND_FAIL,
+    LINEMGMT_ERROR_DEFAULT_PROFILE_ONLINE_BIND_FAIL,
+    LINEMGMT_ERROR_DEFAULT_PROFILE_OFFLINE_BIND_FAIL,
+
+    /* 端口号错误*/
+    LINEMGMT_ERROR_INVALID_ETH_PORT_NUM,
+    LINEMGMT_ERROR_INVALID_POTS_PORT_NUM,
+    LINEMGMT_ERROR_INVALID_CATV_PORT_NUM,
+    LINEMGMT_ERROR_INVALID_MOCA_PORT_NUM,
+
+    /* 其他*/
+    LINEMGMT_ERROR_VID_OUT_OF_RANGE,
+
+    LINEMGMT_ERROR_UNKNOWN,
+}LINEMGMT_ERROR_DTE;
+
+typedef enum
+{
+    LINEMGMT_RESULT_INIT,
+    LINEMGMT_RESULT_SUCCESS,
+    LINEMGMT_RESULT_FAILED,
+}LINEMGMT_RESULT_DTE;
+
+#pragma pack(1)
+
+typedef enum
+{
+    DBA_TYPE_FIX = 1,
+    DBA_TYPE_ASSURE,
+    DBA_TYPE_ASSURE_AND_MAX,
+    DBA_TYPE_MAX,
+    DBA_TYPE_FIX_AND_ASSURE_AND_MAX,
+
+    DBA_TYPE_INVALID,
+}DBA_TYPE_DTE;
+
+typedef struct
+{
+    UINT8               type; /*DBA_TYPE_DTE, 为了节省空间采用UINT8 */
+    UINT32              fix;
+    UINT32              assure;
+    UINT32              max;
+}DBA_DATA_T;
+
+typedef struct
+{
+    UINT8                   bindBit     :1;
+    UINT8                   waitBit     :1;
+    UINT8                   successBit  :1;
+    UINT8                   failedBit   :1;
+    UINT8                   remainTimes :2;
+    
+    UINT8                   rsvd        :2;
+}PROFILE_BIND_FLAG;
+
+#define DBA_PROFILE_NAME_LEN                17
+
+typedef struct{
+    UINT8               ProfileName[DBA_PROFILE_NAME_LEN];
+    UINT16              BindCounter;                                        /* 该profile  被绑定的次数*/
+    PROFILE_BIND_FLAG   Bindflag[MAX_LINE_PROFILE_NUM][MAX_ALLOC_ID_SINGLE_ONU]; /* profile  绑定的所有line profile tcont*/
+    
+    DBA_DATA_T          dba;
+}DBA_PROFILE_INFO;
+
+typedef struct{
+    UINT8                   MappingUsedOrNot;
+    UINT8                   Priority;
+    UINT32                  Vlan;
+}GEM_MAPPING_INFO;
+
+
+typedef struct{
+    UINT8                   GemportUsedOrNot;
+    UINT8                   tcontId;
+    
+    UINT8                   GemMappingSum;
+    GEM_MAPPING_INFO        GemMappingArray[MAX_GEM_MAPPING_NUM_SINGLE_GEMPORT];
+}GEM_PORT_INFO;
+
+
+typedef struct{
+    UINT8                   TcontUsedOrNot;
+    UINT16                  DbaProfileId;
+    
+    UINT8                   TcontGemportSum;
+    UINT8                   GemPortBitMap[(MAX_GEM_PORT_SINGLE_ONU)/8];
+}T_CONT_INFO;
+
+
+typedef struct{
+    UINT8                   ProfileTcontSum;
+    T_CONT_INFO             TcontInfoList[MAX_ALLOC_ID_SINGLE_ONU];
+
+    UINT8                   gemMappingMode;
+    
+    UINT8                   ProfileGemPortSum;
+    GEM_PORT_INFO           GemPortInfoList[MAX_GEM_PORT_SINGLE_ONU];
+}LINE_DATA_T;
+
+
+/*线路模板profile信息*/
+typedef struct{
+    UINT8                   ProfileName[LINE_PROFILE_NAME_LEN];
+    UINT16                  BindCounter;                                        /*绑定记数,表示该profile被绑定的次数,初始为0,表示Profile未绑定过,绑定一次+1*/
+    PROFILE_BIND_FLAG       BindFlag[SYS_MAX_EXIST_PON_NUM][SYS_MAX_ONU_NUM];   /*考虑到便于主控查询,Profile中添加了profile绑定的单个GPON盘下所有的ONU列表*/
+
+    LINE_DATA_T             data;
+}LINE_PROFILE_INFO;
+
+/**********************************************************************************************************************/
+/*  ONU  信息表，用于记录tcont dba 和gemport 分配*//* kth.debug  考虑废除该数据结构*/
+/**********************************************************************************************************************/
+typedef struct{
+    UINT32                  Pir;
+    UINT32                  Fir;
+    UINT32                  Cir;
+}DBA_INFO;
+
+
+typedef struct{
+    UINT8                   TcontType;
+    DBA_INFO                BW;
+}DBA_INFO_AND_TYPE;
+    
+
+typedef struct{
+    UINT16                  AllocId;
+    DBA_INFO_AND_TYPE       AllocIdDbaInfo;
+}ALLOC_ID_INFO;
+
+
+typedef struct{
+    UINT8                   AllocInfoId;
+    UINT16                  GemportId;
+}GEM_PORT_ID_INFO;
+
+
+typedef struct{
+    UINT32                  ProfileBindId;    
+    ALLOC_ID_INFO           AllocIdInfo[MAX_ALLOC_ID_SINGLE_ONU];
+    GEM_PORT_ID_INFO        GemPortInfo[MAX_GEM_PORT_SINGLE_ONU];
+}ONU_LINE_INFO;
+
+
+/**********************************************************************************************************************/
+/*  ONU  信息表，用于创建OMCI 模板*/
+/**********************************************************************************************************************/
+typedef struct
+{
+    UINT16                  AllocId;
+}ALLOC_ID_INFO_FOR_OMCI;
+
+
+typedef struct{
+    UINT8                   Priority;
+    UINT32                  Vlan;
+}GEM_MAPPING_INFO_FOR_OMCI;
+
+
+typedef struct{
+    UINT8                   AllocInfoId;
+    UINT32                  GemportId;
+    GEM_MAPPING_INFO_FOR_OMCI                  
+                            GemMapping[MAX_GEM_MAPPING_NUM_SINGLE_GEMPORT];
+}GEM_PORT_INFO_FOR_OMCI;
+
+
+typedef struct{
+    UINT8                   ethPortSlot;
+    UINT8                   ethPortNum;
+}ETH_PORT_INFO_FOR_OMCI;
+
+
+/*ONU的7种流量模型的定义*/
+typedef enum 
+{
+    ONU_NTO1_BRIDGING_MODE = 1,     /*N:1  bridging*/
+    ONU_1TOM_MAPPING_MODE,          /*1:M  mapping*/
+    ONU_1TOP_FILTERING_MODE,        /*1:P  flitering*/
+    ONU_NTOM_BRIDGE_MAPPING,        /*N:M  bridge-mapping*/
+    ONU_1TOMP_MAP_FILTERING,        /*1:MP map-flitering*/
+    ONU_NTOP_BRIDGE_FILTERING,      /*N:P  bridge-flitering*/
+    ONU_NTOMP_BRIDGE_MAP_FILTERING, /*N:MP bridge-map-filtering*/
+}ONU_TRAFF_MODE_TYPE;
+
+
+/*单个ONU的信息总和*/
+typedef struct{
+    ALLOC_ID_INFO_FOR_OMCI  AllocidInfo[MAX_ALLOC_ID_SINGLE_ONU+1]; /* 实际只有MAX_ALLOC_ID_SINGLE_ONU 个alloc，但部分ONU tcont 0 不可配，所以从1 开始，0忽略*/
+    GEM_PORT_INFO_FOR_OMCI  GemportInfo[MAX_GEM_PORT_SINGLE_ONU];
+    ETH_PORT_INFO_FOR_OMCI  ethPort;
+    ONU_TRAFF_MODE_TYPE     TrafficModeType;
+}ONU_INFO_FOR_OMCI;
+
+typedef enum E_ONU_CB_MSG_TYPE 
+{
+    ONU_CB_MSG_REGISTRATION = 0,    /* ONU registration to the PON  */
+    ONU_CB_MSG_DEREGISTRATION,      /* ONU deregistration (disconnection) from the PON  */
+    ONU_CB_MSG_AUTHORIZATION,       /* Authorization mode update of a single ONU        */
+    ONU_CB_MSG_DEAUTHORIZATION,     /* DeAuthorization mode update of a single ONU    */
+    ONU_CB_MSG_RESERVE,
+}ONU_CB_MSG_TYPE;
+
+#pragma pack()
+
+#define ONU_CB_MSG_CMD 0
+
+
+RTN_STATUS 
+Gpon_OnuLineMgmt_LineProfileBindSingleAdd(
+                UINT32 profileId, 
+                UINT32 linkId, 
+                UINT32 onuId);
+
+RTN_STATUS 
+Gpon_OnuLineMgmt_LineProfileBindSingleDel(
+                UINT32 profileId, 
+                UINT32 linkId, 
+                UINT32 onuId);
+
+RTN_STATUS 
+Gpon_OnuLineMgmt_LineProfileBindModify(
+                UINT32 profileId, 
+                UINT32 ponId, 
+                UINT32 onuId);
+
+/**************************************************************
+ * 函数名称: Gpon_OnuLineMgmt_LineProfileOnuWaitBitSet
+ * 作           者: keith.gong
+ * 日           期: 2015年05月13日
+ *
+ * 函数功能: 
+ * 输入参数: 
+ * 输出参数: 
+ * 返回数值: 
+ * 其           它: 
+**************************************************************/
+RTN_STATUS 
+Gpon_OnuLineMgmt_LineProfileOnuWaitBitSet(
+                UINT32  ponId,
+                UINT32  onuId);
+RTN_STATUS 
+Gpon_OnuLineMgmt_LineProfileOnuWaitBitClr(
+                UINT32  ponId,
+                UINT32  onuId);
+
+
+RTN_STATUS 
+Gpon_OnuLineMgmt_UserDbaProfileAdd(
+                UINT32 profileId,
+                UINT8  profileName[DBA_PROFILE_NAME_LEN]);
+RTN_STATUS 
+Gpon_OnuLineMgmt_UserDbaProfileGet(
+                UINT32 profileId,
+                DBA_PROFILE_INFO *pDbaProfile);;
+RTN_STATUS 
+Gpon_OnuLineMgmt_UserDbaProfileDbaSet(
+                UINT16 profileId,
+                DBA_DATA_T *pDbaData);
+RTN_STATUS 
+Gpon_OnuLineMgmt_DbaProfileSingleDel(
+                UINT32 profileId);
+RTN_STATUS 
+Gpon_OnuLineMgmt_DbaProfileNameModify(
+                UINT32 profileId, 
+                UINT8  NewName[DBA_PROFILE_NAME_LEN]);
+RTN_STATUS 
+Gpon_OnuLineMgmt_FindDbaProfileByName(
+                UINT8   NewName[DBA_PROFILE_NAME_LEN],
+                UINT16 *pProfileId);
+RTN_STATUS 
+Gpon_OnuLineMgmt_FindUnusedDbaProfileId(
+                UINT16 *pProfileId);
+RTN_STATUS 
+Gpon_OnuLineMgmt_UserDbaProfileSumNumberAndIdGet(
+                UINT16 *profileIdCounter,
+                UINT16  profileIdArray[MAX_DBA_PROFILE_NUM]);
+RTN_STATUS 
+Gpon_OnuLineMgmt_DbaProfileBindSingleAdd(
+                UINT32 dbaProfileId, 
+                UINT32 lineProfileId, 
+                UINT32 tcontId);
+
+RTN_STATUS 
+Gpon_OnuLineMgmt_DbaProfileBindSingleDel(
+                UINT32 dbaProfileId, 
+                UINT32 lineProfileId, 
+                UINT32 tcontId);
+
+RTN_STATUS 
+Gpon_OnuLineMgmt_FindLineProfileByName(
+                const UINT8 NewName[LINE_PROFILE_NAME_LEN],
+                UINT16 *pProfileId);
+
+RTN_STATUS 
+Gpon_OnuLineMgmt_FindUnusedLineProfileId(
+                UINT16 *pProfileId);
+
+RTN_STATUS 
+Gpon_OnuLineMgmt_LineProfileAdd(
+                UINT32 profileId,
+                UINT8  profileName[LINE_PROFILE_NAME_LEN]);
+
+RTN_STATUS 
+Gpon_OnuLineMgmt_LineProfileDel(
+                UINT32 profileId);
+RTN_STATUS
+Gpon_OnuLineMgmt_LineProfileGet(
+                UINT32  profileId,
+                LINE_PROFILE_INFO *pLineProfile);
+
+RTN_STATUS
+Gpon_OnuLineMgmt_LineProfileSet(
+                UINT32  profileId,
+                LINE_PROFILE_INFO *pLineProfile); 
+RTN_STATUS
+Gpon_OnuLineMgmt_LineProfileGemPortAdd(
+                LINE_PROFILE_INFO *pLineProfile,
+                UINT32 gemPortId,
+                UINT32 tcontId);
+
+RTN_STATUS
+Gpon_OnuLineMgmt_LineProfileGemPortDel(
+                LINE_PROFILE_INFO *pLineProfile,
+                UINT32 gemPortId);
+RTN_STATUS
+Gpon_OnuLineMgmt_LineProfileGemMappingModeSet(
+                LINE_PROFILE_INFO *pLineProfile,
+                GEM_MAPPING_MODE gemMappingMode);
+
+RTN_STATUS
+Gpon_OnuLineMgmt_LineProfileGemMappingAdd(
+                LINE_PROFILE_INFO *pLineProfile,
+                UINT32 gemPortId,
+                UINT32 gemMappingId,
+                UINT32 Vlan,
+                UINT8  Priority);
+
+RTN_STATUS
+Gpon_OnuLineMgmt_LineProfileGemMappingDel(
+                LINE_PROFILE_INFO *pLineProfile,
+                UINT32 gemPortId,
+                UINT32 gemMappingId);                
+RTN_STATUS 
+Gpon_OnuLineMgmt_LineProfileNameAndBindTimesGet(
+                UINT32  profileId,
+                UINT8   profileName[LINE_PROFILE_NAME_LEN],
+                UINT32 *bindTimes);  
+
+RTN_STATUS 
+Gpon_OnuLineMgmt_LineProfileNameModify(
+                UINT32 profileId, 
+                UINT8  NewName[LINE_PROFILE_NAME_LEN]);  
+RTN_STATUS 
+Gpon_OnuLineMgmt_LineProfileSumNumberAndIdGet(
+                UINT16 *ProfileSumNumber,
+                UINT16  profileIdArray[MAX_LINE_PROFILE_NUM]);    
+RTN_STATUS
+Gpon_OnuLineMgmt_LineProfileTcontAddWithDbaId(
+                UINT32 profileId,
+                LINE_PROFILE_INFO *pLineProfile,
+                UINT8 *tcontListStr,
+                UINT32 dbaProfileId);
+
+RTN_STATUS
+Gpon_OnuLineMgmt_LineProfileTcontAddWithDbaName(
+                UINT32 profileId,
+                LINE_PROFILE_INFO *pLineProfile,
+                UINT8 *tcontListStr,
+                UINT8 *dbaProfileName);      
+RTN_STATUS
+Gpon_OnuLineMgmt_LineProfileTcontDel(
+                UINT32 profileId,
+                LINE_PROFILE_INFO *pLineProfile,
+                UINT8 *tcontListStr);
+
+
+RTN_STATUS
+Gpon_OnuLineMgmt_LineProfileTcontAllGemPortGet(
+                T_CONT_INFO *pTcontInfo,
+                UINT8 *pGemPortNum,
+                UINT8  GemPortList[MAX_GEM_PORT_SINGLE_ONU]);   
+UINT32 
+Gpon_OnuLineMgmt_LineProfileValid(
+                UINT32 profileId);  
+
+RTN_STATUS
+Gpon_OnuLineMgmt_UserLineProfileBwGet(
+                UINT32  profileId,
+                UINT32 *pBw);
+
+RTN_STATUS 
+Gpon_OnuLineMgmt_OnuBindLineProfileIdGet(
+                UINT32  linkId,
+                UINT32  onuId,
+                UINT16 *pProfileId);
+
+RTN_STATUS
+Gpon_OnuLineMgmt_ResultGet(
+                const UINT32 ponId, 
+                const UINT32 onuId,
+                UINT8 *pResult);
+
+
+INT32 
+Gpon_OnuLineMgmt_OnuCapability(
+                UINT32  ponId, 
+                UINT32  onuId,
+                UINT8  *pPonPortNum,
+                UINT8  *pFePortNum,
+                UINT8  *pGePortNum,
+                UINT8  *pPotsPortNum,
+                UINT16 *pTcontNum,
+                UINT16 *pGemNum,
+                UINT8  *pTrafficSchedulerNum);
+
+
+#ifdef __cplusplusS
+}
+#endif  /* __cplusplus */
+
+#endif  /* __GPON_LINE_MGMT_EXPO_H__ */
+
+

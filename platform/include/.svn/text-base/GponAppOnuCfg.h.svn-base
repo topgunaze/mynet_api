@@ -1,0 +1,630 @@
+#ifndef __INC_GponAppOnuCfg_H
+#define __INC_GponAppOnuCfg_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+#include "lstLib.h"
+#include "sys_common.h"
+#include "sys_debug.h"
+//#include    "GponDriverAdapterTrafficManagementBm.h" 
+#include "OnuRaExpo.h"
+
+
+
+
+#if 1       /*zhouxin,from onu_common_constant.h*/
+
+#define ONU_TYPE_NONE               0
+#define ONU_TYPE_AN5506_04B1        340
+#define ONU_TYPE_AN5506_04A         348
+#define ONU_TYPE_AN5506_04C1        750
+
+#define ONU_TYPE_AN5506_06          341
+#define ONU_TYPE_AN5506_15          27
+#define ONU_TYPE_AN5506_20          32
+#define ONU_TYPE_AN5506_07B2        345
+#define ONU_TYPE_AN5506_07A2        752
+
+#define ONU_TYPE_AN5506_07A1        754
+#define ONU_TYPE_AN5506_07B1        755
+
+#define ONU_TYPE_AN5506_09A1        756
+#define ONU_TYPE_AN5506_09B1        757
+
+#define ONU_TYPE_AN5506_10A1        758
+#define ONU_TYPE_AN5506_10B1        759
+
+#define ONU_TYPE_HG260              762
+
+#define ONU_TYPE_AN5506_04F1                765
+#define ONU_TYPE_AN5506_04G1                766
+
+#define ONU_TYPE_AN5506_04A1G               767
+#define ONU_TYPE_AN5506_04B2G               768
+#define ONU_TYPE_AN5506_06E         997
+
+#define ONU_TYPE_OTHER          331
+
+#define ONU_TYPE_UNKNOWN        0xffff
+
+
+
+#define PACKET_TYPE_BROADCAST       0
+#define PACKET_TYPE_MULTICAST       1
+#define PACKET_TYPE_UNKNOWN     2
+#define PACKET_TYPE_NUM     (PACKET_TYPE_UNKNOWN+1)
+#define PACKET_TYPE_CONTROL_LIMIT_DEFAULT   150
+
+
+enum
+{
+    SWITCHPORT_SPEED_10M=0,
+    SWITCHPORT_SPEED_100M,
+    SWITCHPORT_SPEED_1000M,
+};
+
+enum
+{
+    SWITCHPORT_DUPLEX_HALF=0,
+    SWITCHPORT_DUPLEX_FULL,
+};
+
+enum
+{
+    SWITCHPORT_AUTOGOTIATE_DISABLE=0,
+    SWITCHPORT_AUTOGOTIATE_ENABLE,  
+};
+
+
+#define OPTICAL_ALARMCODE_MAX_RX_POWER      (997)
+#define OPTICAL_ALARMCODE_MIN_RX_POWER      (998)
+#define OPTICAL_ALARMCODE_MAX_TX_POWER      (999)
+#define OPTICAL_ALARMCODE_MIN_TX_POWER      (1000)
+#define OPTICAL_ALARMCODE_MAX_BIAS_CURRENT  (1001)
+#define OPTICAL_ALARMCODE_MIN_BIAS_CURRENT      (1002)
+#define OPTICAL_ALARMCODE_MAX_VOLT              (1003)
+#define OPTICAL_ALARMCODE_MIN_VOLT              (1004)
+#define OPTICAL_ALARMCODE_MAX_TEMPERATURE       (1023)
+#define OPTICAL_ALARMCODE_MIN_TEMPERATURE       (1024)
+
+#define OPTICAL_ALARMCODE_PRE_MAX_RX_POWER      (1007)
+#define OPTICAL_ALARMCODE_PRE_MIN_RX_POWER      (1008)
+#define OPTICAL_ALARMCODE_PRE_MAX_TX_POWER      (1009)
+#define OPTICAL_ALARMCODE_PRE_MIN_TX_POWER      (1010)
+#define OPTICAL_ALARMCODE_PRE_MAX_BIAS_CURRENT  (1011)
+#define OPTICAL_ALARMCODE_PRE_MIN_BIAS_CURRENT      (1012)
+#define OPTICAL_ALARMCODE_PRE_MAX_VOLT              (1013)
+#define OPTICAL_ALARMCODE_PRE_MIN_VOLT              (1014)
+#define OPTICAL_ALARMCODE_PRE_MAX_TEMPERATURE       (1015)
+#define OPTICAL_ALARMCODE_PRE_MIN_TEMPERATURE       (1016)
+#define ONU_ALARMCODE_MAX_TEMPERATURE           (1021)
+#define ONU_ALARMCODE_MIN_TEMPERATURE           (1022)
+#define ONU_ALARMCODE_US_BIP8_ERROR             (1037)
+#define ONU_ALARMCODE_DS_BIP8_ERROR             (1038)
+#define MAX_SERVICE_DIFFER_ENTRY_NUM        4
+
+#endif      /*zhouxin,from onu_common_constant.h*/
+
+
+#if 1       /*zhouxin,from gpon_line_functions.h*/
+#define ONU_MAX_NUM         2           /*zhouxin,128->2*/
+#define ONU_MAX_ID          254
+#define GEMPORT_MAX_ID      4095
+#define ALLOC_MAX_ID        1024
+
+#define ONU_MAX_NUM_3458    128
+
+#define ONU_GEM_MAPPING_METHOD_TCI      1
+#define ONU_GEM_MAPPING_METHOD_VLAN 2
+#define ONU_GEM_MAPPING_METHOD_VLANTCI  3
+
+#define ONU_DEFAULT_MAP_METHOD      ONU_GEM_MAPPING_METHOD_VLANTCI
+
+#define ONU_DEFAULT_OUTER_ETHER_TYPE_INSERT 0x8100
+#define ONU_DEFAULT_INER_ETHER_TYPE_INSERT      0x8100
+
+#define ONU_DEFAULT_VLAN_ID         0xffff
+#define ONU_DEFAULT_VLAN_TCI        0xffff
+
+#define ONU_LOOP_NONE   0
+#define ONU_LOOP_INTERIOR   1
+#define ONU_LOOP_EXTERIOR   2
+
+#define ONU_LOOP_MAX_VALUE      ONU_LOOP_EXTERIOR
+
+#define ONU_LOOPCHECK_DISABLE       0x01
+#define ONU_LOOPCHECK_ENABLE        0x02
+#define ONU_LOOPCHECK_INTERVAL_MIN  10
+#define ONU_LOOPCHECK_INTERVAL_MAX  3600
+
+#define ONU_LOOPCHECK_DEFAULT   ONU_LOOPCHECK_DISABLE
+#define ONU_LOOPCHECK_MAX       ONU_LOOPCHECK_ENABLE
+#define ONU_LOOPCHECK_MIN       ONU_LOOPCHECK_DISABLE
+#define ONU_LOOPCHECK_INTERVAL_DEFAULT  20
+
+
+#define BL3458_ONU_ONLINE       1
+
+typedef unsigned char CONFIG_ENABLE_FLAG;  /*zhouxin,can config onu or not*/
+
+enum
+{
+    CONFIG_DISABLE=0,
+    CONFIG_ENABLE=1
+};
+
+#define MAX_FE_ACL_RULE_NUM_NO_ONUTYPE   8
+#define MAX_FE_QOS_RULE_NUM_NO_ONUTYPE   8
+
+#define MAX_FE_ACL_NUM_IN_ONU_ACTION    4
+#define MAX_FE_QOS_NUM_IN_ONU_ACTION    4
+
+
+#define MAX_ONU_FE_NUM_NO_ONUTYPE       32
+
+#define MAX_SCHEDULE_QUEUE_NUM          8
+
+/*************************************************
+        TDM  
+**************************************************/
+#define MAX_TDM_E1_NUM              63
+#define MIN_TDM_E1_BUFFER_NUM           4
+#define MAX_TDM_E1_BUFFER_NUM       64
+
+
+#define ONU_TDM_CLOCK_RECOVERY_MODE_ADAPTIVE    1
+#define ONU_TDM_CLOCK_RECOVERY_MODE_LOOPBACK    2
+#define ONU_TDM_CLOCK_RECOVERY_MODE_DIFFERENTIAL    3
+#define ONU_TDM_CLOCK_RECOVERY_MODE_ENHANCE     4
+
+#define ONU_TDM_CLOCK_RECOVERY_MODE_MIN ONU_TDM_CLOCK_RECOVERY_MODE_ADAPTIVE
+#define ONU_TDM_CLOCK_RECOVERY_MODE_MAX ONU_TDM_CLOCK_RECOVERY_MODE_ENHANCE
+#define ONU_DEFAULT_TDM_CLOCK_RECOVERY_MODE     ONU_TDM_CLOCK_RECOVERY_MODE_ADAPTIVE
+
+#endif      /*zhouxin,from gpon_line_functions.h*/
+
+
+#if 1           /*zhouxin,from onu_type_special.h*/
+
+/*******************ONU15/20************************************/
+#define MAX_ONU15_SPECIAL_CONFIG_MANAGE_VLAN_NUM        4
+#define ONU15_SPECIAL_CONFIG_MANAGE_VLAN_LENGTH_PER_NUM 77
+#define MAX_ONU15_SPECIAL_CONFIG_MANAGE_VLAN_LENGTH ONU15_SPECIAL_CONFIG_MANAGE_VLAN_LENGTH_PER_NUM*MAX_ONU15_SPECIAL_CONFIG_MANAGE_VLAN_NUM
+
+
+typedef struct _onu_onu15_type_manage_vlan_entry_
+{
+    unsigned char buf[MAX_ONU15_SPECIAL_CONFIG_MANAGE_VLAN_LENGTH];
+}ONU_ONU15_TYPE_MANAGE_VLAN_ENTRY;
+
+
+typedef struct _onu_onu15_type_config_
+{
+    unsigned short  manage_vlan_num;
+    ONU_ONU15_TYPE_MANAGE_VLAN_ENTRY onu_onu15_type_manage_vlan_entry;
+}ONU_ONU15_TYPE_CONFIG;
+
+
+
+#define MAX_ONU20_STATIC_ROUTE_NUM  8
+/* 2010.1.23 liyang 刘的结构定义 */
+typedef struct _onu_onu20_static_route_entry_
+{
+    unsigned int net_address;
+    unsigned int net_gateway;
+    unsigned int subnet_mask;
+}ONU_ONU20_STATIC_ROUTE_ENTRY;
+
+typedef struct _onu_onu20_static_route_
+{
+    unsigned short static_route_num;
+    ONU_ONU20_STATIC_ROUTE_ENTRY    static_route_entry[MAX_ONU20_STATIC_ROUTE_NUM];
+}ONU_ONU20_STATIC_ROUTE;
+
+
+#endif          /*zhouxin,from onu_type_special.h*/
+
+
+#pragma pack(1)
+/***********************************************************\
+
+                              数据结构的定义
+
+\***********************************************************/
+
+/* VLAN  转换的结构 */
+typedef struct{
+    NODE node;
+    unsigned int cTag;
+    unsigned int sTag;
+    unsigned char qinqFlag;
+}vlanNode_t;
+
+
+/* VLAN  N : 1  聚合的结构 */
+typedef struct {
+    NODE node;
+    unsigned int srcVlan;
+}srcVlanNode_t;
+
+typedef struct
+{
+    NODE node;
+    unsigned int dstVlan;
+    LIST srcVlanList; /* list of  srcVlanNode_t*/
+}nTo1AgNode_t;
+
+
+/* VLAN  TRUNK  的结构 */
+typedef struct {
+    NODE node;
+    unsigned int trunkVlan;
+}trunkNode_t;
+
+
+/*--------------   ONU  配置总表 --------------*/
+typedef struct 
+{
+    UINT16 alarmId;
+    UINT32 adminState;/*告警开关*/
+}onuAlarmAdminStateParam_t;
+
+typedef struct 
+{
+    UINT16 alarmId;
+    UINT32 alarmThresholdValue[2];/*告警门限值*/
+}onuAlarmThresholdParam_t;
+
+typedef struct 
+{
+    UINT8 thresholdbitmap;
+    UINT16 queuethresholds[8];/*定义宏*/
+}dbaqueueattr_t;
+
+
+
+typedef struct
+{
+    UINT8 num;
+    UINT32 srcvlan[16];
+}srcvlanstruct_t;
+
+typedef struct
+{
+    INT16 temp;
+    UINT16 vcc;
+    UINT16 txbias;
+    UINT16 txpowerinput;
+    UINT16 txpoweroutput;
+}onuCfgOptDiag;
+
+
+typedef struct
+{
+    UINT8 rulefield;
+    UINT8 ruleval[6];
+    UINT8 ruleoper;
+}ethcamrulerktruct_t;
+
+typedef struct
+{
+    UINT8 precedence;
+    UINT8 priorityMark;
+    UINT8 queueMapped;
+    UINT8 rulenum;  
+    ethcamrulerktruct_t camrule[ONU_CFG_MAX_PORT_CAM_RULE_NUM];
+}ethcammarktruct_t;
+
+/*end of add */
+#define MAX_SRV_PROFILE_NUM                 513
+
+typedef struct
+{
+    UINT8                       bindBit     :1;    
+    UINT8                       waitBit     :1;
+    UINT8                       successBit  :1;
+    UINT8                       failedBit   :1;
+    
+    UINT8                       remainTimes :2;    
+    UINT8                       rsvd        :2;
+}SRV_PROFILE_BIND_FLAG;
+
+
+typedef struct
+{
+    UINT8                       catvPortNum;    
+    UINT8                       ethPortNum;
+    UINT8                       mocaPortNum;
+    UINT8                       potsPortNum;
+}ONT_PORTS_NUM;
+
+
+#define ONUCFG_ETH_MAX_VLAN_ENTRY           8
+typedef struct
+{
+    UINT8                       qinqFlag;
+    UINT32                      sVlan;
+    UINT32                      cVlan;
+}onuEthVlanEntry;
+
+/*--------------   ONU  PORT  VLAN  属性结构 --------------*/
+typedef struct
+{
+    onuEthPortVlanMode_t        vlanMode;
+    UINT32                      defVlanTag;
+    onuEthVlanEntry             entry[ONUCFG_ETH_MAX_VLAN_ENTRY];
+} SRV_PROFILE_ETH_VLAN_INFO;
+
+/*--------------   ONU  PORT  MCAST  属性结构 --------------*/
+typedef struct
+{
+    UINT16                  multicastVlan;                          /* 组播VLAN  */
+    UINT16                  iptvUserVlan;                           /* 用户VLAN */
+}onuEthPtMcastSwitching_t;
+
+
+/*--------------   ONU  PORT  MCAST  属性结构 --------------*/
+typedef struct
+{
+    UINT8                   mcastVlanStrip;                         /* 组播VLAN 剥除   1 is not strip,  0 is strip */
+    UINT16                  mcastVlanId;                            /* 组播VLAN */
+    UINT8                   mcastMaxGroup;                          /* 组播的最大数目 */
+    UINT8                   mcastXlateNum;                          /* 组播切换的最大数目 */
+    UINT8                   iptvPackageId;
+    onuEthPtMcastSwitching_t mcastXlateList[SYS_MAX_ONU_MVLAN_SWITCHING_NUM];
+
+    UINT8                   mcastEthVlanId;                         /* 组播端口VLAN */
+}onuEthPtMcast_t;
+
+/*--------------   ONU  ETH  PORT  属性结构 --------------*/
+typedef struct
+{
+    SRV_PROFILE_ETH_VLAN_INFO   vlanParam;               /* 端口VLAN属性*/
+    onuEthPtMcast_t             uniMcast;           /* 以太网组播:包含组播VLAN，组播VLAN剥离，组播最大数目 */
+} SRV_PROFILE_ETH_INFO;
+
+
+/*--------------   ONU   MCAST  属性结构 --------------*/
+typedef struct
+{
+    UINT8                   mcastMode;                              /* 组播模式 0 is snooping,  1 is controllable */
+    UINT8                   mcastLeaveMode;                         /* 快速离开 0 is disable, 1 is enable */
+}onuMcast_t;
+
+
+#define SRV_PROFILE_NAME_LEN                17
+
+typedef struct
+{
+    ONT_PORTS_NUM               PortsNum;
+
+    UINT16                      macAgeTime;    
+    UINT8                       macLearingInd;      /*以太网端口MAC地址学习使能 ,0 disable ,1 enable*/
+    onuMcast_t                  onuMcast;           /*组播:包含组播模式、组播快速离开*/   
+
+    SRV_PROFILE_ETH_INFO        onuEthAttr[SYS_MAX_ONU_PORT_NUM]; /* 以太口属性表指针*/
+}SRV_DATA_T;
+
+typedef struct
+{
+    UINT8                       ProfileName[SRV_PROFILE_NAME_LEN];    
+    UINT16                      BindCounter;        /* 绑定记数,  表示该被绑定的次数*/
+    SRV_PROFILE_BIND_FLAG       BindFlag[SYS_MAX_EXIST_PON_NUM][SYS_MAX_ONU_NUM];
+
+    SRV_DATA_T                  data;
+}SRV_PROFILE_INFO;
+
+#pragma pack()
+
+UINT32 
+OnuRa_AuthProc_DoesOnuExist(
+                const UINT16 ponId, 
+                const UINT16 authId);
+
+
+#if 1//DEF_FUNC("ONU 授权匹配")
+
+
+RTN_STATUS 
+OnuRa_AuthProc_AuthOnu(
+                const ONURA_CORE_MSG_ST *pOnuRaCoreMsg,
+                UINT16 *pAuthId,
+                ONURA_ONU_AUTH_RESULT_EN *pAuthResult);
+
+#endif
+
+RTN_STATUS 
+OnuRa_AuthProc_ActiveOnu(
+                const UINT16 ponId,
+                const UINT16 authId);
+RTN_STATUS 
+OnuRa_AuthProc_ActiveAllOnu(
+                const UINT16 ponId,
+                UINT32 *pSuccessNum,
+                UINT32 *pFailedNum);
+RTN_STATUS 
+OnuRa_AuthProc_DeactiveOnu(
+                const UINT16 ponId,
+                const UINT16 authId);
+RTN_STATUS 
+OnuRa_AuthProc_DeactiveAllOnu(
+                const UINT16 ponId,
+                UINT32 *pSuccessNum,
+                UINT32 *pFailedNum);
+RTN_STATUS 
+OnuRa_AuthProc_GetOnuDeActiveFlag(
+                const UINT16 ponId,
+                const UINT16 authId,
+                UINT8 *pFlag);
+
+
+/**************************************************************
+ * 函数名称: OnuRa_AuthProc_OnuConfirmAllBySn
+ * 作           者: keith.gong
+ * 日           期: 2015年03月20日
+ *
+ * 函数功能: 
+                            根据SN 填写授权表并尝试激活。
+ * 输入参数: 
+ * 输出参数: 
+ * 返回数值: 
+                            成功返回OK
+ * 其           它: 
+**************************************************************/
+RTN_STATUS 
+OnuRa_AuthProc_OnuConfirmBySn(
+                const UINT16 ponId,
+                const UINT8  phyAddr[PHY_ADDR_LENGTH],
+                const UINT16 srvProfileId,
+                const UINT16 lineProfileId,
+                UINT16 *pAuthId);
+
+RTN_STATUS 
+OnuRa_AuthProc_OnuAddBySn(
+                const UINT16 ponId,
+                const UINT16 authId,
+                const UINT8  phyAddr[PHY_ADDR_LENGTH],
+                const UINT16 srvProfileId,
+                const UINT16 lineProfileId);
+
+
+/**************************************************************
+ * 函数名称: OnuRa_AuthProc_OnuConfirmAllBySn
+ * 作           者: keith.gong
+ * 日           期: 2015年03月20日
+ *
+ * 函数功能: 
+                            根据SN 填写授权表并尝试激活。
+ * 输入参数: 
+ * 输出参数: 
+ * 返回数值: 
+                            成功返回OK
+ * 其           它: 
+**************************************************************/
+RTN_STATUS 
+OnuRa_AuthProc_OnuConfirmAllBySn(
+                UINT16  ponId,
+                UINT16  srvProfileId,
+                UINT16  lineProfileId,
+                UINT32 *pSuccessNum,
+                UINT32 *pFailedNum);
+
+RTN_STATUS 
+OnuRaCmdAdpterGetRegUnauthOnu(
+                UINT32 ponId,
+                ONURA_REG_UNAUTH_ONU_PER_PON_INFO_ST* regInfo);
+RTN_STATUS 
+OnuRa_RegProc_GetOnuDistance(
+                const UINT16 ponId,
+                const UINT8  phyAddr[PHY_ADDR_LENGTH],
+                UINT32 *pDistance);
+
+//STATUS GponGetOnuCfgCallback();
+RTN_STATUS 
+OnuRa_RegProc_GetOnuEntry(
+                const UINT16 ponId, 
+                const UINT16 regId,
+                ONURA_REG_ONU_ENTRY_ST *pRegEntry);
+
+
+RTN_STATUS
+OnuCfgSetEthSpeedDuplexStatus(
+                const UINT8 ponId,
+                const UINT8 onuId,
+                const UINT8 portId,
+                UINT16 status);
+RTN_STATUS
+OnuCfgSetEthFlowCtrl(
+                const UINT8 ponId,
+                const UINT8 onuId,
+                const UINT8 portId,
+                UINT16 status);
+RTN_STATUS
+OnuCfgSetEthAdmCtrlStatus(
+                const UINT8 ponId,
+                const UINT8 onuId,
+                const UINT8 portId,
+                UINT16 status);
+RTN_STATUS
+OnuCfgRebootOnu(
+                const UINT16 ponId,
+                const UINT32 onuId);
+
+RTN_STATUS
+OnuCfgRebootOnuAll(
+                const UINT16 ponId);
+
+RTN_STATUS
+OnuCfgDispatchResultGet(
+                const UINT16 ponId, 
+                const UINT32 onuId,
+                UINT8 *pResult);
+
+RTN_STATUS 
+Cdt_Gpon_OnuCfg_UserSrvProfileSumNumberAndIdGet(
+                UINT16 *profileIdCounter,
+                UINT16  profileIdArray[MAX_SRV_PROFILE_NUM]);
+RTN_STATUS 
+Cdt_Gpon_OnuCfg_SrvProfileBindModify(
+                UINT32 profileId, 
+                UINT32 ponId, 
+                UINT32 onuId);
+
+RTN_STATUS 
+Cdt_Gpon_OnuCfg_UserSrvProfileGet(
+                UINT32  profileId,
+                SRV_PROFILE_INFO *pSrvProfile);
+
+RTN_STATUS 
+Cdt_Gpon_OnuCfg_UserSrvProfileSet(
+                UINT32 profileId,
+                SRV_PROFILE_INFO *pSrvProfile);
+
+UINT32 
+Cdt_Gpon_OnuCfg_SrvProfileValid(
+                UINT32 profileId);
+RTN_STATUS 
+Cdt_Gpon_OnuCfg_SrvProfileNameModify(
+                UINT32 profileId, 
+                UINT8  NewName[SRV_PROFILE_NAME_LEN]);
+
+RTN_STATUS 
+Cdt_Gpon_OnuCfg_SrvProfileNameAndBindTimesGet(
+                UINT32  profileId,
+                UINT8   profileName[SRV_PROFILE_NAME_LEN],
+                UINT32 *bindTimes);
+RTN_STATUS 
+Cdt_Gpon_OnuCfg_SrvProfileDel(
+                UINT32 profileId);
+RTN_STATUS 
+Cdt_Gpon_OnuCfg_SrvProfileAdd(
+                UINT32 profileId,
+                UINT8  profileName[SRV_PROFILE_NAME_LEN]);
+RTN_STATUS 
+Cdt_Gpon_OnuCfg_OnuPortNumGet(
+                UINT32  ponId,
+                UINT32  onuId,
+                UINT8  *pEthPortNum,
+                UINT8  *pPotsPortNum);
+RTN_STATUS 
+Cdt_Gpon_OnuCfg_FindSrvProfileByName(
+                UINT8   NewName[SRV_PROFILE_NAME_LEN],
+                UINT16 *pProfileId);
+
+RTN_STATUS 
+Cdt_Gpon_OnuCfg_FindUnusedSrvProfileId(
+                UINT16 *pProfileId);
+
+RTN_STATUS 
+Cdt_Gpon_OnuCfg_OnuBindSrvProfileIdGet(
+                UINT32  ponId,
+                UINT32  onuId,
+                UINT16 *pProfileId); 
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

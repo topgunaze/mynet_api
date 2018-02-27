@@ -1,0 +1,60 @@
+#  Name         : Makefile
+#  Version      : V2.00
+#  Author       : keith.gong (kizerg@163.com)
+#  Time         : 2015.05.30
+#  Description  : Makefile for FD1508GS pon devctrl
+#                 Copyright (c) 2009-2015 C-Data Co.,Ltd.
+#                 All Rights Reserved.
+#  Modification : 2015.05.30, keith.gong, created
+
+MODULE_DIR           ?= $(shell pwd)
+PRJ_ROOT_DIR         ?= $(shell cd ../../..; pwd)
+
+include $(PRJ_ROOT_DIR)/make/Make.config
+
+#  Create some dependency directory 
+MODULE_OBJ_DIR       := $(PRJ_OBJ_DIR)/pondevctrl
+MODULE_LIB_DIR       := $(PRJ_LIB_DIR)/pondevctrl
+$(shell $(MKDIR) $(MODULE_OBJ_DIR) $(MODULE_LIB_DIR))
+
+MODULE_OBJS          := $(subst .c,.o,$(wildcard src/*.c)) 
+MODULE_DEPS          := $(MODULE_OBJS:src%=$(MODULE_OBJ_DIR)%)
+
+INCLUDE_DIRS         := $(PRJ_ROOT_DIR)/include $(APP_DIR)/include $(COM_DIR)/include $(VTYSH_DIR)/include $(GPON_PROFILE_DIR)/include $(GPON_ONURA_DIR)/include $(GPON_ALARM_DIR)/include $(GPON_PONCFG_DIR)/include ./include $(LIBEV_DIR)/include $(SWAPP_DIR)/include $(SWSDK_DIR)/include $(ZLIB_DIR)/include $(SOCDRV_DIR)/include $(GPON_ALARM_DIR)/include
+APP_DEP_LIBS         :=	$(PRJ_LIB_DIR)/common/libcommon.a \
+			$(PON_ADP_DIR)/libpon_adaptor.a\
+			$(PRJ_LIB_DIR)/poncfg/libponcfg.a \
+			$(PRJ_LIB_DIR)/onura/libonura.a \
+			$(PRJ_LIB_DIR)/profile/libprofile.a \
+			$(PRJ_LIB_DIR)/alarm/libalarm.a \
+			$(PRJ_LIB_DIR)/onucfg/libonucfg.a \
+			$(PRJ_LIB_DIR)/ipc/libipc_if.a 
+#			$(PRJ_LIB_DIR)/socdrv/libsocdrv.a\
+#		$(PRJ_LIB_DIR)/statistic/libstatistic.a \
+
+CFLAGS               += -Wall -Werror -g $(addprefix -I,$(INCLUDE_DIRS)) -DHAVE_CONFIG_H
+LIBS_FLAGS           := -Wl,--start-group $(INCLUDE_LIBS) -Wl,--end-group
+#CC_LIBS              := -lm -lrt -lpthread -L$(PRJ_LIB_DIR)/vtysh -lvtysh -L$(PRJ_LIB_DIR)/snmpd -lnetsnmpmibs -lnetsnmpagent -lnetsnmp
+CC_LIBS              := -lm -lrt -lpthread -L$(PRJ_ROOT_DIR)/platform/zlib/install/lib -lz -L$(PRJ_ROOT_DIR)/platform/libev/install/lib -lev -L$(PRJ_LIB_DIR)/vtysh -lvtysh
+
+#  Pattern matching rules: 
+$(MODULE_OBJ_DIR)/%.o:     $(MODULE_DIR)/src/%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+.PHONY: all lib clean 
+all: $(FW_ROOTFS_USR_BIN_DIR)/pondevctrl
+
+$(FW_ROOTFS_USR_BIN_DIR)/pondevctrl : $(APP_DEP_LIBS) $(MODULE_DEPS)
+	$(CC) $(CFLAGS) -DSTT_UNDERLYING_OS=U_LINUX -o $@ $^ $(MODULE_DEP) -Wl,--start-group $(CC_LIBS) $(APP_DEP_LIBS) -Wl,--end-group 
+	$(CROSS_COMPILE)objdump -S $@ > gpon_dump.txt
+	$(STRIP) $@
+
+clean: 
+	$(RM) $(MODULE_OBJ_DIR)/*
+	$(RM) $(MODULE_LIB_DIR)/*
+
+test:
+	@$(ECHO) $(MODULE_DEPS)
+	@$(ECHO) $(MODULE_OBJ_DIR) $(MODULE_DIR)/src/
+	@$(ECHO) $(CC) -c $(CFLAGS) -o $(MODULE_OBJ_DIR) $(MODULE_DIR)/src/
+

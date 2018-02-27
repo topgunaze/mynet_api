@@ -1,0 +1,13 @@
+#  Name         : Makefile
+#  Version      : V2.00
+#  Author       : keith.gong (kizerg@163.com)
+#  Time         : 2014.12.18
+#  Description  : Config for FD1508GS switch
+#                 Copyright (c) 2009-2015 C-Data Co.,Ltd.
+#                 All Rights Reserved.
+#  Modification : 2014.12.18, keith.gong, created
+
+export KERNDIR       := $(LINUX_DIR)
+SWITCH_MAKE_DIR      := $(SWITCH_SDK_DIR)/systems/linux/user/keystone-2_6
+SWITCH_BUILD_DIR     := $(SWITCH_SDK_DIR)/build/linux/user/keystone-2_6
+

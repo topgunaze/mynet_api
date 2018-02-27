@@ -1,0 +1,239 @@
+#  Name         : Makefile
+#  Version      : V2.00
+#  Author       : keith.gong (kizerg@163.com)
+#  Time         : 2017.02.14
+#  Description  : Top level Makefile for FD1616GS project
+#                 Copyright (c) 2009-2017 C-Data Co.,Ltd.
+#                 All Rights Reserved.
+#  Modification : 2017.02.14, keith.gong, created
+
+export PRJ_ROOT_DIR  := $(shell pwd)
+
+#  Include the project config file
+include $(PRJ_ROOT_DIR)/make/Make.config
+
+#  Include the project version config file
+include $(PRJ_ROOT_DIR)/make/Make.version
+
+#  Create some depend directory 
+$(shell $(MKDIR) $(RELEASE_DIR) $(ROOTFS_DIR) $(ROOTFS_DRV_DIR) $(ROOTFS_USR_BIN_DIR) $(FW_ROOTFS_LIB_DIR) $(FW_ROOTFS_USR_BIN_DIR) $(FW_ROOTFS_USR_SHARE_DIR))
+
+$(shell $(MKDIR) $(PRJ_LIB_DIR)/sysctrl; $(CP) $(SYSTEM_DIR)/libs/libMacCrypt.a $(PRJ_LIB_DIR)/sysctrl/libsysMacCrypt.a)
+
+#  Set all modules
+APPS_MODULES         := common vtysh ssh sysctrl swapp monitor poncfg onura profile alarm devctrl
+PLATFORM_MODULES     := swsdk flash fwloader ponsdk socdrv pononucfg ponprofile #ponomci sqlite3 #ponhwal pondrv
+PON_PLATFORM_MODULES := ponsdk #sqlite3 ponomci #sqlite3 #ponhwal pondrv
+PROTECTED_MODULES    := ipc
+
+#  Set some phony targets 
+.PHONY: fw all test clean clean_all platform
+
+fw: $(PON_PLATFORM_MODULES) $(APPS_MODULES) swsdk apps
+
+fw_clean: $(addsuffix _clean,$(PON_PLATFORM_MODULES)) $(addsuffix _clean,$(APPS_MODULES)) apps_clean
+
+#clean: fw_clean
+
+#platform: common vtysh sysctrl $(PLATFORM_MODULES) 
+platform: $(PLATFORM_MODULES) 
+
+platform_clean: sysctrl_clean vtysh_clean sysctrl_clean $(addsuffix _clean,$(PLATFORM_MODULES))
+
+#all: platform fw 
+
+#clean_all: platform_clean fw_clean
+
+test: $(addsuffix _test,$(APPS_MODULES))
+
+#  Set the MAKE_DIR MAKE_CFLAGS and MAKE_TARGET for each module
+
+KERNEL_MAKE_DIR      ?= 
+KERNEL_MAKE_CFLAGS   := KBUILD_VERBOSE=1
+KERNEL_MAKE_TARGET   := build
+
+PONSDK_BOARD := BOARD=wrx V=0
+
+CLI_MAKE_DIR         := $(CLI_DIR)
+
+VTYSH_MAKE_DIR       := $(VTYSH_DIR)
+
+SSH_MAKE_DIR         := $(SSH_DIR)
+
+SNMPD_MAKE_DIR       := $(SNMP_DIR)
+
+COMMON_MAKE_DIR      := $(COM_DIR)
+
+IPC_MAKE_DIR         := $(IPC_DIR)
+
+SWAPP_MAKE_DIR       := $(SWAPP_DIR)
+
+MONITOR_MAKE_DIR     := $(MONITOR_DIR)
+
+SYSCTRL_MAKE_DIR     := $(SYSCTRL_DIR)
+
+PONSDK_MAKE_DIR	     := $(PONSDK_DIR)
+
+PONHWAL_MAKE_DIR     := $(PONHWAL_DIR)
+
+PONDRV_MAKE_DIR      := $(PONDRV_DIR)
+
+EPON_MAKE_DIR        := $(EPON_DIR)
+
+FLASH_MAKE_DIR       := $(FLASH_DIR)
+
+FWLOADER_MAKE_DIR    := $(FWLOADER_DIR)
+
+export MKFBOX        := $(HOSTTOOLS_DIR)/mkfilebox
+
+HOSTTOOLS_DIR        := $(PRJ_ROOT_DIR)/hosttools
+
+SOCDRV_MAKE_DIR      := $(SOCDRV_DIR)
+
+SQLITE3_MAKE_DIR     := $(SQLITE_DIR)
+
+PONOMCI_MAKE_DIR     := $(PONOMCI_DIR)
+PONCFG_MAKE_DIR      := $(GPON_PONCFG_DIR)
+ONURA_MAKE_DIR       := $(GPON_ONURA_DIR)
+DEVCTRL_MAKE_DIR     := $(GPON_DEVCTRL_DIR)
+
+PONCFG_MAKE_DIR      := $(GPON_PONCFG_DIR)
+ONURA_MAKE_DIR       := $(GPON_ONURA_DIR)
+DEVCTRL_MAKE_DIR     := $(GPON_DEVCTRL_DIR)
+PROFILE_MAKE_DIR     := $(GPON_PROFILE_DIR)
+ONUCFG_MAKE_DIR      := $(GPON_ONUCFG_DIR)
+ALARM_MAKE_DIR       := $(GPON_ALARM_DIR)
+PONONUCFG_MAKE_DIR   := $(PONONUCFG_DIR)
+PONPROFILE_MAKE_DIR  := $(PONPROFILE_DIR)
+
+export IPC_DIR
+export PRJ_LIB_DIR
+include $(PRJ_MAKE_DIR)/Make.swsdk-config
+export SWSDK_MAKE_DIR      ?= $(SWSDK_DIR)/systems/linux/user/iproc-3_6
+
+exist = $(shell if [ -f output/host ]; then echo "exist"; else echo "notexist"; fi;)
+ifeq (exist, "exist") 
+  exist = $(shell if [ -f output/host/usr/share/aclocal ]; then echo "exist"; else echo "notexist"; fi;)
+
+  ifneq (exist, "exist")
+       $(shell cp host/usr/share/aclocal output/host/usr/share/aclocal -r)
+  endif
+endif
+#  Define the common make function for each module
+define module_make_func
+.PHONY: $(1) $(1)_clean
+$(1):
+	$(MAKE)  $($(shell echo $(1) | tr a-z A-Z)_BOARD) $($(shell echo $(1) | tr a-z A-Z)_MAKE_CFLAGS) -C $($(shell echo $(1) | tr a-z A-Z)_MAKE_DIR) $($(shell echo $(1) | tr a-z A-Z)_MAKE_TARGET)
+
+$(1)_test:
+	@$(ECHO) $(MAKE)  $($(shell echo $(1) | tr a-z A-Z)_BOARD) $($(shell echo $(1) | tr a-z A-Z)_MAKE_CFLAGS) -C $($(shell echo $(1) | tr a-z A-Z)_MAKE_DIR) $($(shell echo $(1) | tr a-z A-Z)_MAKE_TARGET)
+
+$(1)_clean:
+	$(MAKE) clean -C $($(shell echo $(1) | tr a-z A-Z)_MAKE_DIR) $($(shell echo $(1) | tr a-z A-Z)_BOARD)
+endef
+$(foreach modules, $(APPS_MODULES) $(PROTECTED_MODULES) $(PLATFORM_MODULES), $(eval $(call module_make_func,$(modules))))
+	
+
+#  Generate the image
+#.PHONY: image image_clean 
+base_lib:common flash vtysh sysctrl fwloader swapp ponsdk
+image:  platform fw image_raminitfs 
+	@timestamp=`(date "+%y%m%d_%H%M")`; \
+	timestamp2=`(date "+%y-%m-%d-%H-%M-%S")`; \
+	$(CP) $(PRJ_ROOT_DIR)/output/build/linux-3.6.5/arch/arm/boot/Image  $(RELEASE_DIR)/$(IMAGE_PREFIX)_Image_$$timestamp; \
+	$(MKIMG1) -A arm -O linux -T kernel -n "Broadcom Linux" -a 0x61008000 -C none -d $(RELEASE_DIR)/$(IMAGE_PREFIX)_Image_$$timestamp $(RELEASE_DIR)/$(IMAGE_PREFIX)_Image_$$timestamp.img.tmp; \
+	$(MKIMG) -v -T 0x06 -V $(APP_VERSION) -D $$timestamp2 $(RELEASE_DIR)/$(IMAGE_PREFIX)_Image_$$timestamp.img.tmp $(RELEASE_DIR)/$(IMAGE_PREFIX)_Image_V$(APP_VERSION)_$$timestamp.img;\
+	$(RM) $(RELEASE_DIR)/$(IMAGE_PREFIX)_Image_$$timestamp;\
+	$(RM) $(RELEASE_DIR)/$(IMAGE_PREFIX)_Image_$$timestamp.img.tmp;
+image_raminitfs: image_config image_misc_cp world
+
+image_config:
+	$(CP) image.config .config
+kernel_config:
+	$(CP) kernel.config .config
+#把此目标独立出来是因为编译sdk的ko模块的时候需要先编译一遍内核,后面的编译可以直接make image即可
+kernel:kernel_config world
+
+
+$(ROOTFS_DIR)/dev: $(BUSYBOX_DIR)/rootfs_dev.tar.gz
+	$(RM) $(ROOTFS_DIR)/dev
+	sudo tar zxmf $(BUSYBOX_DIR)/rootfs_dev.tar.gz -C $(ROOTFS_DIR)
+
+$(ROOTFS_DIR)/lib: 
+	find $(ROOTFS_DIR)/lib -maxdepth 1 -mindepth 1 -type f -exec rm {} -f \;
+
+image_rootfs_depends: $(ROOTFS_DIR)/dev $(ROOTFS_DIR)/lib
+	$(RM) $(ROOTFS_DIR)/etc $(ROOTFS_DIR)/mnt $(ROOTFS_DIR)/proc $(ROOTFS_DIR)/sys $(ROOTFS_DIR)/tmp $(ROOTFS_USR_BIN_DIR)/*
+	$(CP) $(BUSYBOX_DIR)/rootfs/* $(ROOTFS_DIR)
+	find $(ROOTFS_DIR) -name "*.svn*"|xargs rm -rf
+	$(MKDIR) $(ROOTFS_DIR)/var/log
+
+image_misc_cp:
+	$(RM) $(ROOTFS_DRV_DIR)/*
+	$(CP) $(SWSDK_BUILD_DIR)/bcm.user $(ROOTFS_USR_BIN_DIR)
+	$(STRIP) $(ROOTFS_USR_BIN_DIR)/* 
+	$(CP) $(SWSDK_BUILD_DIR)/*.ko $(ROOTFS_DRV_DIR)
+	
+$(ROOTFS_USR_BIN_DIR)/fwloader :
+	$(MAKE) $(SYSCTRL_MAKE_CFLAGS) -C $(SYSCTRL_MAKE_DIR) fwloader
+	
+image_clean:image_config fw_clean
+	$(RM) $(ROOTFS_DRV_DIR)
+	$(RM) $(ROOTFS_USR_BIN_DIR)
+	$(MAKE) clean
+#  Generate the apps firmware
+.PHONY: apps apps_cp apps_clean
+
+apps: apps_cp
+#	@timestamp=`(date "+%y%m%d_%H%M")`; \
+#	timestamp2=`(date "+%y-%m-%d-%H-%M-%S")`; \
+#	$(TARB) $(RELEASE_DIR)/$(IMAGE_PREFIX)_FW_$$timestamp.bz2 -C $(FW_ROOTFS_DIR) .; \
+
+apps_cp:
+	$(CP) $(SWSDK_BUILD_DIR)/bcm.user $(FW_ROOTFS_USR_BIN_DIR)
+	$(CP) $(PRJ_LIB_DIR)/ipc/ipc_ker $(FW_ROOTFS_USR_BIN_DIR)
+	$(CP) $(SWAPP_MAKE_DIR)/layer2/l2 $(FW_ROOTFS_USR_BIN_DIR)	
+	$(CP) $(SWAPP_MAKE_DIR)/igmpsn/swigmpsn $(FW_ROOTFS_USR_BIN_DIR)
+	$(CP) $(SWAPP_MAKE_DIR)/rstp/swrstp $(FW_ROOTFS_USR_BIN_DIR)
+	$(CP) $(SWAPP_MAKE_DIR)/dhcpsn/swdhcpsn $(FW_ROOTFS_USR_BIN_DIR)
+	$(CP) $(SWAPP_MAKE_DIR)/lacp/swlacp $(FW_ROOTFS_USR_BIN_DIR)
+#	$(CP) $(SWAPP_MAKE_DIR)/dot1x/swdot1x $(FW_ROOTFS_USR_BIN_DIR)
+	$(STRIP) $(FW_ROOTFS_USR_BIN_DIR)/*
+	$(CHMOD) 777 $(FW_ROOTFS_USR_BIN_DIR)/*
+	$(CP) $(PRJ_LIB_DIR)/vtysh/libvtysh.so $(FW_ROOTFS_LIB_DIR)
+	$(CP) $(PRJ_LIB_DIR)/switch/libsw.so $(FW_ROOTFS_LIB_DIR)
+	$(CP) $(LIBEV_DIR)/install/lib/libev.so* $(FW_ROOTFS_LIB_DIR)
+	$(CP) $(ZLIB_DIR)/install/lib/libz.so* $(FW_ROOTFS_LIB_DIR)
+	$(CP) $(SQLITE_DIR)/install/lib/libsqlite3.so* $(FW_ROOTFS_LIB_DIR)
+ifeq ($(SUPPORT_SNMP),y)	
+	$(CP) -H $(PRJ_LIB_DIR)/snmpd/libnetsnmp.so.30 $(FW_ROOTFS_LIB_DIR)
+	$(CP) -H $(PRJ_LIB_DIR)/snmpd/libnetsnmpagent.so.30 $(FW_ROOTFS_LIB_DIR)
+	$(CP) -H $(PRJ_LIB_DIR)/snmpd/libnetsnmpmibs.so.30 $(FW_ROOTFS_LIB_DIR)
+endif		
+
+apps_clean:
+	$(RM) $(FW_ROOTFS_DIR)
+	$(RM) $(RELEASE_DIR)/$(IMAGE_PREFIX)_FW_*
+	
+boot: hosttools_check boot_config world
+	@timestamp=`(date "+%y%m%d_%H%M")`;  \
+	timestamp2=`(date "+%y-%m-%d-%H-%M-%S")`; \
+	$(MKIMG) -v -T 0x01 -V $(UBOOT_VERSION) -D $$timestamp2 $(PRJ_ROOT_DIR)/output/images/u-boot.bin $(RELEASE_DIR)/$(IMAGE_PREFIX)_uboot_V$(UBOOT_VERSION)_$$timestamp.img;
+boot_config:
+	$(CP) uboot.config .config
+hosttools_check:
+	@if [ ! -f $(MKIMG) -o ! -f $(MKFBOX) ] ; then \
+		$(MAKE) -C $(HOSTTOOLS_DIR); \
+		$(CHMOD) 777 $(MKIMG); \
+	fi
+
+boot_clean:boot_config
+	$(MAKE) clean
+
+tools: tools_config world
+	
+tools_config:
+	$(CP) tools.config .config
+tools_clean:tools_config
+	$(MAKE) clean
+

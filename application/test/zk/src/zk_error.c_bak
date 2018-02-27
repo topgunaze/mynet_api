@@ -1,0 +1,166 @@
+/**************************************************************
+ * 文件名称:  
+ * 作           者:  
+ * 日           期:  
+ * 文件描述:  
+ * 版           本:  
+ * 修改历史:  
+ *     <修改者>   <时间>    <版本 >   <描述>
+**************************************************************/
+
+#include "tf_adaptor_errno.h"
+
+static char rc_simple_des[100];
+
+static GTF_ERROR_MSG 
+errorMsg[PROFILE_RTN_MAX] = 
+{
+    [GTF_RTN_OK]                               = {"Success"},
+    [GTF_RTN_ERROR]                            = {"Error"},
+
+    /* 通用错误*/
+    [GTF_RTN_ERROR_MALLOC]                     = {"No enought memory"},
+    [GTF_RTN_ERROR_INVALID_PARAM]              = {"Invalid parameter"},
+    [GTF_RTN_CONFIG_REPEAT]                    = {"Make configuration repeatedly"},
+    [GTF_RTN_CONFIG_SYNC_CONFLICT]             = {"The profile in sync operation wait a moment"},
+    [GTF_RTN_ERROR_OMCI_PROCESS_FAILED]        = {"Failed to process OMCI"},
+        
+    /* 模板错误*/    
+    [GTF_RTN_DBA_PROFILE_EXIST]                = {"The dba profile already exists"},
+    [GTF_RTN_DBA_PROFILE_NOT_EXIST]            = {"The dba profile does not exist"},
+    [GTF_RTN_DBA_PROFILE_BOUND]                = {"The dba profile has been bound"},
+    [GTF_RTN_DBA_PROFILE_TABLE_FULL]           = {"The dba profile table is full"},
+        
+    [GTF_RTN_LINE_PROFILE_EXIST]               = {"The line profile already exists"},
+    [GTF_RTN_LINE_PROFILE_NOT_EXIST]           = {"The line profile does not exist"},
+    [GTF_RTN_LINE_PROFILE_BOUND]               = {"The line profile has been bound"},
+    [GTF_RTN_LINE_PROFILE_TABLE_FULL]          = {"The line profile table is full"},
+        
+    [GTF_RTN_SRV_PROFILE_EXIST]                = {"The service profile already exists"},
+    [GTF_RTN_SRV_PROFILE_NOT_EXIST]            = {"The service profile does not exist"},
+    [GTF_RTN_SRV_PROFILE_BOUND]                = {"The service profile has been bound"},
+    [GTF_RTN_SRV_PROFILE_TABLE_FULL]           = {"The service profile table is full"},
+    
+    [GTF_RTN_SIPAGENT_PROFILE_EXIST]           = {"The sip agent profile already exists"},
+    [GTF_RTN_SIPAGENT_PROFILE_NOT_EXIST]       = {"The sip agent profile does not exist"},
+    [GTF_RTN_SIPAGENT_PROFILE_BOUND]           = {"The sip agent profile has been bound"},
+    [GTF_RTN_SIPAGENT_PROFILE_TABLE_FULL]      = {"The sip agent profile table is full"},
+
+    [GTF_RTN_POTS_PROFILE_EXIST]               = {"The pots profile already exists"},
+    [GTF_RTN_POTS_PROFILE_NOT_EXIST]           = {"The pots profile does not exist"},
+    [GTF_RTN_POTS_PROFILE_BOUND]               = {"The pots profile has been bound"},
+    [GTF_RTN_POTS_PROFILE_TABLE_FULL]          = {"The pots profile table is full"},
+
+    [GTF_RTN_DIGITMAP_PROFILE_EXIST]           = {"The digital map profile already exists"},
+    [GTF_RTN_DIGITMAP_PROFILE_NOT_EXIST]       = {"The digital map profile does not exist"},
+    [GTF_RTN_DIGITMAP_PROFILE_BOUND]           = {"The digital map profile has been bound"},
+    [GTF_RTN_DIGITMAP_PROFILE_TABLE_FULL]      = {"The digital map profile table is full"},
+
+    [GTF_RTN_SIPRIGHT_PROFILE_EXIST]           = {"The sip right flag profile already exists"},
+    [GTF_RTN_SIPRIGHT_PROFILE_NOT_EXIST]       = {"The sip right flag profile does not exist"},
+    [GTF_RTN_SIPRIGHT_PROFILE_BOUND]           = {"The sip right flag profile has been bound"},
+    [GTF_RTN_SIPRIGHT_PROFILE_TABLE_FULL]      = {"The sip right flag profile table is full"},
+    
+    [GTF_RTN_TRAFFIC_PROFILE_EXIST]            = {"The traffic profile already exists"},
+    [GTF_RTN_TRAFFIC_PROFILE_NOT_EXIST]        = {"The traffic profile does not exist"},
+    [GTF_RTN_TRAFFIC_PROFILE_BOUND]            = {"The traffic profile has been bound"},
+    [GTF_RTN_TRAFFIC_PROFILE_NOT_BOUND]        = {"The traffic profile has not been bound"},
+    [GTF_RTN_TRAFFIC_PROFILE_TABLE_FULL]       = {"The traffic profile table is full"},
+
+    /* 模板绑定错误*/
+    [GTF_RTN_ERROR_ONU_BOUND]                  = {"The ONU has been bound to a profile"},
+    [GTF_RTN_ERROR_ONU_NOT_BOUND]              = {"The ONU has not been bound to a profile"},
+
+    /* ONU 状态*/
+    [GTF_RTN_ONU_NOT_EXIST]                    = {"The ONT does not exist"},
+    [GTF_RTN_ONU_NOT_ONLINE]                   = {"The ONT does not online"},
+    [GTF_RTN_ONU_IDLE]                         = {"The ONT is idle"},
+    [GTF_RTN_ONU_BUSY]                         = {"The ONT is busy now, please try later"},
+    [GTF_RTN_ONU_MIB_SYNCED]                   = {"The ONU's mib is in synchronized state"},
+    [GTF_RTN_ONU_MIB_NOT_SYNCED]               = {"The ONU's mib is not in synchronized state"},
+
+    /* 授权状态错误*/
+    [GTF_RTN_ERROR_ONURA_ONU_HAS_NOT_REGED]    = {"The ONU has not registered to the OLT"},
+    [GTF_RTN_ERROR_ONURA_ONU_ALREADY_AUTHED]   = {"The ONU already been authenticated to the OLT"},
+    [GTF_RTN_ERROR_ONURA_AUTH_LIST_TABLE_FULL] = {"The ONU authentication table is full"},
+    [GTF_RTN_ERROR_ONURA_AUTH_ENTRY_NOT_EXIST] = {"The ONU does not exist in the authentication table"},
+    [GTF_RTN_ERROR_ONURA_AUTH_ENTRY_EXIST]     = {"The ONU already exists in the authentication table"},
+    [GTF_RTN_ERROR_ONURA_AUTH_ENTRY_CONFLLIC]  = {"The ONU ID conflict whit the authentication table"},
+    [GTF_RTN_ERROR_ONURA_AUTH_NO_UNUSED_AUTHID]= {"The ONU authentication table is full"},
+
+    /*注册状态错误*/
+    [GTF_RTN_ONURA_ERROR_REG_LIST_TABLE_FULL]  = {"ONU register table is full", ""},
+    [GTF_RTN_ONURA_ERROR_REG_ENTRY_NOT_EXIST]  = {"The ONU does not exist in the registry table"},
+    [GTF_RTN_ONURA_ERROR_REG_ENTRY_EXIST]      = {"The ONU already exists in the registry table"},
+    [GTF_RTN_ONURA_ERROR_REG_ENTRY_CONFLLIC]   = {"The ONU conflict whit the registry table"},
+    [GTF_RTN_ONURA_ERROR_REG_ENTRY_ID_USED]    = {"The ONU already exists in the registry table"},
+    [GTF_RTN_ONURA_ERROR_REG_ENTRY_SN_REGED]   = {"Add ONU to registry table failed"},
+
+    /* 物理状态配置错误*/
+    [GTF_RTN_ONURA_ERROR_SILENCE_FAILED]       = {"Silence failed"},
+    [GTF_RTN_ONURA_ERROR_DESILENCE_FAILED]     = {"Desilence failed"},
+    [GTF_RTN_ONURA_ERROR_OFFLINE_FAILED]       = {"Offline failed"},
+
+    /* 带宽溢出*/
+    [GTF_RTN_NO_ENOUGHT_BW]                    = {"No enought bandwidth"},
+
+    [GTF_RTN_ERROR_ETH_PORT_NOT_EXIST]         = {"The ONT port does not exist"},
+    [GTF_RTN_ERROR_ETH_PORT_NOT_ADD_TO_THE_VLAN] 
+                                                = {"The port has not been added to the specified VLAN"},
+
+    [GTF_RTN_ERROR_POTS_PORT_NOT_EXIST]        = {"The ONT port does not exist"},
+    [GTF_RTN_ERROR_POTS_PORT_USER_EXIST]       = {"The user already exists"},
+    [GTF_RTN_ERROR_POTS_PORT_USER_NOT_EXIST]   = {"The user does not exist"},
+
+    [GTF_RTN_ONU_UPGRADE_LOAD_START]           = {"The onu load process already started"},
+    [GTF_RTN_ONU_UPGRADE_LOAD_STOP]            = {"The onu load process has not been started"},
+    [GTF_RTN_ONU_UPGRADE_LOADING]              = {"The onu is in loading state"},
+    [GTF_RTN_ONU_UPGRADE_NOT_SELECT]           = {"The onu has not been selected"},
+    [GTF_RTN_ONU_UPGRADE_SELECT]               = {"The onu has already been selected"},
+    [GTF_RTN_ONU_UPGRADE_DOWNLOAD_FAILED]      = {"Download the ONU's image failed"},
+    [GTF_RTN_ONU_UPGRADE_IMAGE_DOWNLOADING]    = {"Downloading the ONU's image"},
+    [GTF_RTN_ONU_UPGRADE_OPEN_FAILED]          = {"Open the ONU's image failed"},
+    [GTF_RTN_ONU_UPGRADE_IMAGE_SIZE_ERROR]     = {"The size of the ONU's image is unnormal"},
+    [GTF_RTN_ONU_UPGRADE_IMAGE_READED]         = {"The ONU's image has already been readed"},
+
+    [GTF_RTN_ONU_AUTOAUTH_RULE_CONFLICT]       = {"Confilct with existing automatic authentication rule"},
+    [GTF_RTN_ONU_AUTOAUTH_RULE_FULL]           = {"Automatic authentication rule table is full"},
+    [GTF_RTN_ONU_AUTOAUTH_RULE_ENTRY_EXIST]    = {"Automatic authentication rule has been already configured"},
+    [GTF_RTN_ONU_AUTOAUTH_MODE_CONFLICT]       = {"ONT automatic authentication mode conflict"},
+
+    [GTF_RTN_LINE_PROFILE_BOUND_BY_AUTOAUTH]   = {"The line profile has been used by ONU automaitc authentication"},
+    [GTF_RTN_SRV_PROFILE_BOUND_BY_AUTOAUTH]    = {"The service profile has been used by ONU automaitc authentication"},
+};
+
+
+//简化处理
+const char *
+tf_rc_simple_print(
+                unsigned int ret)
+{
+    tf_rc_info rc_info;
+    tf_rc2info_convert(ret, &rc_info);
+
+    if(rc_info.obj_id >= OBJ_ID_NUM_OF)
+        return "Unknown return code";
+        
+    //对象 - 子对象- 错误码
+    snprintf(rc_simple_des, sizeof(rc_simple_des), "Error code description obj: %d sub_obj: %d errno: %d\n", 
+                rc_info.obj_id, *(unsigned int*)&rc_info.sub_obj_id, rc_info.err_id);
+
+    return rc_simple_des;
+}
+
+const char *
+tf_gtf_errorcode_print(
+                GTF_RTN_CODE ret)
+{
+    ret %= TF_RETURNCODE_BASE; 
+    
+    if(ret >= PROFILE_RTN_MAX)
+        return "Unknown return code";
+    
+    return errorMsg[ret].pMsg;
+}
+
+

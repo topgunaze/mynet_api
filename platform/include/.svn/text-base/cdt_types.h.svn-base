@@ -1,0 +1,84 @@
+/**************************************************************
+ * 文件名称:  cdt_types.h
+ * 作           者:  keith.gong
+ * 日           期:  2014.12.20
+ * 文件描述:  工程通用数据类型定义
+ * 版           本:  V1.00
+ * 修改历史:  
+ *     <修改者>   <时间>    <版本 >   <描述>
+**************************************************************/
+
+#ifndef __CDT_TYPES_H__
+#define __CDT_TYPES_H__
+
+#include <unistd.h>
+#include <stdlib.h>
+
+#ifndef ERROR
+#define ERROR                           (-1)
+#endif
+
+#ifndef OK
+#define OK                              0
+#endif
+
+typedef enum
+{
+    RTN_ERROR                           = ERROR,
+    RTN_OK                              = OK,
+}RTN_STATUS;
+#define RTN_ERR                     RTN_ERROR
+#define	STDIN                           0
+#define	STDOUT                          1
+#define	STDERR                          2
+
+#ifndef BOOL
+typedef unsigned char                   BOOL;
+#endif
+
+#ifndef FALSE
+#define FALSE                           0
+#endif
+
+#ifndef TRUE
+#define TRUE                            1
+#endif
+
+
+
+typedef unsigned int               	UINT;
+typedef char                        INT8;
+typedef short                       INT16;
+typedef int                         INT32;
+typedef long long                   INT64;
+
+typedef unsigned char                   UINT8;
+typedef unsigned short                  UINT16;
+typedef unsigned int                    UINT32;
+typedef unsigned long long              UINT64;
+
+#ifndef MIN
+#define MIN(a, b)                       ((a) > (b) ? b : a)
+#endif
+
+#ifndef DEF_FUNC
+#define DEF_FUNC(x) 0x01
+#endif
+#ifndef CDT_BIT_SET
+#define CDT_BIT_SET(val, bit, set)	\
+	do \
+	{ \
+		if((set) == 1) \
+			(val) |= (1<<(bit)); \
+		else if((set) == 0) \
+			(val) &= ~(1<<(bit)); \
+	}while(0);
+#endif
+
+#ifndef CDT_BIT_TEST
+#define CDT_BIT_TEST(val, bit) (((val) >> (bit)) & 0x01U)
+#endif
+
+
+#endif
+

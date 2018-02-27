@@ -1,0 +1,369 @@
+
+
+#ifndef __vifDrv_h__
+#define __vifDrv_h__
+
+#include "netinet/if_ether.h"
+#include "netinet/in.h"
+#include "stdio.h"
+
+#include "cdt_types.h"
+
+#if 000
+#define HW_DEVICE_NAME		"hw"
+#define HW_DEVICE_NAME_LEN	3
+
+#define AG_DEVICE_NAME			"ag"
+#define AG_DEVICE_NAME_LEN	3
+
+#define SW_DEVICE_NAME			"sw"
+#define SW_DEVICE_NAME_LEN	3
+
+#define HW_LOAD_STRING  	"0"
+#define HW_LOAD_FUNC    	hwEndLoad
+
+#define AG_LOAD_STRING  	"0"
+#define AG_LOAD_FUNC    		agEndLoad
+
+#define SW_LOAD_STRING  	"0"
+#define SW_LOAD_FUNC    	swEndLoad
+#endif
+
+#define VLAN_ID_MASK        	0x00000FFF  
+#define DEFAULT_VID         	0x0001
+
+#define SYS_MIN_VID			1
+#define SYS_MAX_VID			4094
+
+#define SYS_MIN_AGID		1
+#define SYS_MAX_AGID		8
+#define SYS_MAX_AGMEM		8
+
+#define SYS_MAX_SYS		1
+#define SYS_MAX_SLOT		12
+#define SYS_MAX_PORT		4
+#define SYS_MAX_USER_PORT		4
+
+#define MAX_ENTRY_NUM		200
+
+#define DEFAULT_MTU			1518
+
+#define END_MACROS
+
+enum {
+	HW = 0,/*上联，内口*/
+	AG,
+	SW,
+	SUB,
+	SUBIF,
+	PON,
+	PROTECTPON,
+};
+
+enum {
+    ONU_SYS = 0,
+    ONU_CARD,
+    ONU_ETH,
+    ONU_POTS,
+    ONU_E1,
+    ONU_ADSL,
+    ONU_PON_IF,
+    ONU_VLINK,
+    ONU_GEMPORT,/*20130923 add*/
+    ONU_RESERVE,
+};
+
+enum {
+	HANDLE_CMD_GET = 1,
+	HANDLE_CMD_SET,	
+};
+
+#if 0
+enum {
+	VLAN_TYPE_STATIC = 1,
+	VLAN_TYPE_DYNAMIC = 2,
+};
+#endif
+
+enum {
+	IF_VALUE_AUTO = 1,
+	IF_VALUE_HALF_10 = 2,
+	IF_VALUE_FULL_10 = 3,
+	IF_VALUE_HALF_100 = 4,
+	IF_VALUE_FULL_100 = 5,
+	IF_VALUE_HALF_1000 = 6,
+	IF_VALUE_FULL_1000 = 7,
+
+	IF_VALUE_ACCEPTFRAME_ALL = 1,
+	IF_VALUE_ACCEPTFRAME_TAGONLY = 2,
+
+	IF_VALUE_VLANMODE_TRANSPARENT = 1,
+	IF_VALUE_VLANMODE_HYBRID = 2,
+
+	IF_VALUE_UNTAG = 1,
+	IF_VALUE_TAG = 2,
+	
+	IF_VALUE_ZERO = 0,
+	IF_VALUE_ENABLE = 1,
+	IF_VALUE_DISABLE = 2,
+	IF_VALUE_BLOCK = 3,
+};
+
+enum {
+	SW_REGISTER_SLOT,
+	SW_DEREGISTER_SLOT,
+	SW_RECEIVE_PKT,
+	SW_STATE_NOTIFY,
+};
+
+enum {
+	m_ifType,
+	m_ifDescr,
+	m_ifMtu,
+	m_ifFlowCtrl, /* read_write */
+	m_ifSpeedDupLex, /* read_write */
+	m_ifCurSpeedDupLex, /* read_write */
+	m_ifAcceptFrame,
+	m_ifIngressFilter,
+	m_ifDefaultCos,
+	m_ifPvid,
+	m_ifAdminStatus, /* read_write */
+	m_ifOperateStatus,
+	m_ifCurOperateStatus,/* read_only */
+	m_ifInRateLimit, /* read_write */
+	m_ifOutRateLimit,
+	m_ifInMirrorPort,
+	m_ifOutMirrorPort,
+	m_ifBcLimit,
+	m_ifMcLimit,
+	m_ifDlfLimit,
+	m_ifJumboFrame,
+	m_ifVlanMode,
+	m_ifVlanMember,
+	m_ifVlanUntag,
+	m_ifJoinVlan,
+	m_ifQuitVlan,
+	m_ifJoinTrunk,
+	m_ifQuitTrunk,	
+	m_ifSelfMember,
+	m_ifMacLearning,
+	
+	m_swAddIpAddr,
+	m_swDelIpAddr,
+	m_swClearIpAddr,
+	m_swDescription,
+	m_swType,
+	m_swAdmin,
+	m_swOperate,
+	m_swMember,/* get vlan member (hwEnd only)*/
+	m_swMemberUntag,/* get vlan member untag (hwEnd only )*/
+	m_swMemberLogic,/* get vlan member (hwEnd and agEnd)*/
+	m_swClearSubEnd,/* */
+};
+
+typedef struct {
+	int cfg_ifType;
+	char cfg_ifDescr[32];
+	int cfg_ifMtu;
+	int cfg_ifSpeedDupLex;
+	int cfg_ifFlowCtrl;
+	int cfg_ifInRateLimit;
+	int cfg_ifOutRateLimit;
+	int cfg_ifInMirrorPort;
+	int cfg_ifOutMirrorPort;
+	int cfg_ifBcLimit;
+	int cfg_ifMcLimit;
+	int cfg_ifDlfLimit;
+	int cfg_ifJumboFrame;
+	int cfg_ifDefaultCos;
+	int cfg_ifPvid;
+	int cfg_ifIngressFilter;
+	int cfg_ifAcceptFrame;
+	int cfg_ifVlanMode;
+	int cfg_ifAdminStatus;
+	int cfg_ifMacLearning;
+}cfgData_t;
+
+#if 000
+typedef struct {
+    END_OBJ     	endObj;         /* The class we inherit from. */
+    int         		unit;           /* unit number */
+    int         		index;           /* index number */
+    long        		flags;          /* Our local flags. */
+    CACHE_FUNCS 	cacheFuncs;     /* cache function pointers */
+
+    NET_FUNCS   	funcTable;      /* Must allocate an instance per END. */
+
+    uchar_t     	vidMList[512];      /* Bit map of current VLAN ID's - member */
+    uchar_t     	vidUList[512];      /* Bit map of current VLAN ID's - untag */
+
+    END_OBJ  		*pAgEnd;		/* aboveAgEnd */
+
+    ushort_t		qtag;
+    u_short		vid;
+	
+    cfgData_t		cfgData;
+
+    LIST               aboveEndList;    /* just have above END */
+} HWDEV_OBJ;
+
+typedef struct {
+    END_OBJ     endObj;         /* The class we inherit from. */
+    int         unit;           /* unit number */
+    int         index;           /* index number */
+    long        flags;          /* Our local flags. */
+    CACHE_FUNCS cacheFuncs;     /* cache function pointers */
+
+    ushort_t    qtag;           /* QTAG Length */
+    ushort_t    vid;            /* VLAN ID for an L3 switch. */
+
+    int		agid;
+	
+    uchar_t     vidMList[512];      /* Bit map of current VLAN ID's - member */
+    uchar_t     vidUList[512];      /* Bit map of current VLAN ID's - untag */
+
+    NET_FUNCS   funcTable;      /* Must allocate an instance per END. */
+
+    cfgData_t		cfgData;
+
+    LIST               aboveEndList;
+    LIST               belowEndList;
+} AGDEV_OBJ;
+
+
+typedef struct {
+    END_OBJ     endObj;         /* The class we inherit from. */
+    int         unit;           /* unit number */
+    long        flags;          /* Our local flags. */
+
+    int		type;		/* static or dynamic */
+    ushort_t    qtag;           /* Length of the QTAG value */
+    ushort_t    vid;            /* VLAN ID value for this swEnd */
+
+    NET_FUNCS   funcTable;      /* Must allocate an instance per END. */
+
+    char 		description[64]; /* vlan name */
+
+    LIST         belowEndList;   /* just have below ENDs */
+
+    LIST         ipAddrList; /* ipv4 address list */
+} SWDEV_OBJ;
+
+typedef struct {
+	NODE node;
+	END_OBJ *pEnd;
+	int type;
+} subEndLink_t;
+
+typedef struct {
+	NODE node;
+	long  ipAddr;
+} ipAddrLink_t;
+
+typedef struct {
+    char      	*pDevName;
+    END_OBJ   	*(*pLoadFunc) (char*);
+    char      	*pLoadString;
+} vifEndTable_t;
+#endif
+
+typedef struct {
+	int type;
+	struct {
+		int system;
+		int slot;
+		int port;
+		int channel;
+		int subif;
+	} sspc;
+	int virnum;
+} phyInfo_t;
+
+
+
+
+typedef struct {
+	int type;				/* 8 bits */
+	struct {
+		int onuSys;		/* 8 bits, this note LLID or optical id of ONU */
+		int onuCard;		/* 8 bits, this note slot id of ONU, used by FTTC, always as 1 when FTTH or FTTB*/
+		int onuSubIdx;	/* 8 bits, this note port id of ethernet or pots or E1 */
+	} oscs;
+} subPhyInfo_t;
+
+#if 000
+extern END_OBJ *vifEndFindByVid(u_short vid);
+extern BOOL ifVlanExist(u_short vid);
+extern END_OBJ *vifEndFindByAgid(int agId);
+extern END_OBJ *vifEndFindByUnit(UINT32 unit);
+extern STATUS vifEndStatusNotify(int unit, int status);
+extern STATUS vifLog2Phy(UINT32 unit, phyInfo_t *phy);
+extern STATUS vifPhy2Log(phyInfo_t *phy, UINT32 *unit);
+extern STATUS vifEndEtherPacketDataGet(M_BLK_ID pMblk, LL_HDR_INFO *pLinkHdrInfo);
+
+STATUS nmPhy2VifPhy(phyInfo_t *vifPhy, phyInfo_t *nmPhy);
+STATUS vifPhy2NmPhy(phyInfo_t *nmPhy, phyInfo_t *vifPhy);
+STATUS subVifLog2Phy(UINT32 unit, subPhyInfo_t *phy);
+STATUS subVifPhy2Log(subPhyInfo_t *phy, UINT32 *unit);
+
+STATUS onuIfOnuId2Log(UINT32 authId, UINT32 *unit);
+#endif
+RTN_STATUS onuIfOnuId2Log(UINT32 authId, UINT32 *unit);
+RTN_STATUS onuIfOnuEthPort2Log(UINT32 authId, UINT32 ethPortId, UINT32 *unit);
+RTN_STATUS onuIfOnuVoipPort2Log(UINT32 authId, UINT32 voipPortId, UINT32 *unit);
+RTN_STATUS onuIfOnuE1Port2Log(UINT32 authId, UINT32 e1PortId, UINT32 *unit);
+RTN_STATUS onuIfOnuPonIf2Log(UINT32 authId, UINT32 ponIfId, UINT32 *unit);
+RTN_STATUS onuIfOltId2VifLog(UINT32 ponId, UINT32 *unit);
+void onuEthIndex2OnuIfUnit(int onuId,int portId, UINT32 *subInst);
+
+
+
+void
+AttachAuthIdAndPhyId(
+                UINT16 ponId,
+                UINT16 authId,
+                UINT16 phyId);
+
+
+RTN_STATUS 
+vifLog2Phy(
+                UINT32 unit, 
+                phyInfo_t *phy);
+
+RTN_STATUS 
+vifPhy2Log(
+                phyInfo_t *phy, 
+                UINT32 *unit);
+
+RTN_STATUS 
+subVifPhy2Log(
+                subPhyInfo_t *phy, 
+                UINT32 *unit);
+
+RTN_STATUS 
+subVifLog2Phy(
+                UINT32 unit, 
+                subPhyInfo_t *phy);
+
+void  
+ponIndex2VifUnit(
+                int slotId,
+                int ponId,
+                UINT32 *instance);
+
+#if 0
+void 
+onuIndex2OnuIfUnit(
+                int ponId,
+                int onuId,
+                UINT32 *subInst);
+
+
+RTN_STATUS onuIfOnuId2Log(UINT32 ponId, UINT32 authId, UINT32 *unit);
+RTN_STATUS onuIfPhyId2Log(UINT32 ponId, UINT32 phyId, UINT32 *unit);
+UINT32 onuIfPhyId2OnuId(UINT32 ponId, UINT32 phyId);
+UINT32 onuIfOnuId2PhyId(UINT32 ponId, UINT32 authId);
+#endif
+
+#endif /* __vifDrv_h__ */
+

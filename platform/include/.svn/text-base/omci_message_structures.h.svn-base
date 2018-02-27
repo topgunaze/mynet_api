@@ -1,0 +1,69 @@
+
+#ifndef _OMCI_MESSAGE_STRUCTURE_H
+#define _OMCI_MESSAGE_STRUCTURE_H
+
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#include "cdt_queue.h"
+
+#define OMCI_MESSAGE_HEADER_LENGTH     8
+
+
+/*OMCI 消息结构定义*/
+typedef struct OMCI_MESSAGE_HEADER
+{
+    short       Transaction_Correlation_Identifier;     /*事务相关标识符*/
+    char        priority;                               /*消息优先级,0:低优先级，1: 高优先级*/
+    char        destination_bit;                        /*预留给目的位，在OMCI中，该位总是为0。*/
+    char        Acknowledge_Request;                /*请求确认，用来指示该消息是否需要确认。如果需要确认，该位被置为"1"，否则，该位为"0"。*/
+    char        Acknowledgement;                    /*确认，用来指示该消息是不是对一个动作请求的应答消息。如果是，该位被置为"1"。如果不是，该位被置为"0"。*/
+    char        MessageType;                        /*消息类型*/
+    char        DeviceIdentifier;                   /*设备标识符*/
+    unsigned int            MeIdentifier;                          /*受管实体标识符*/
+    unsigned int            instanceIdentifier;                 /*实例标识符*/
+}OMCI_MESSAGE_HEADER;
+
+#define OMCI_MESSAGE_CONTENTS_MAX_LENRTH    32
+
+typedef struct OMCI_MESSAGE_
+{
+    OMCI_MESSAGE_HEADER     header;                 /*omci头部*/
+    unsigned char           MessageContents[OMCI_MESSAGE_CONTENTS_MAX_LENRTH];  /*消息内容*/
+    char                    omci_trailer[8];            /*omci 尾字段*/
+}OMCI_MESSAGE;
+
+typedef struct OMCI_GENARAL_RESPONSE_MESSAGE_
+{
+    OMCI_MESSAGE_HEADER     header;                 /*omci头部*/
+    char                        processed_result;       /*执行结果*/
+}OMCI_GENARAL_RESPONSE_MESSAGE;
+
+typedef struct OMCI_CREATE_MESSAGE_
+{
+    OMCI_MESSAGE_HEADER     header;                 /*omci头部*/
+    char                        processed_result;       /*执行结果*/
+}OMCI_CREATE_MESSAGE;
+
+
+typedef struct OMCI_TX_BUFFER
+{
+    OMCI_TX_QUEUE_LINKS         links;
+    char*                       p_packet;
+    int                         size_of_packet;
+    int                          retransmission_timer; /* in ticks */
+    int                          retransmission_count;/*该包已发送的次数*/
+    int                          TCI_of_the_packet;/*TCI*/
+    void                         (*fptr_tx_complete) (char *bptr_data); /*buffer释放回调函数*/
+}OMCI_TX_BUFFER;
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#endif/*_OMCI_MESSAGE_STRUCTURE_H*/

@@ -1,0 +1,317 @@
+
+#ifndef _PON_ONU_TYPE_H
+#define _PON_ONU_TYPE_H
+
+
+/*================  ONU  类型相关宏===================*/
+
+/*============================*\
+			FP_ONU_NONE
+\*============================*/
+#define FP_ONU_NONE_FE_NUM 1
+#define FP_ONU_NONE_GE_NUM 0
+#define FP_ONU_NONE_VOIP_NUM 0
+#define FP_ONU_NONE_ADSL2_NUM 0
+#define FP_ONU_NONE_VDSL2_NUM 0
+#define FP_ONU_NONE_E1_NUM 0
+#define FP_ONU_NONE_VENDOR_ID "xxxx"
+#define FP_ONU_NONE_MODEL 0
+
+/*============================*\
+			FP1001
+\*============================*/
+#define FP1001_FE_NUM 1
+#define FP1001_GE_NUM 0
+#define FP1001_VOIP_NUM 0
+#define FP1001_ADSL2_NUM 0
+#define FP1001_VDSL2_NUM 0
+#define FP1001_E1_NUM 0
+#define FP1001_VENDOR_ID "xxxx"
+#define FP1001_MODEL 0
+
+
+/*============================*\
+			FP1004_I
+\*============================*/
+#define FP1004_I_FE_NUM 4
+#define FP1004_I_GE_NUM 0
+#define FP1004_I_VOIP_NUM 0
+#define FP1004_I_ADSL2_NUM 0
+#define FP1004_I_VDSL2_NUM 0
+#define FP1004_I_E1_NUM 0
+#define FP1004_I_VENDOR_ID "xxxx"
+#define FP1004_I_MODEL 0
+
+
+/*============================*\
+			FP1008T
+\*============================*/
+#define FP1008T_FE_NUM 8
+#define FP1008T_GE_NUM 0
+#define FP1008T_VOIP_NUM 0
+#define FP1008T_ADSL2_NUM 0
+#define FP1008T_VDSL2_NUM 0
+#define FP1008T_E1_NUM 0
+#define FP1008T_VENDOR_ID "xxxx"
+#define FP1008T_MODEL 0
+
+
+/*============================*\
+			FPOTH_T1
+\*============================*/
+#define FPOTH_T1_FE_NUM 0
+#define FPOTH_T1_GE_NUM 1
+#define FPOTH_T1_VOIP_NUM 0
+#define FPOTH_T1_ADSL2_NUM 0
+#define FPOTH_T1_VDSL2_NUM 0
+#define FPOTH_T1_E1_NUM 0
+#define FPOTH_T1_VENDOR_ID "xxxx"
+#define FPOTH_T1_MODEL 0
+
+/*============================*\
+			FPOTH_T4
+\*============================*/
+#define FPOTH_T4_FE_NUM 4
+#define FPOTH_T4_GE_NUM 0
+#define FPOTH_T4_VOIP_NUM 0
+#define FPOTH_T4_ADSL2_NUM 0
+#define FPOTH_T4_VDSL2_NUM 0
+#define FPOTH_T4_E1_NUM 0
+#define FPOTH_T4_VENDOR_ID "xxxx"
+#define FPOTH_T4_MODEL 0
+
+/*============================*\
+			FPOTH_T8
+\*============================*/
+#define FPOTH_T8_FE_NUM 8
+#define FPOTH_T8_GE_NUM 0
+#define FPOTH_T8_VOIP_NUM 0
+#define FPOTH_T8_ADSL2_NUM 0
+#define FPOTH_T8_VDSL2_NUM 0
+#define FPOTH_T8_E1_NUM 0
+#define FPOTH_T8_VENDOR_ID "xxxx"
+#define FPOTH_T8_MODEL 0
+
+
+
+/*================================*\
+		FP_ONU_OTH1		单千兆口
+\*================================*/
+#define FP_ONU_OTH1_FE_NUM 0
+#define FP_ONU_OTH1_GE_NUM 1
+#define FP_ONU_OTH1_VOIP_NUM 0
+#define FP_ONU_OTH1_ADSL2_NUM 0
+#define FP_ONU_OTH1_VDSL2_NUM 0
+#define FP_ONU_OTH1_E1_NUM 0
+#define FP_ONU_OTH1_VENDOR_ID "xxxx"
+#define FP_ONU_OTH1_MODEL 0
+
+/*================================*\
+		FP_ONU_OTH2		单百兆口
+\*================================*/
+#define FP_ONU_OTH2_FE_NUM 1
+#define FP_ONU_OTH2_GE_NUM 0
+#define FP_ONU_OTH2_VOIP_NUM 0
+#define FP_ONU_OTH2_ADSL2_NUM 0
+#define FP_ONU_OTH2_VDSL2_NUM 0
+#define FP_ONU_OTH2_E1_NUM 0
+#define FP_ONU_OTH2_VENDOR_ID "xxxx"
+#define FP_ONU_OTH2_MODEL 0
+
+
+/*================================*\
+		FP_ONU_OTH3		单千兆+  单百兆
+\*================================*/
+#define FP_ONU_OTH3_FE_NUM 1
+#define FP_ONU_OTH3_GE_NUM 1
+#define FP_ONU_OTH3_VOIP_NUM 0
+#define FP_ONU_OTH3_ADSL2_NUM 0
+#define FP_ONU_OTH3_VDSL2_NUM 0
+#define FP_ONU_OTH3_E1_NUM 0
+#define FP_ONU_OTH3_VENDOR_ID "xxxx"
+#define FP_ONU_OTH3_MODEL 0
+
+/*================================*\
+		FP_ONU_OTH4		四个百兆口
+\*================================*/
+#define FP_ONU_OTH4_FE_NUM 4
+#define FP_ONU_OTH4_GE_NUM 0
+#define FP_ONU_OTH4_VOIP_NUM 0
+#define FP_ONU_OTH4_ADSL2_NUM 0
+#define FP_ONU_OTH4_VDSL2_NUM 0
+#define FP_ONU_OTH4_E1_NUM 0
+#define FP_ONU_OTH4_VENDOR_ID "xxxx"
+#define FP_ONU_OTH4_MODEL 0
+
+/*================================*\
+		FP_ONU_OTH5		四口以上
+\*================================*/
+#define FP_ONU_OTH5_FE_NUM 8
+#define FP_ONU_OTH5_GE_NUM 0
+#define FP_ONU_OTH5_VOIP_NUM 0
+#define FP_ONU_OTH5_ADSL2_NUM 0
+#define FP_ONU_OTH5_VDSL2_NUM 0
+#define FP_ONU_OTH5_E1_NUM 0
+#define FP_ONU_OTH5_VENDOR_ID "xxxx"
+#define FP_ONU_OTH5_MODEL 0
+
+/*================================*\
+		FP_ONU_OTH6		1+1
+\*================================*/
+#define FP_ONU_OTH6_FE_NUM 0
+#define FP_ONU_OTH6_GE_NUM 1
+#define FP_ONU_OTH6_VOIP_NUM 1
+#define FP_ONU_OTH6_ADSL2_NUM 0
+#define FP_ONU_OTH6_VDSL2_NUM 0
+#define FP_ONU_OTH6_E1_NUM 0
+#define FP_ONU_OTH6_VENDOR_ID "xxxx"
+#define FP_ONU_OTH6_MODEL 0
+
+/*============================*\
+			FP_ONU_02A
+\*============================*/
+#define FP_ONU_02A_FE_NUM 0
+#define FP_ONU_02A_GE_NUM 1
+#define FP_ONU_02A_VOIP_NUM 0
+#define FP_ONU_02A_ADSL2_NUM 0
+#define FP_ONU_02A_VDSL2_NUM 0
+#define FP_ONU_02A_E1_NUM 0
+#define FP_ONU_02A_VENDOR_ID "xxxx"
+#define FP_ONU_02A_MODEL 0
+
+/*============================*\
+			FP_ONU_09A
+\*============================*/
+#define FP_ONU_09A_FE_NUM 8
+#define FP_ONU_09A_GE_NUM 0
+#define FP_ONU_09A_VOIP_NUM 0
+#define FP_ONU_09A_ADSL2_NUM 0
+#define FP_ONU_09A_VDSL2_NUM 0
+#define FP_ONU_09A_E1_NUM 0
+#define FP_ONU_09A_VENDOR_ID "xxxx"
+#define FP_ONU_09A_MODEL 0
+
+/*============================*\
+			FP_ONU_TKOTH
+\*============================*/
+#define FP_ONU_TKOTH_FE_NUM 0
+#define FP_ONU_TKOTH_GE_NUM 1
+#define FP_ONU_TKOTH_VOIP_NUM 0
+#define FP_ONU_TKOTH_ADSL2_NUM 0
+#define FP_ONU_TKOTH_VDSL2_NUM 0
+#define FP_ONU_TKOTH_E1_NUM 0
+#define FP_ONU_TKOTH_VENDOR_ID "xxxx"
+#define FP_ONU_TKOTH_MODEL 0
+
+/*20131122 hupan add  .有SN中vendorId 如果是PHIC，则再利用 ONU2-G中产品码来识别出的本厂type*/
+/*============================*\
+            FGP1401
+\*============================*/
+#define FGP1401_FE_NUM 0
+#define FGP1401_GE_NUM 1
+#define FGP1401_VOIP_NUM 0
+#define FGP1401_ADSL2_NUM 0
+#define FGP1401_VDSL2_NUM 0
+#define FGP1401_E1_NUM 0
+#define FGP1401_VENDOR_ID "xxxx"
+#define FGP1401_MODEL 0
+
+/*============================*\
+            FGP1404
+\*============================*/
+#define FGP1404_FE_NUM 0
+#define FGP1404_GE_NUM 4
+#define FGP1404_VOIP_NUM 0
+#define FGP1404_ADSL2_NUM 0
+#define FGP1404_VDSL2_NUM 0
+#define FGP1404_E1_NUM 0
+#define FGP1404_VENDOR_ID "xxxx"
+#define FGP1404_MODEL 0
+
+#define VENDOR_ID(x) x##_VENDOR_ID
+#define MODEL(x) x##_MODEL
+#define FE_NUM(x) x##_FE_NUM
+#define GE_NUM(x) x##_GE_NUM
+#define VOIP_NUM(x) x##_VOIP_NUM
+#define ADSL2_NUM(x) x##_ADSL2_NUM
+#define VDSL2_NUM(x) x##_VDSL2_NUM
+#define E1_NUM(x) x##_E1_NUM
+#define ONU_TYPE_RECORD(x) {\
+	x,VENDOR_ID(x),MODEL(x),FE_NUM(x),GE_NUM(x),VOIP_NUM(x),\
+	ADSL2_NUM(x),VDSL2_NUM(x),E1_NUM(x)\
+	}
+
+#pragma pack(1)
+
+typedef enum
+{
+    FP_ONU_NONE = 0,
+    FP1001,
+    FP1004_I,
+    FP1008T,
+    FP1016T,
+    FP1024T,
+    FP1604,
+    FGP1401, /*20131122 hupan add */
+    FGP1404,
+    FP_ONU_RESERVE = 255
+}onuType_feixun;
+
+
+typedef struct{
+    onuType_feixun onuType;  
+    unsigned char  vendorId[5];
+    unsigned int   model;
+    unsigned char fePortNum;
+    unsigned char gePortNum;
+    unsigned char voipPortNum;
+    unsigned char adsl2PortNum;
+    unsigned char vdsl2PortNum;
+    unsigned char e1PortNum;
+}onuPortTypeEntry_t;
+
+
+#if 000		
+#define OnuTypestrlen 16
+typedef struct
+{
+	int type_flag;	/*为0表示是其它厂商的ONU，为1表示是斐讯自家的ONU*/
+	onuType_feixun	typeNum;
+	unsigned char  typeString[OnuTypestrlen];
+}onuType_t;
+#endif
+
+typedef struct
+{
+	unsigned char  FAST_ETHERNET_NUM;
+	unsigned char  GIGA_ETHERNET_NUM;
+	unsigned char  VOIP_PORT_NUM;
+	unsigned char  ADSL2_PORT_NUM;
+	unsigned char  VDSL2_PORT_NUM;
+	unsigned char  E1_PORT_NUM;
+	unsigned char  CATV_PORT_NUM;
+	unsigned char  USB_PORT_NUM;
+	unsigned char  WLAN_PORT_NUM;
+
+}onuPortNumInfo_t;
+/*-------------- ONU PORT TYPE --------------*/
+typedef enum
+{
+	ONU_PORT_FAST_ETHERNET,
+	ONU_PORT_GIGA_ETHERNET,
+	ONU_PORT_VOIP,
+	ONU_PORT_ADSL2,
+	ONU_PORT_VDSL2,
+	ONU_PORT_E1,
+	ONU_PORT_CATV,
+	ONU_PORT_USB,
+	ONU_PORT_WLAN,
+	ONU_PORT_RESERVE,
+}onuPortType_t;
+		
+#pragma pack(0)
+
+
+
+#endif
+

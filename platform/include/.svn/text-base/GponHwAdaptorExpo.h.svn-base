@@ -1,0 +1,250 @@
+
+#ifndef _MY_GPON_HW_ADAPTOR_EXPO_H
+#define _MY_GPON_HW_ADAPTOR_EXPO_H
+
+#include "omci_structures.h"
+
+
+
+/***************************************************\
+ ********                                                               ********
+ ********                配置类型枚举                ********
+ ********                                                               ********
+\***************************************************/
+#if 0
+#define  UINT32 unsigned int
+#define  INT32  int
+#define LONG  long
+#define ULONG unsigned long
+#define UINT16 unsigned short
+#define SHORT  short
+#define UINT8 UINT8
+#define CHAR  char
+#endif
+
+#if 1
+typedef struct
+{
+    UINT16  usVlanId;       /* 组播vlan */
+    UINT32   ulIpStart;
+    UINT32   ulIpEnd;
+}IPTV_TABLE_ST;
+#endif
+
+/*add 2013 0809*/
+typedef struct _optical_alarm_config_threshold
+{
+    short max_temperature_threshold;
+    short min_temperature_threshold;
+    short max_voltage_threshold;
+    short min_voltage_threshold;
+    short max_bias_current_threshold;
+    short min_bias_current_threshold;
+    char max_tx_optical_power_threshold;/*988  一个字节*/ 
+    char min_tx_optical_power_threshold;/*988  一个字节*/
+    UINT8 max_rx_optical_power_threshold;/*988  一个字节  Valid values 
+    are  -127 dBm (coded as 254) to 0 dBm (coded as 0)*/  
+    UINT8 min_rx_optical_power_threshold;/*988  一个字节*/
+}OPTICAL_POWER_ALARM_THRESHOLD_OLD;
+
+typedef struct ANI_G_INFO
+{
+    UINT8 SF_threshold;
+    UINT8 SD_threshold;
+    short Optical_signal_power;
+    UINT8 Optical_power_lower_limit;
+    UINT8 Optical_power_upper_limit;
+
+    short transmit_optical_power;
+    char transmit_opticalPower_lower_limit;
+    char transmit_opticalPower_upper_limit;
+
+    short power_feed_voltage;
+    short laser_bias_current;
+    short temperature_degrees;
+
+}ANI_G_INFO;
+
+
+typedef struct _onu_alarm_config_old_
+{
+    OPTICAL_POWER_ALARM_THRESHOLD_OLD   onu_optical_power;
+}ALL_ONUS_ALARM_CONFIG_OLD;
+
+#endif  
+#pragma pack ()
+
+
+OPTICAL_POWER_ALARM_THRESHOLD_OLD g_onu_threshold;
+
+/***************************************************\
+ ********                                                               ********
+ ********                内部函数说明                ********
+ ********                                                               ********
+\***************************************************/
+/*组播*/
+
+#if 000
+INT32 SetOnuMcastGroupNum(UINT32 link_id, UINT32 onu_id,UINT16 feid,UINT16 max_online_group);
+INT32 GetOnuMcastGroupNum(UINT32 link_id, UINT32 onu_id, UINT16 feid,UINT16 *max_online_group);
+#endif
+
+/*重启*/
+INT32 
+RebootOnu( 
+                UINT16 link_id, 
+                UINT16 onu_id);
+
+
+/*链路标记*/
+INT32 
+SetOnuEthAdministrativeState(
+                UINT32 link_id, 
+                UINT32 onu_id,
+                UINT16 instanceId,
+                UINT8  AdministrativeState);
+
+INT32 GetOnuEthAdministrativeState(UINT32 link_id, UINT32 onu_id,UINT16 portId,UINT8 *AdministrativeState);
+
+INT32 SetOnuEthMacLimit( UINT32 link_id, UINT32 onu_id,UINT16 feid ,UINT8 maclimit);
+INT32 GetOnuEthMacLimit(UINT32 link_id, UINT32 onu_id, UINT16 feid, UINT8 *maclimit);
+
+
+INT32 SetOnuMacAgingTime(UINT32 link_id, UINT32  onu_id, UINT16 xi_agingtime);
+INT32 GetOnuMacAgingTime(UINT32  link_id, UINT32  onu_id,UINT16 *xi_agingtime);
+
+#if 000
+/*端口*/
+INT32 SetOnuEthAlarmAdminState( UINT32 link_id, UINT32 onu_id,  CHAR state);
+INT32 SetOnuPonIfAlarmAdminState( UINT32 link_id, UINT32 onu_id, CHAR state);
+INT32 SetOnuAlarmAdminState( UINT32 link_id, UINT32 onu_id, INT32 state);
+#endif
+
+INT32 SetOnuEthLinkStatus(UINT32 link_id, UINT32 onu_id,UINT16 portId,UINT8 linkStatus);
+INT32 GetOnuEthLinkStatus(UINT32 link_id, UINT32 onu_id,UINT16 portId,UINT8 *linkStatus);
+INT32 SetOnuEthAutoNegoStatus(UINT32 link_id, UINT32 onu_id,UINT16 portId,UINT8 AutoCfg);
+INT32 GetOnuEthAutoNegoStatus(UINT32 link_id, UINT32 onu_id,UINT16 PortId,UINT8 *AutoCfg);
+INT32 SetOnuEthFlowControl(UINT32 link_id, UINT32 onu_id,UINT16 portId,UINT8 FlowControl);
+INT32 GetOnuEthFlowControl(UINT32 link_id, UINT32 onu_id,UINT16 portId,UINT8* FlowControl);
+
+INT32 SetOnuEthLoopbackStatus(UINT32 link_id, UINT32 onu_id,UINT16 portId,UINT8 loopback);
+INT32 GetOnuEthLoopbackStatus(UINT32 link_id, UINT32 onu_id,UINT16 PortId,UINT8 *loopBack);
+
+INT32 SetOnuEthLoopBack(UINT32 link_id, UINT32 onu_id, UINT16 portId, UINT8 loopcheck_status,UINT32 loopcheck_interval);
+
+
+INT32 SetOnuIsolateState(UINT32 link_id,UINT32 onu_id,UINT8 status);
+int 
+OntDataMibReset(
+                UINT32 link_id,
+                UINT32 onu_id,
+                UINT8  flag);
+int 
+OltMibReset(
+                UINT32 onu_no,
+                UINT8  flagresetcofg)  ;
+int OltOmciMibUpload(UINT32 link_id, UINT32 onu_id);
+int GetOnuTypeAndSoftversion(UINT32 link_id, UINT32 onu_id,UINT8 *type_and_version);
+
+int OltOmciGetAllAlarm(UINT32 link_id, UINT32 onu_id);
+
+int GetOnuCapability(UINT32 link_id, UINT32 onu_id, UINT8 *operatorId,
+    UINT8 *CTC_version,UINT8* onuType,UINT8 *powerControl);
+
+#if 1
+extern int omci_set_optical_rx_power_threshold( UINT32 xi_link_id,UINT32 xi_onu_id,OPTICAL_POWER_ALARM_THRESHOLD_OLD xi_onu_optical_alarm_threshold);
+extern int omci_set_optical_tx_power_threshold( UINT32 xi_link_id,UINT32 xi_onu_id,OPTICAL_POWER_ALARM_THRESHOLD_OLD xi_onu_optical_alarm_threshold);
+extern int omci_get_optical_power_threshold( UINT32 xi_link_id,UINT32 xi_onu_id,OPTICAL_POWER_ALARM_THRESHOLD_OLD *xi_onu_optical_alarm_threshold);   
+extern int omci_get_optical_power_info( UINT32 xi_link_id,UINT32 xi_onu_id,ANI_G_INFO *alarm_info );
+
+extern int omci_set_optical_sd_sf_threshold( UINT32 xi_link_id,UINT32 xi_onu_id,ANI_G_INFO alarm_info);
+extern int omci_get_optical_sd_sf_threshold( UINT32 xi_link_id,UINT32 xi_onu_id,ANI_G_INFO *alarm_info);
+
+
+#endif
+
+
+extern int GetOnuPortType(UINT32 link_id, UINT32 onu_id,UINT16* PortType);
+extern int SetLOIDAuthentication(UINT32  link_id, UINT32 onu_id,int authenticatior_state);
+extern int GetLOIDAuthentication(UINT32  link_id, UINT32 onu_id,UINT8* real_LOID);
+extern int GetLOID_PWDAuthentication(UINT32  link_id, UINT32 onu_id,UINT8* real_password);
+
+INT32 ClearOnuEthMacTable(UINT32 link_id, UINT32 onu_id,UINT16 instanceId, UINT8 macType);
+INT32 SetOnuEthMacTable(UINT32 link_id, UINT32 onu_id,UINT16 instanceId,UINT8 filterAction,UINT8 entryNum,
+        UINT8 macType,UINT8 *MacTable);
+int SetOnuUniVlanTP(UINT32 link_id,UINT32 onu_id, UINT16 instanceId);
+int SetOnuUniVlanTranslate( UINT32 link_id,UINT32 onu_id,UINT16 instanceId,
+            UINT32   Default_Vlan, LIST   *pVlanTL);
+int SetEthUsRateLimit(UINT32 link_id,UINT32 onu_id,UINT16 portId,
+            ONU_SWITCHPORT_RATE_CONTRL ratelimit );
+int SetEthDsRateLimit(UINT32 link_id,UINT32 onu_id,UINT16 portId,
+            ONU_SWITCHPORT_RATE_CONTRL ratelimit );
+            INT32 setOnuEthMcastStrip(UINT32 link_id, UINT32 onu_id,UINT16 instance_id, UINT8 mcastVlanStrip);
+            INT32 setOnuEthMcastVlan(UINT32 link_id, UINT32 onu_id,UINT16 instance_id, UINT16 mcastVlan);
+            INT32 SetOnuMcastGroupNum(UINT32 link_id,UINT32 onu_id, UINT16 feid,UINT16 max_online_group);
+            INT32 setOnuEthMcastVlanReplace(UINT32 link_id, UINT32 onu_id,UINT16 instance_id, 
+                 UINT16 mcastVlan,UINT16 userVlan);
+
+            INT32 SetOnuExtendMcastUpstreamVlan(UINT32 link_id, UINT32 onu_id,UINT16 instance_id, 
+                  UINT16 Upstream_IGMP_TCI,UINT8 Upstream_IGMP_Tag_Control );
+            INT32 SetOnuMacLimit(UINT32 link_id, UINT32 onu_id, UINT8 maclimit);
+            INT32 SetOnuExtendMcastMode(UINT32 link_id, UINT32 onu_id,UINT16 instance_id, UINT8 IGMP_Function );
+            INT32 SetOnuExtendMcastFastLeave(UINT32 link_id, UINT32 onu_id,UINT16 instance_id, UINT8 Immediate_Leave );
+            UINT32 
+            omci_MibAuditAndResynchronization(
+                            UINT32 link_id,
+                            UINT32 onu_id);
+            
+            int SetOnuMacLearningInd(UINT32 link_id,UINT32 onu_id, UINT8 learning_ind);
+            int  ANI_G_SelfTest(UINT32 link_id,UINT32 onu_id, ANI_G_INFO* ani_info);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            void GetOnuTrafficProfileFlag(UINT32 link_id,UINT32 onu_id,UINT32 *trafficProfileFlag);
+
+
+void ClrOnuTrafficProfileFlag(UINT32 link_id,UINT32 onu_id);
+void 
+SetOnuTrafficProfileFlag(
+                UINT32 link_id,
+                UINT32 onu_id);
+
+INT32 
+GetOnuOmciEquipmentIDGet(
+                UINT32  link_id, 
+                UINT32  onu_id,
+                UINT8  *equipmentID);
+
+INT32 
+GetOnuOmciCapability(
+                UINT32  link_id, 
+                UINT32  onu_id,
+                UINT8  *ponPortNum,
+                UINT8  *fePortNum,
+                UINT8  *gePortNum,
+                UINT8  *potsPortNum,
+                UINT16 *pTcontNum,
+                UINT16 *pGemNum,
+                UINT8  *pTrafficSchedulerNum);
+
+
+RTN_STATUS
+UNIGetPPTPSlotId(
+                UINT32  link_id, 
+                UINT32  onu_id,
+                UINT8  *pSlotId,
+                UINT8  *pNum);
+

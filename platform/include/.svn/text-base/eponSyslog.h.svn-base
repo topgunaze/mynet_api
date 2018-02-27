@@ -1,0 +1,71 @@
+/******************************************************************************
+ * FILE   : eponSyslog.h
+ * Description : EPON ?????
+ * Author : Gerhard Lao
+ * Date   : 2016/01/27
+ * Copyright (c) 2016-2026 by C-Data Tech. Co., Ltd. All Rights Reserved.
+ ******************************************************************************/
+#ifndef __EPON_SYSLOG_H__
+#define __EPON_SYSLOG_H__
+
+
+#include <stdio.h>
+#include <time.h>
+#include "cdt_log.h"
+
+
+typedef enum
+{
+    EPON_SYSLOG_MODULE_DRV,
+    EPON_SYSLOG_MODULE_HWAL,
+    EPON_SYSLOG_MODULE_OAM,
+    EPON_SYSLOG_MODULE_ONUREG,
+    EPON_SYSLOG_MODULE_PROFILE,
+    EPON_SYSLOG_MODULE_ONUCFG,
+    EPON_SYSLOG_MODULE_PONCFG,
+    EPON_SYSLOG_MODULE_DEVCTRL,
+    EPON_SYSLOG_MODULE_SNMP,
+
+    EPON_SYSLOG_MODULE_MAX_NUM,
+}EPON_SYSLOG_MODULE_ID_ST;
+
+#define DRV_PRINT(fmt,arg...) cdtlog_info(fmt, ##arg)
+#define DRV_ERROR(fmt,arg...) cdtlog_err(fmt, ##arg)
+#define DRV_DEBUG(fmt,arg...) cdtlog_debug(EPON_SYSLOG_MODULE_DRV, "[DRV ] "fmt, ##arg)
+
+#define HWAL_PRINT(fmt,arg...) cdtlog_info(fmt, ##arg)
+#define HWAL_ERROR(fmt,arg...) cdtlog_err(fmt, ##arg)
+#define HWAL_DEBUG(fmt,arg...) cdtlog_debug(EPON_SYSLOG_MODULE_HWAL, "[HWAL] "fmt, ##arg)
+
+#define OAM_PRINT(fmt,arg...) cdtlog_info(fmt, ##arg)
+#define OAM_ERROR(fmt,arg...) cdtlog_err(fmt, ##arg)
+#define OAM_DEBUG(fmt,arg...) cdtlog_debug(EPON_SYSLOG_MODULE_OAM, "[OAM] "fmt, ##arg)
+
+#define ONURA_PRINT(fmt,arg...) cdtlog_info(fmt, ##arg)
+#define ONURA_ERROR(fmt,arg...) cdtlog_err(fmt, ##arg)
+#define ONURA_DEBUG(fmt,arg...) cdtlog_debug(EPON_SYSLOG_MODULE_ONUREG, "[RA ] "fmt, ##arg)
+
+#define PROFILE_PRINT(fmt,arg...) cdtlog_info(fmt, ##arg)
+#define PROFILE_ERROR(fmt,arg...) cdtlog_err(fmt, ##arg)
+#define PROFILE_DEBUG(fmt,arg...) cdtlog_debug(EPON_SYSLOG_MODULE_PROFILE, "[ROFILE] "fmt, ##arg)
+
+#define ONUCFG_PRINT(fmt,arg...) cdtlog_info(fmt, ##arg)
+#define ONUCFG_ERROR(fmt,arg...) cdtlog_err(fmt, ##arg)
+#define ONUCFG_DEBUG(fmt,arg...) cdtlog_debug(EPON_SYSLOG_MODULE_ONUCFG, "[OCFG] "fmt, ##arg)
+
+#define PONCFG_PRINT(fmt,arg...) cdtlog_info(fmt, ##arg)
+#define PONCFG_ERROR(fmt,arg...) cdtlog_err(fmt, ##arg)
+#define PONCFG_DEBUG(fmt,arg...) cdtlog_debug(EPON_SYSLOG_MODULE_PONCFG, "[PCFG] "fmt, ##arg)
+
+#define PONDEVCTRL_PRINT(fmt,arg...) cdtlog_info(fmt, ##arg)
+#define PONDEVCTRL_ERROR(fmt,arg...) cdtlog_err(fmt, ##arg)
+#define PONDEVCTRL_DEBUG(fmt,arg...) cdtlog_debug(EPON_SYSLOG_MODULE_DEVCTRL, "[DCTL] "fmt, ##arg)
+
+#define SNMP_PRINT(fmt,arg...) cdtlog_info(fmt, ##arg)
+#define SNMP_ERROR(fmt,arg...) cdtlog_err(fmt, ##arg)
+#define SNMP_DEBUG(fmt,arg...) cdtlog_debug(EPON_SYSLOG_MODULE_SNMP, "[SNMP] "fmt, ##arg)
+
+
+#endif /* __EPON_SYSLOG_H__ */
+
+

@@ -1,0 +1,793 @@
+/**************************************************************
+* 文件名称:  eponProfileDB.h
+* 作           者:  keith.gong
+* 日           期:  2015.11.26
+* 文件描述:  
+* 版           本:  V1.00
+* 修改历史:  
+*     <修改者>     <时间>      <版本 >     <描述>
+        keith.gong          2015.11.26      v1.00              Create
+**************************************************************/
+
+
+#ifndef __EPON_PROFILE_DB_H__
+#define __EPON_PROFILE_DB_H__
+
+
+#include "cdt_types.h"
+#include "sys_common.h"
+
+
+#define MAX_ONU_EACH_PON            SYS_MAX_ONU_NUM
+#define MAX_PON_NUM                 SYS_MAX_PON_NUM
+#define MAX_ONU_NUM                 ((MAX_ONU_EACH_PON) * (MAX_PON_NUM))
+
+#define MAX_LLID_NUM                SYS_MAX_ONU_LLID_NUM
+#define MAX_ONU_NUM_WITH_DEF        ((MAX_ONU_NUM)+1)
+
+#define INVALID_PROFILE_ID          0xFFFF
+
+
+typedef struct S_LIST
+{
+    struct S_LIST *pNext;
+}S_LIST;
+
+/******************************************      ONU Info    **************************************************/
+#define CFG_BIT_SET(pOnuInfo, bit)  (pOnuInfo)->cfgBit |= (bit)
+#define CFG_BIT_TEST(pOnuInfo, bit) (((pOnuInfo)->cfgBit & (bit)) == (bit))
+#define ERR_BIT_TEST(pOnuInfo, bit) (((pOnuInfo)->failedBit & (bit)) == (bit))
+#define CFG_BIT_CLR(pOnuInfo, bit)  (pOnuInfo)->cfgBit &= (~(bit))
+
+/*ONU ATTR*/
+#define ONUCFG_BIT_START_BIT        (0)
+
+#define ONUCFG_BIT_MC_FAST_LEAVE    (0x00000001U<<(ONUCFG_BIT_START_BIT+0))
+#define ONUCFG_BIT_IP_CONFIG        (0x00000001U<<(ONUCFG_BIT_START_BIT+1))
+#define ONUCFG_BIT_SNMP_CONFIG      (0x00000001U<<(ONUCFG_BIT_START_BIT+2))
+#define ONUCFG_BIT_PORT_ISOLATE     (0x00000001U<<(ONUCFG_BIT_START_BIT+3))
+
+#define ONUCFG_BIT_ATTR             (ONUCFG_BIT_MC_FAST_LEAVE|ONUCFG_BIT_IP_CONFIG|ONUCFG_BIT_SNMP_CONFIG|ONUCFG_BIT_PORT_ISOLATE)
+
+/*ONU PORT ATTR*/
+#define ONUCFG_BIT_ETH_START_BIT    (4)
+
+#define ONUCFG_BIT_ETH_VLAN         (0x00000001U<<(ONUCFG_BIT_ETH_START_BIT+0))
+#define ONUCFG_BIT_ETH_MC_VLAN      (0x00000001U<<(ONUCFG_BIT_ETH_START_BIT+1))
+#define ONUCFG_BIT_ETH_MC_MAX_GROUP (0x00000001U<<(ONUCFG_BIT_ETH_START_BIT+2))
+#define ONUCFG_BIT_ETH_UP_CAR       (0x00000001U<<(ONUCFG_BIT_ETH_START_BIT+3))
+#define ONUCFG_BIT_ETH_DS_CAR       (0x00000001U<<(ONUCFG_BIT_ETH_START_BIT+4))
+#define ONUCFG_BIT_ETH_FLOW_CTRL    (0x00000001U<<(ONUCFG_BIT_ETH_START_BIT+5))
+#define ONUCFG_BIT_ETH_OP_STATE     (0x00000001U<<(ONUCFG_BIT_ETH_START_BIT+6))
+#define ONUCFG_BIT_ETH_SP_DULPEX    (0x00000001U<<(ONUCFG_BIT_ETH_START_BIT+7))
+#define ONUCFG_BIT_ETH_MAX_MAC_CNT  (0x00000001U<<(ONUCFG_BIT_ETH_START_BIT+8))
+#define ONUCFG_BIT_ETH_MAX_AGING    (0x00000001U<<(ONUCFG_BIT_ETH_START_BIT+9))
+#define ONUCFG_BIT_RING_CHECK       (0x00000001U<<(ONUCFG_BIT_ETH_START_BIT+10))
+#define ONUCFG_BIT_RCHECK_AUTO_DOWN (0x00000001U<<(ONUCFG_BIT_ETH_START_BIT+11))
+#define ONUCFG_BIT_ETH_MC_TAG_STRIP (0x00000001U<<(ONUCFG_BIT_ETH_START_BIT+12))
+
+#define ONUCFG_BIT_ETH_ATTR         (ONUCFG_BIT_ETH_VLAN|ONUCFG_BIT_ETH_MC_VLAN|ONUCFG_BIT_ETH_MC_MAX_GROUP|\
+                                     ONUCFG_BIT_ETH_UP_CAR|ONUCFG_BIT_ETH_DS_CAR|ONUCFG_BIT_ETH_FLOW_CTRL|\
+                                     ONUCFG_BIT_ETH_OP_STATE|ONUCFG_BIT_ETH_SP_DULPEX|ONUCFG_BIT_ETH_MAX_MAC_CNT|\
+                                     ONUCFG_BIT_ETH_MAX_AGING|ONUCFG_BIT_RING_CHECK|ONUCFG_BIT_RCHECK_AUTO_DOWN|ONUCFG_BIT_ETH_MC_TAG_STRIP)
+
+/*ONU LINE*/
+#define ONUCFG_BIT_MISC_START_BIT   (20)
+
+#define ONUCFG_BIT_DBA              (0x00000001U<<(ONUCFG_BIT_MISC_START_BIT+0))
+#define ONUCFG_BIT_FEC              (0x00000001U<<(ONUCFG_BIT_MISC_START_BIT+1))
+#define ONUCFG_BIT_ENCRYPT          (0x00000001U<<(ONUCFG_BIT_MISC_START_BIT+2))
+#define ONUCFG_BIT_DBA_THRESHOLD    (0x00000001U<<(ONUCFG_BIT_MISC_START_BIT+3))
+
+#define ONUCFG_BIT_LINE             (ONUCFG_BIT_DBA|ONUCFG_BIT_FEC|ONUCFG_BIT_DBA_THRESHOLD)
+
+#define ONUCFG_BIT_CATV_OP_STATE    (0x00000001U<<(ONUCFG_BIT_MISC_START_BIT+4))
+#define ONUCFG_BIT_SLA              (0x00000001U<<(ONUCFG_BIT_MISC_START_BIT+5))
+#define ONUCFG_BIT_ALARM            (0x00000001U<<(ONUCFG_BIT_MISC_START_BIT+6))
+#define ONUCFG_BIT_OPALARM          (0x00000001U<<(ONUCFG_BIT_MISC_START_BIT+7))
+#define ONUCFG_BIT_ACL              (0x00000001U<<(ONUCFG_BIT_MISC_START_BIT+8))
+
+/*所有配置*/
+#define ONUCFG_BIT_ALL_CFG          (ONUCFG_BIT_LINE|ONUCFG_BIT_ATTR|ONUCFG_BIT_ETH_ATTR|ONUCFG_BIT_CATV_OP_STATE|\
+                                     ONUCFG_BIT_SLA|ONUCFG_BIT_ALARM|ONUCFG_BIT_OPALARM|ONUCFG_BIT_ACL)
+
+
+#define ONU_RA_STATUS_REG_BIT       0x01
+#define ONU_RA_STATUS_AUTH_BIT      0x02
+#define ONU_RA_STATUS_RA_MAP        0x03
+#define ONU_RA_STATUS_PROCESS_BIT   0x04
+
+#define ONU_CFG_DEF_AGING_TIME      300
+
+typedef enum
+{
+    ONU_CFG_STATUS_NA_NR,           /* 未授权未注册00*/
+    ONU_CFG_STATUS_NA_R,            /* 未授权，注册01*/
+    ONU_CFG_STATUS_A_NR,            /* 授权，未注册10*/
+    ONU_CFG_STATUS_A_R,             /* 授权，注册      11*/
+
+    ONU_CFG_STATUS_A_R_PENDING,
+    ONU_CFG_STATUS_PROCESSING,
+
+}ONU_CFG_STATUS;
+
+#if 0/*closed by Gerhard Lao	2016/02/25 */
+typedef struct{
+    UINT16                          allocId;
+    UINT32                          fix;
+    UINT32                          assure;
+    UINT32                          max;
+}TCONT_INFO_FOR_OMCI_T;
+
+typedef struct{
+    UINT16                          llidId;
+    UINT16                          gemPort;
+}GEM_INFO_FOR_OMCI_T;
+#endif
+
+typedef struct
+{
+    UINT32                          ipAddr;
+    UINT32                          netMask;
+    UINT32                          gateway;
+    UINT16                          cVlan;
+    UINT16                          sVlan;
+    UINT8                           priority;
+}ONU_MGMT_INFO;
+
+/*--------------   VLAN  --------------*/
+#define ONUCFG_ETH_MAX_VLAN_ENTRY   8
+typedef enum
+{
+    ONU_ETH_PORT_VLAN_TP = 0,
+    ONU_ETH_PORT_VLAN_NTP,
+}ONU_ETH_VLAN_MODE_DTE;
+
+typedef struct
+{
+    //UINT8                           qinqFlag;
+    UINT16                          sVlan;
+    UINT8                           sPri;
+    UINT16                          cVlan;
+    UINT8                           cPri;
+    UINT16                          cVlanAsNativeCount;
+}ONU_ETH_VLAN_ENTRY;
+
+typedef struct
+{
+    UINT8   version;/*snmp version, default 2*/
+    UINT8   ipVersion;/*0:ipv4 1:ipv6*/
+    UINT16  trapPort;/*default 162*/
+    UINT16  snmpPort;/*default 161*/
+    union
+    {
+        UINT32 ipV4;
+        UINT8  ipV6[16];    
+    }trapIp;    
+    UINT8   name[32];
+    UINT8   comRd[32];
+    UINT8   comWr[32];
+}ONU_SNMP_INFO;
+
+typedef struct
+{
+    UINT8 mode;/*0-disable 1-enable*/
+	UINT32 cir;
+	UINT32 pir;    
+}ONU_ETH_DS_CAR_LS;
+
+typedef struct
+{
+    UINT8 mode;/*0-disable 1-enable*/
+	UINT32 cir;
+	UINT32 cbs;
+	UINT32 ebs;
+}ONU_ETH_UP_CAR_LS; 
+
+typedef struct
+{
+    ONU_ETH_UP_CAR_LS   upRate;
+    ONU_ETH_DS_CAR_LS   dsRate;
+}ONU_ETH_CAR_LS;
+
+typedef struct
+{
+    ONU_ETH_VLAN_MODE_DTE           vlanMode;
+    ONU_ETH_VLAN_ENTRY              entry[ONUCFG_ETH_MAX_VLAN_ENTRY];
+} ONU_ETH_VLAN_INFO;
+
+typedef struct
+{
+    UINT32                          cfgBit; /* 记录配置失败项 */
+    UINT8                           speedDuplex;
+    UINT8                           shutdown;
+    UINT8                           flowCtrl;
+    UINT16                          defVlanTag; /*vid+pri*/
+    UINT16                          upCar;
+    UINT16                          downCar;
+    UINT32                          agingTime;
+    ONU_ETH_CAR_LS                  ethPortRate;   // dispersed configuration
+    ONU_ETH_VLAN_INFO               vlan;
+} ONU_ETH_INFO;
+
+typedef struct
+{
+    INT16                            txPowerUpW;/* power*100 */
+    INT16                            txPowerLwW;/* power*100 */
+    INT16                            txPowerUpA;/* power*100 */
+    INT16                            txPowerLwA;/* power*100 */ 
+    
+    INT16                            rxPowerUpW;/* power*100 */
+    INT16                            rxPowerLwW;/* power*100 */
+    INT16                            rxPowerUpA;/* power*100 */
+    INT16                            rxPowerLwA;/* power*100 */ 
+    
+    UINT16                           biasUpW;
+    UINT16                           biasLwW;
+    UINT16                           biasUpA;
+    UINT16                           biasLwA;
+    
+    UINT16                           voltageUpW;/* voltage*100 */
+    UINT16                           voltageLwW;/* voltage*100 */
+    UINT16                           voltageUpA;/* voltage*100 */
+    UINT16                           voltageLwA;/* voltage*100 */
+    
+    INT16                            tempUpW;
+    INT16                            tempLwW;
+    INT16                            tempUpA;
+    INT16                            tempLwA;     
+}OPTICAL_ALARM_DATA_T;
+
+typedef struct
+{
+    UINT8                           shutdown;
+} ONU_POTS_INFO;
+
+typedef struct
+{
+    UINT8                           shutdown;
+} ONU_CATV_INFO;
+
+typedef struct
+{
+    UINT32                          defVlanTag;
+} ONU_IPHOST_INFO;
+
+typedef struct
+{
+    UINT16                          dbaProfileId;     
+    UINT16                          ontCar;
+    UINT32                          onuDsBw;/*for no profile style*/
+} ONU_LLID_INFO;
+
+typedef struct
+{
+    ONU_MGMT_INFO                   mgmtInfo;
+    ONU_SNMP_INFO                   snmpInfo;
+    UINT8                           mcMode; /*0:igmp snooping, 1:ctc, 127:transparent */
+    UINT8                           portIsolate; /*1:disable, 2:enable */  
+    UINT8                           ringCheckAutoDown; /*0:enable, 1:disable */ 
+    OPTICAL_ALARM_DATA_T            opticalAlarm;
+} ONU_ATTR_INFO;
+
+
+typedef struct 
+{
+    /* 状态标识*/
+    UINT8                           linkState[SYS_MAX_ONU_LLID_NUM];       /* LINK_STATUS */
+
+    UINT8                           dbaBit;/*标识哪一条link的BDA参数发生变化, 每一位代表一条link*/
+    
+    UINT8                           cfgLink;/*标识由哪一条link下发ONU配置, 该link下线时清除其标识*/
+    //UINT8                           cfgErrCnt;/*3次配置下发都失败，才标记failedBit为失败状态*/
+    UINT32                          cfgBit;
+    UINT32                          failedBit;
+    UINT32                          ownCfgBit;/*标识离散配置*/
+
+    /* 模板信息*/
+    struct LINE_PROFILE_INFO        *pLineProfile;
+    struct SRV_PROFILE_INFO         *pSrvProfile;
+    struct SLA_PROFILE_INFO         *pSlaProfile;
+    struct ALARM_PROFILE_INFO       *pAlarmProfile;
+    struct OPTICAL_ALARM_PROFILE_INFO
+                                    *pOpticalAlarmProfile;
+
+    ONU_ATTR_INFO                   onuAttr;
+
+    /*离散配置, 与线路模板配置互斥*/
+    ONU_LLID_INFO                   llidInfo[SYS_MAX_ONU_LLID_NUM];
+    
+
+    /* 以太网端口信息*/
+    ONU_ETH_INFO                    onuEthAttr[SYS_MAX_ONU_PORT_NUM];
+
+    /* POTS 端口信息*/
+    ONU_POTS_INFO                   onuPotsAttr[SYS_MAX_ONU_POTS_NUM];
+
+    /* CATV 端口信息*/
+    ONU_CATV_INFO                   onuCatvAttr[SYS_MAX_ONU_POTS_NUM];
+
+    /* iphost 端口信息*/
+    ONU_IPHOST_INFO                 onuIpHostAttr[SYS_MAX_ONU_IPHOST_NUM];
+
+    
+}ONU_INFO;
+
+/******************************************      LLID Info    **************************************************/
+#define LLID_CFG_BIT_SET(pLlidInfo, bit)  (pLlidInfo)->cfgBit |= (bit)
+
+#define LLIDCFG_BIT_DOWN_CAR        (0x00000001U<<0)
+#define LLIDCFG_BIT_ENCRYPT         (0x00000001U<<1)
+#define LLIDCFG_BIT_DBA             (0x00000001U<<2)
+
+#define LLIDCFG_BIT_ALL_CFG         (LLIDCFG_BIT_DOWN_CAR|LLIDCFG_BIT_ENCRYPT|LLIDCFG_BIT_DBA)
+
+
+/*******************************************   Line Profile   **************************************************/
+#define MAX_LINE_PROFILE_NUM        (GPON_CLI_STYLE == CLI_STYLE_GENERAL ? 513 : 1025)
+#define LINE_PROFILE_NAME_LEN       17
+#define VALIDATE_LINE_PROFILE_ID(profileId) \
+    (((profileId) > 0) && ((profileId) < MAX_LINE_PROFILE_NUM))
+
+#define MAX_GEM_MAPPING_NUM_SINGLE_GEMPORT  8
+
+#define DEFAULT_8021P_PRIORITY      0
+#define INVALID_8021P_PRIORITY      0xFF
+#define DEFAULT_VLAN_ID             1
+#define INVALID_VLAN_ID             0xFFFF
+#define MAX_VID_PER_GEMPORT         12
+
+#define INVALID_ALLOC_ID            0xFFFF
+#define INVALID_GEMPORT_ID          0
+
+#define ONU_MAX_QUEUE               8
+#define ONU_MAX_QUEUE_SET           4
+
+typedef enum{
+    GEM_MAPPING_MODE_VLAN,
+    GEM_MAPPING_MODE_PRIORITY,
+    GEM_MAPPING_MODE_VLAN_PRIORITY,
+}GEM_MAPPING_MODE;
+
+typedef struct{
+    UINT8                           MappingUsedOrNot;
+    UINT8                           Priority;
+    UINT32                          Vlan;
+}GEM_MAPPING_INFO;
+
+typedef struct 
+{
+    UINT8                           llidId;
+    UINT16                          upCar;
+    UINT16                          downCar;
+    UINT8                           GemMappingSum;
+    GEM_MAPPING_INFO                mappingRule[MAX_GEM_MAPPING_NUM_SINGLE_GEMPORT];
+}LINE_PROFILE_GEM_INFO;
+
+typedef struct 
+{
+    UINT16                          downCar;
+    UINT8                           encryptMode;    
+    struct LINE_PROFILE_INFO        *pLineProfile;
+    struct DBA_PROFILE_INFO         *pDbaProfile;
+}LINE_PROFILE_LLID_INFO;
+
+typedef struct{
+    UINT8                           llidUsedOrNot;
+    UINT8                           encryptMode;    /*0-off, 1-triple churning*/
+    UINT16                          dbaProfileId;
+    UINT16                          ontCar;    
+}LINE_LLID_DATA_T;
+
+typedef struct ONU_INFO_ENTRY
+{
+    struct ONU_INFO_ENTRY           *pNext;
+    ONU_INFO                        *pOnuInfo;
+}ONU_INFO_ENTRY;
+
+typedef struct {
+    UINT8  reportBitmap;
+    UINT16 queueThreshold[ONU_MAX_QUEUE];
+} DBA_THRESHOLD_T;
+
+typedef struct{
+    UINT8                           fecMode;
+    DBA_THRESHOLD_T                 dbaQueueSet[ONU_MAX_QUEUE_SET];
+    LINE_LLID_DATA_T                llidInfo[SYS_MAX_ONU_LLID_NUM];
+}LINE_DATA_T;
+
+typedef struct LINE_PROFILE_INFO
+{
+    UINT16                          profileId;
+    UINT8                           ProfileName[LINE_PROFILE_NAME_LEN];
+    UINT8                           fecMode;
+    DBA_THRESHOLD_T                 dbaQueueSet[ONU_MAX_QUEUE_SET];
+    LINE_PROFILE_LLID_INFO          *pLlidInfo[SYS_MAX_ONU_LLID_NUM];
+    UINT32                          bindOnuCounter;
+    ONU_INFO_ENTRY                  *pOnuList;
+}LINE_PROFILE_INFO;
+
+
+/*****************************************   Line Profile   for vty ***********************************************/
+typedef struct{
+    UINT8                           GemportUsedOrNot;
+    UINT8                           llidId;
+    UINT16                          upCar;
+    UINT16                          downCar;
+    
+    UINT8                           GemMappingSum;
+    GEM_MAPPING_INFO                GemMappingArray[MAX_GEM_MAPPING_NUM_SINGLE_GEMPORT];
+}GEM_INFO_FOR_VTY_T;
+
+/*******************************************   Srv Profile   **************************************************/
+#define MAX_SRV_PROFILE_NUM         (GPON_CLI_STYLE == CLI_STYLE_GENERAL ? 513 : 1025)
+#define SRV_PROFILE_NAME_LEN        17
+#define VALIDATE_SRV_PROFILE_ID(profileId) \
+    (((profileId) > 0) && ((profileId) < MAX_SRV_PROFILE_NUM))
+    
+
+#define SYS_MAX_ONU_PORT_NUM        24       /* 系统单ONU 的单卡支持的最大端口数*/
+#define SYS_MAX_ONU_POTS_NUM        8       /* 系统单ONU 的单卡支持的最大POTS 端口数*/
+
+#define ONUCFG_ETH_MAX_MC_TL_VLAN   4
+
+typedef enum
+{
+    ONU_ETH_PORT_MC_TAGSTRIP_NOT_STRIP = 0,
+    ONU_ETH_PORT_MC_TAGSTRIP_STRIP,
+    ONU_ETH_PORT_MC_TAGSTRIP_TL,
+}ONU_ETH_MC_TAG_SP_MODE_DTE;
+
+#define PRIORITY_COPY_FROM_INNER 8
+#define PRIORITY_COPY_FROM_OUTER 9
+#define PRIORITY_DSCP_MAP        10
+
+typedef struct
+{
+    ONU_ETH_VLAN_MODE_DTE           vlanMode;
+    ONU_ETH_VLAN_ENTRY              entry[ONUCFG_ETH_MAX_VLAN_ENTRY];
+} SRV_PROFILE_ETH_VLAN_INFO;
+
+typedef struct
+{
+    ONU_ETH_MC_TAG_SP_MODE_DTE      mode;
+    ONU_ETH_VLAN_ENTRY              entry[ONUCFG_ETH_MAX_VLAN_ENTRY];
+} SRV_PROFILE_ETH_MC_VLAN_INFO;
+
+/*--------------   ONU  ETH  PORT   --------------*/
+typedef struct
+{
+    UINT8                           maxMacCnt;              /* 1-64端口MAC限制, 0不限制*/
+    UINT8                           maxGroupCnt;            /* 0-255最大组播组*/
+    UINT16                          upPolicing;             /* 1-256流量模板*/
+    UINT16                          dsPolicing;             /* 1-256流量模板*/
+    SRV_PROFILE_ETH_MC_VLAN_INFO    mcVlanParam;            /* 端口multicast vlan属性*/
+    SRV_PROFILE_ETH_VLAN_INFO       vlanParam;               /* 端口VLAN属性*/
+} SRV_PROFILE_ETH_INFO;
+
+typedef enum
+{
+    ONU_MCAST_MODE_IGMP_SNOOPING,
+    ONU_MCAST_MODE_OLT_CONTROL,
+}ONU_MCAST_MODE;
+
+typedef enum
+{
+    ONU_MCAST_IGMP_FWD_MODE_DEF,
+    ONU_MCAST_IGMP_FWD_MODE_TR,
+    ONU_MCAST_IGMP_FWD_MODE_TL,
+}ONU_MCAST_IGMP_FWD_MODE;
+
+typedef enum
+{
+    ONU_MCAST_MC_FWD_MODE_UNTAG,
+    ONU_MCAST_MC_FWD_MODE_TAG_TP,
+    ONU_MCAST_MC_FWD_MODE_TAG_TL,
+}ONU_MCAST_MC_FWD_MODE;
+
+/*--------------   ONU   MCAST   --------------*/
+typedef struct
+{
+    UINT8                           mode;           /* ONU_MCAST_MODE */
+    UINT8                           upIgmpFwdMode;    /* ONU_MCAST_IGMP_FWD_MODE */
+    UINT16                          upIgmpTCI;
+    UINT8                           dnMcMode;
+    UINT16                          dnMcTCI;
+}ONU_MCAST_T;
+
+/*--------------   ONU   PORT NUM --------------*/
+typedef struct
+{
+    UINT8                           catvPortNum;    
+    UINT8                           ethPortNum;
+    UINT8                           mocaPortNum;
+    UINT8                           potsPortNum;
+}ONT_PORTS_NUM;
+
+typedef struct
+{
+    ONT_PORTS_NUM                   portsNum;
+
+
+    UINT8                           fastLeaveMode;
+    UINT8                           ringCheckMode;
+
+    SRV_PROFILE_ETH_INFO            onuEthAttr[SYS_MAX_ONU_PORT_NUM]; /* 以太口属性表指针*/
+}SRV_DATA_T;
+
+typedef struct SRV_PROFILE_INFO
+{
+    UINT16                          profileId;
+    UINT8                           ProfileName[SRV_PROFILE_NAME_LEN];    
+
+    SRV_DATA_T                      data;
+    
+    UINT32                          bindOnuCounter;
+    ONU_INFO_ENTRY                  *pOnuList;
+}SRV_PROFILE_INFO;
+
+/*******************************************   DBA Profile   **************************************************/
+#define MAX_DBA_PROFILE_NUM         (GPON_CLI_STYLE == CLI_STYLE_GENERAL ? 129 : 1025)
+#define DBA_PROFILE_NAME_LEN        17
+#define VALIDATE_DBA_PROFILE_ID(profileId)  \
+    ((profileId) < MAX_DBA_PROFILE_NUM)
+#define VALIDATE_USER_DBA_PROFILE_ID(profileId)  \
+        (((profileId) > 0) && ((profileId) < MAX_DBA_PROFILE_NUM))
+
+#define MAX_PON_BW                  1000000
+#define MAX_PON_BW_STR              "1000000"
+#define DBA_DEFAULT_BW              1000000
+
+typedef enum
+{
+    DBA_TYPE_FIX = 1,
+    DBA_TYPE_ASSURE,
+    DBA_TYPE_ASSURE_AND_MAX,
+    DBA_TYPE_MAX,
+    DBA_TYPE_FIX_AND_ASSURE_AND_MAX,
+
+    DBA_TYPE_INVALID,
+}DBA_TYPE_DTE;
+
+typedef struct
+{
+    UINT8                           type;
+    UINT32                          fix;
+    UINT32                          assure;
+    UINT32                          max;
+}DBA_DATA_T;
+
+#define LINE_PROFILE_LLID_INFO_TO_LLID_ENTRY(pLlidInfo) \
+    (LINE_PROFILE_LLID_ENTRY*)((UINT8*)pLlidInfo - sizeof(struct LINE_PROFILE_LLID_ENTRY*))
+
+typedef struct LINE_PROFILE_LLID_ENTRY
+{
+    struct LINE_PROFILE_LLID_ENTRY *pNext;
+    LINE_PROFILE_LLID_INFO          llidInfo;
+}LINE_PROFILE_LLID_ENTRY;
+
+typedef struct DBA_PROFILE_INFO
+{
+    UINT16                          profileId;
+    UINT8                           ProfileName[DBA_PROFILE_NAME_LEN];
+    DBA_DATA_T                      dba;
+
+    UINT16                          bindTcontCounter;
+    LINE_PROFILE_LLID_ENTRY        *pLlidList;
+}DBA_PROFILE_INFO;
+
+/*******************************************   Sla Profile   **************************************************/
+#define MAX_SLA_PROFILE_NUM         129
+#define SLA_PROFILE_NAME_LEN        17
+#define VALIDATE_SLA_PROFILE_ID(profileId) \
+    (((profileId) > 0) && ((profileId) < MAX_SLA_PROFILE_NUM))
+
+#define MAX_SLA_SERVICE_NUM         8
+
+typedef struct
+{
+    UINT16                          fixPktSize;
+    UINT32                          fixBandwidth;
+    UINT32                          assureBandwidth;
+    UINT32                          maxBandwidth;
+    UINT8                           wrrWeight;
+}SLA_DATA_SERVICE_T;
+
+typedef struct
+{
+    UINT32                          cycleLength;
+    UINT8                           serviceNum;
+    UINT8                           serviceMode;/*0-SP, 1-WRR, 2-SP+WRR*/
+    SLA_DATA_SERVICE_T              service[MAX_SLA_SERVICE_NUM];
+}SLA_DATA_T;
+
+typedef struct SLA_PROFILE_INFO
+{
+    UINT16                          profileId;
+    UINT8                           ProfileName[SRV_PROFILE_NAME_LEN];    
+
+    SLA_DATA_T                      data;
+    
+    UINT32                          bindOnuCounter;
+    ONU_INFO_ENTRY                  *pOnuList;
+}SLA_PROFILE_INFO;
+
+/*******************************************   Alarm Profile   **************************************************/
+#define MAX_ALARM_PROFILE_NUM         51
+#define ALARM_PROFILE_NAME_LEN        17
+#define VALIDATE_ALARM_PROFILE_ID(profileId) \
+    (((profileId) > 0) && ((profileId) < MAX_ALARM_PROFILE_NUM))
+
+typedef struct
+{
+    UINT32                          txDrop;
+    UINT32                          txDropR;
+    UINT32                          rxDrop;
+    UINT32                          rxDropR; 
+    
+    UINT32                          txCrcErr;
+    UINT32                          txCrcErrR;
+    UINT32                          rxCrcErr;
+    UINT32                          rxCrcErrR;
+    
+    UINT32                          txUnderSize;
+    UINT32                          txUnderSizeR;
+    UINT32                          rxUnderSize;
+    UINT32                          rxUnderSizeR;
+    
+    UINT32                          txOverSize;
+    UINT32                          txOverSizeR;
+    UINT32                          rxOverSize;
+    UINT32                          rxOverSizeR; 
+    
+    UINT32                          txFragment;
+    UINT32                          txFragmentR;
+    UINT32                          rxFragment;
+    UINT32                          rxFragmentR;
+
+    UINT32                          txJabber;
+    UINT32                          txJabberR;
+    UINT32                          rxJabber;
+    UINT32                          rxJabberR;
+
+    UINT32                          txDiscard;
+    UINT32                          txDiscardR;
+    UINT32                          rxDiscard;
+    UINT32                          rxDiscardR;
+
+    UINT32                          txError;
+    UINT32                          txErrorR;
+    UINT32                          rxError;
+    UINT32                          rxErrorR;
+}ALARM_DATA_T;
+
+typedef struct ALARM_PROFILE_INFO
+{
+    UINT16                          profileId;
+    UINT8                           ProfileName[ALARM_PROFILE_NAME_LEN];    
+
+    ALARM_DATA_T                    data;
+    
+    UINT32                          bindOnuCounter;
+    ONU_INFO_ENTRY                  *pOnuList;
+}ALARM_PROFILE_INFO;
+
+/*******************************************   Optical Alarm Profile   **************************************************/
+#define MAX_OPTICAL_ALARM_PROFILE_NUM         257
+#define OPTICAL_ALARM_PROFILE_NAME_LEN        17
+#define VALIDATE_OPTICAL_ALARM_PROFILE_ID(profileId) \
+    (((profileId) > 0) && ((profileId) < MAX_OPTICAL_ALARM_PROFILE_NUM))
+
+typedef struct OPTICAL_ALARM_PROFILE_INFO
+{
+    UINT16                          profileId;
+    UINT8                           ProfileName[ALARM_PROFILE_NAME_LEN];    
+
+    OPTICAL_ALARM_DATA_T            data;
+    
+    UINT32                          bindOnuCounter;
+    ONU_INFO_ENTRY                  *pOnuList;
+}OPTICAL_ALARM_PROFILE_INFO;
+
+/*******************************************   Classification Profile   **************************************************/
+#define MAX_CLASSIFICATION_PROFILE_NUM         257
+#define CLASSIFICATION_PROFILE_NAME_LEN        17
+#define VALIDATE_CLASSIFICATION_PROFILE_ID(profileId) \
+    (((profileId) > 0) && ((profileId) < MAX_CLASSIFICATION_PROFILE_NUM))
+
+typedef struct
+{
+    UINT8                           test;
+}CLASSIFICATION_DATA_T;
+
+typedef struct CLASSIFICATION_PROFILE_INFO
+{
+    UINT16                          profileId;
+    UINT8                           ProfileName[ALARM_PROFILE_NAME_LEN];    
+
+    CLASSIFICATION_DATA_T           data;
+    
+    UINT32                          bindOnuCounter;
+    ONU_INFO_ENTRY                  *pOnuList;
+}CLASSIFICATION_PROFILE_INFO;
+
+/*****************************************   sip agent Profile   ************************************************/
+#define MAX_SIPAGENT_PROFILE_NUM        17
+#define SIPAGENT_PROFILE_NAME_LEN       17
+#define VALIDATE_SIPAGENT_PROFILE_ID(profileId)  \
+    ((profileId) < MAX_SIPAGENT_PROFILE_NUM)
+#define VALIDATE_USER_SIPAGENT_PROFILE_ID(profileId)  \
+        (((profileId) > 0) && ((profileId) < MAX_SIPAGENT_PROFILE_NUM))
+
+#define GPON_SIPAGENT_URI_LEN           63
+#define GPON_SIPAGENT_AUTH_REALM_LEN    24
+
+#define SIGNAL_TRANSFER_MODE_UDP        0
+#define SIGNAL_TRANSFER_MODE_TCP        1
+
+typedef struct
+{
+    char                            proxyServerUri[GPON_SIPAGENT_URI_LEN];
+    
+    UINT8                           rtpDscp;
+    UINT16                          rtpMinPort;
+    UINT16                          rtpMaxPort;
+    
+    UINT8                           signalDscp;
+    UINT16                          signalPort;
+    UINT8                           signalTransfermode;
+    
+    UINT32                          registrationExpiration;
+    UINT32                          registrationReregHeadStartTime;
+    char                            registrationServerUri[GPON_SIPAGENT_URI_LEN];
+
+    char                            voiceMailServerUri[GPON_SIPAGENT_URI_LEN];
+    UINT32                          voiceMailSubscriptionExpiration;
+
+    char                            confFactory[GPON_SIPAGENT_URI_LEN];
+    char                            bridgedLineAgent[GPON_SIPAGENT_URI_LEN];
+    char                            authRealm[GPON_SIPAGENT_AUTH_REALM_LEN];
+}SIPAGENT_DATA_T;
+
+typedef struct SIPAGENT_PROFILE_INFO
+{
+    UINT16                          profileId;
+    UINT8                           ProfileName[SIPAGENT_PROFILE_NAME_LEN];    
+
+    SIPAGENT_DATA_T                 data;
+    
+    UINT32                          bindPotsCounter;
+    //ONU_INFO_ENTRY                  *pOnuList;
+}SIPAGENT_PROFILE_INFO;
+
+
+/*****************************************   traffic Profile   ***************************************************/
+#define MAX_TRAFFIC_PROFILE_NUM         257
+#define TRAFFIC_PROFILE_NAME_LEN        17
+#define VALIDATE_TRAFFIC_PROFILE_ID(profileId)  \
+    ((profileId) < MAX_TRAFFIC_PROFILE_NUM)
+#define VALIDATE_USER_TRAFFIC_PROFILE_ID(profileId)  \
+        (((profileId) > 0) && ((profileId) < MAX_TRAFFIC_PROFILE_NUM))
+
+typedef struct
+{
+    UINT32                          cir;
+    UINT32                          pir;
+    UINT32                          cbs;
+    UINT32                          pbs;
+}TRAFFIC_PROFILE_DATA_T;
+
+typedef struct TRAFFIC_PROFILE_INFO
+{
+    UINT16                          profileId;
+    UINT8                           ProfileName[SIPAGENT_PROFILE_NAME_LEN];    
+
+    TRAFFIC_PROFILE_DATA_T          data;
+    
+    UINT32                          bindCounter;
+}TRAFFIC_PROFILE_INFO;
+
+
+
+#endif /* __EPON_PROFILE_DB_H__ */
+

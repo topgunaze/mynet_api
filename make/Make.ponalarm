@@ -1,0 +1,63 @@
+#  Name         : Makefile
+#  Version      : V2.01
+#  Author       : keith.gong (kizerg@163.com)
+#  Time         : 2016.06.22
+#  Description  : Makefile for GPON Alarm
+#                 Copyright (c) 2009-2016 Kth Co.,Ltd.
+#                 All Rights Reserved.
+#  Modification : 2016.06.22, keith.gong, created
+
+MODULE_DIR           := $(shell pwd)
+MODULE_NAME          := $(notdir $(MODULE_DIR))
+PRJ_ROOT_DIR         ?= $(shell cd ../../../; pwd)
+
+-include $(PRJ_ROOT_DIR)/make/Make.config
+#CROSS_COMPILE        := mips_4KC-
+CC                   := $(CROSS_COMPILE)gcc
+AR                   := $(CROSS_COMPILE)ar
+STRIP                ?= $(CROSS_COMPILE)strip
+
+#  Create some dependency directory 
+MODULE_OBJ_DIR       ?= $(PRJ_ROOT_DIR)/build/objs/$(MODULE_NAME)
+MODULE_LIB_DIR       ?= $(PRJ_ROOT_DIR)/build/libs/$(MODULE_NAME)
+INSTALL_DIR          := ./
+MKDIR                ?= mkdir -p 
+$(shell $(MKDIR) $(MODULE_OBJ_DIR) $(MODULE_LIB_DIR) $(INSTALL_DIR))
+
+INCLUDE_DIRS         := ./include $(VTYSH_DIR)/include $(PRJ_ROOT_DIR)/include $(APP_DIR)/include $(COM_DIR)/include #$(APP_DIR)/gpon/onura/include
+MODULE_CFLAGS        := -Wall -Werror -g $(addprefix -I,$(INCLUDE_DIRS))
+CFLAGS               += $(MODULE_CFLAGS) -DHAVE_CONFIG_H
+CC_LIBS              := -lpthread -lrt -L$(PRJ_LIB_DIR)/vtysh -lvtysh
+
+MODULE_APP_OBJS      := 
+MODULE_APP_DEPS      := 
+MODULE_LIB_OBJS      := $(subst .c,.o, $(wildcard src/*.c))
+MODULE_LIB_DEPS      := $(MODULE_LIB_OBJS:src%=$(MODULE_OBJ_DIR)%)
+
+#  Pattern matching rules:
+$(MODULE_OBJ_DIR)/%.o:     $(MODULE_DIR)/src/%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+$(MODULE_OBJ_DIR)/%.o:     $(MODULE_DIR)/lib/%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
+ 
+.PHONY: all lib program clean
+#all: lib program
+all: lib 
+
+lib: $(MODULE_LIB_DIR)/lib$(MODULE_NAME).a
+
+$(MODULE_LIB_DIR)/lib$(MODULE_NAME).a: $(MODULE_LIB_DEPS)
+	$(AR) $(LDFLAGS) crv $(MODULE_LIB_DIR)/lib$(MODULE_NAME).a $(MODULE_LIB_DEPS)
+
+#program : $(INSTALL_DIR)/$(MODULE_NAME)
+#$(INSTALL_DIR)/$(MODULE_NAME) : $(MODULE_APP_DEPS) $(MODULE_LIB_DIR)/lib$(MODULE_NAME).a
+#	$(CC) $(CFLAGS) -o $@ $(MODULE_APP_DEPS) -Wl,--start-group $(APP_DEP_LIBS) $(MODULE_LIB_DIR)/lib$(MODULE_NAME).a -Wl,--end-group $(CC_LIBS)
+#	$(STRIP) $@
+
+clean: 
+	$(RM) $(MODULE_OBJ_DIR)/*
+	$(RM) $(MODULE_LIB_DIR)/*
+
+test:
+

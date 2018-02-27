@@ -1,0 +1,142 @@
+/*
+ *
+ * keith.gong
+ *
+ * 2014/03/06 - ?
+ *
+ */
+
+#ifndef __CDT_QUEUE_H__
+#define __CDT_QUEUE_H__
+
+#include <cdt_types.h>
+
+#define CDT_QUEUE_NO_WAIT                      (0)
+#define CDT_QUEUE_WAIT_FOREVER              (-1)
+
+
+typedef enum
+{
+    CDT_QUEUE_SWITCH_IGMP,
+    CDT_QUEUE_SWITCH_RSTP,
+    CDT_QUEUE_RSTP_TIMER,
+
+    CDT_QUEUE_NUM,
+}cdtQueueSubKey;
+
+
+typedef enum
+{
+    CDT_SW_MSG_ANY = 0,
+    CDT_SW_MSG_ARP,
+    CDT_SW_MSG_DHCP,
+    CDT_SW_MSG_IGMP,
+    CDT_SW_MSG_RSTP,
+    CDT_SW_MSG_LACP,
+    CDT_SW_MSG_DOT1X,
+
+	CDT_SW_MSG_MAX,
+}cdtSwQueueMsgType;
+
+
+#define CDT_SW_MSG_TEXT_SIZE                1550
+#define CDT_SW_MSG_MAX_NUM                  30
+
+
+typedef struct
+{
+    long                                    type;
+    UINT8                                   srcPort;
+    UINT16                                  pktLen;
+    UINT16                                  llid;
+    UINT16                                  devId;
+    UINT16                                  vid;
+}cdtSwitchIgmpMsgHeader_t;
+
+typedef struct
+{
+    long        type;
+    INT8        port;
+    INT8        trunk;
+    UINT8       noVlan;
+    UINT16      vid;
+    UINT16      len;
+    UINT8       data[CDT_SW_MSG_TEXT_SIZE];
+}cdtRstpBpduMsg_t;
+
+typedef struct
+{
+    cdtSwitchIgmpMsgHeader_t                hdr;
+    UINT8                                   data[CDT_SW_MSG_TEXT_SIZE];
+}cdtSwitchIgmpMsg_t;
+
+
+typedef struct
+{
+    long type;
+    UINT8 srcport;
+    UINT32 pktLen;  		/*报文长度*/
+    UINT16 ipHeadOffset;   /*IP 头的偏移值*/
+    UINT16 vid;
+    UINT8 direction;                /*报文方向;client->server/server->client*/
+    UINT32  dhcpOffset;            /*dhcp报文的偏移值*/
+}cdtSwitchDhcpMsgHeader_t;
+
+
+typedef struct
+{
+    cdtSwitchDhcpMsgHeader_t hdr;
+    UINT8 data[CDT_SW_MSG_TEXT_SIZE];
+}cdtSwitchDhcpMsg_t;
+
+typedef struct
+{
+	long                                    type;
+	UINT8                                   srcPort;
+	UINT16                                  pktLen;
+	UINT16                                  vid;
+}cdtSwitchArpMsgHeader_t;
+
+typedef struct
+{
+    cdtSwitchArpMsgHeader_t hdr;
+    UINT8 data[CDT_SW_MSG_TEXT_SIZE];
+}cdtSwitchArpMsg_t;
+
+typedef struct
+{
+    long        type;       /* CDT_SW_MSG_LACP */
+    UINT8       srcPort;    /* 入接口索引 */
+    UINT16      pktLen;
+    UINT16      vid;        /* 实际不涉及 */
+}cdtSwitchLacpMsgHeader_t;
+
+typedef struct
+{
+    cdtSwitchLacpMsgHeader_t hdr;
+    UINT8 data[CDT_SW_MSG_TEXT_SIZE];
+}cdtSwitchLacpMsg_t;
+
+typedef struct
+{
+    long        type;       /* CDT_SW_MSG_DOT1X */
+    UINT8       srcPort;    /* 入接口索引 */
+    UINT16      pktLen;
+    UINT16      vid;        /* 暂时不区分 */
+}cdtSwitchDot1xMsgHeader_t;
+
+typedef struct
+{
+    cdtSwitchDot1xMsgHeader_t hdr;
+    UINT8 data[CDT_SW_MSG_TEXT_SIZE];
+}cdtSwitchDot1xMsg_t;
+
+
+
+INT32 cdtQueueCreate (INT32 *queue_id, INT32 subKey, UINT32 queue_size);
+INT32 cdtQueueGet (INT32 queue_id, long type, void *data, UINT32 size, UINT32 *size_copied, INT32 timeout);
+INT32 cdtQueuePut (INT32 queue_id, void *data, UINT32 size, INT32 timeout);
+
+
+#endif
+

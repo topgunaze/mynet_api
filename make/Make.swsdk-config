@@ -1,0 +1,13 @@
+#  Name         : Makefile
+#  Version      : V2.00
+#  Author       : keith.gong (kizerg@163.com)
+#  Time         : 2014.12.18
+#  Description  : Config for FD1508GS switch
+#                 Copyright (c) 2009-2015 C-Data Co.,Ltd.
+#                 All Rights Reserved.
+#  Modification : 2014.12.18, keith.gong, created
+
+export KERNDIR       := $(LINUX_DIR)
+SWSDK_MAKE_DIR      := $(SWSDK_DIR)/systems/linux/user/iproc-3_6
+SWSDK_BUILD_DIR     := $(SWSDK_DIR)/build/linux/user/iproc-3_6
+

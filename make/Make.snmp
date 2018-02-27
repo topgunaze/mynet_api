@@ -1,0 +1,129 @@
+#  Name         : Makefile
+#  Version      : V2.01
+#  Author       : keith.gong (kizerg@163.com)
+#  Time         : 2016.03.22
+#  Description  : Makefile for Net SNMP
+#                 Copyright (c) 2009-2016 CDATA Co.,Ltd.
+#                 All Rights Reserved.
+#  Modification : 2016.03.22, keith.gong, created
+
+MODULE_DIR           := $(shell pwd)
+MODULE_NAME          := $(notdir $(MODULE_DIR))
+PRJ_ROOT_DIR         ?= $(shell cd ../../; pwd)
+NET_SNMP_DIR         := ./net-snmp-5.7.3
+
+-include $(PRJ_ROOT_DIR)/make/Make.config
+#CROSS_COMPILE        := mips_4KC-
+CC                   := $(CROSS_COMPILE)gcc
+AR                   := $(CROSS_COMPILE)ar
+STRIP                ?= strip
+
+#  Create some dependency directory 
+MODULE_OBJ_DIR       ?= $(PRJ_ROOT_DIR)/build/objs/$(MODULE_NAME)
+MODULE_LIB_DIR       ?= $(PRJ_ROOT_DIR)/build/libs/$(MODULE_NAME)
+INSTALL_DIR          := $(FW_ROOTFS_USR_BIN_DIR)
+MKDIR                ?= mkdir -p 
+$(shell $(MKDIR) $(MODULE_OBJ_DIR) $(MODULE_LIB_DIR) $(INSTALL_DIR))
+
+INCLUDE_DIRS         := ./include $(VTYSH_DIR)/include $(PRJ_ROOT_DIR)/include $(APP_DIR)/include $(COM_DIR)/include
+MODULE_CFLAGS        := -Wall -Werror -g $(addprefix -I,$(INCLUDE_DIRS))
+CFLAGS               += $(MODULE_CFLAGS) 
+CC_LIBS              := -lpthread -lrt -L$(PRJ_LIB_DIR)/snmpd -lnetsnmpagent -lnetsnmpmibs -lnetsnmp -L$(PRJ_LIB_DIR)/vtysh -lvtysh
+
+APP_DEP_LIBS         := $(PRJ_LIB_DIR)/sysctrl/libsysMacCrypt.a
+
+MODULE_APP_OBJS      := 
+MODULE_APP_DEPS      := 
+MODULE_LIB_OBJS      := 
+MODULE_LIB_DEPS      := 
+
+#  Pattern matching rules:
+$(MODULE_OBJ_DIR)/%.o:     $(MODULE_DIR)/src/%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+$(MODULE_OBJ_DIR)/%.o:     $(MODULE_DIR)/lib/%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+JOBS := $(shell grep -c ^processor /proc/cpuinfo 2>/dev/null)
+ifeq ($(JOBS),)
+JOBS := 1
+endif
+
+SNMP_CONFIG_CMD      := ./configure \
+	--build=i386-linux \
+	--host=arm-linux \
+	--target=arm-linux \
+	--with-cc=$(CROSS_COMPILE)gcc \
+	--with-ar=$(CROSS_COMPILE)ar \
+	LD=$(CROSS_COMPILE)ld \
+	--prefix="$(MODULE_OBJ_DIR)" \
+	--libdir="$(MODULE_LIB_DIR)" \
+	--includedir="$(MODULE_DIR)/include" \
+	--bindir="$(MODULE_OBJ_DIR)" \
+	--sbindir="$(MODULE_OBJ_DIR)" \
+	--sysconfdir="/etc" \
+	--enable-static=no \
+	--disable-deprecated \
+	--with-endianness=big \
+	--with-default-snmp-version="3" \
+	--with-sys-location="location" \
+	--with-sys-contact="contact" \
+	--with-logfile="/var/log/snmpd.log" \
+	--with-persistent-directory="/var/" \
+	--without-rpm \
+	--with-openssl="internal" \
+	--disable-embedded-perl \
+	--without-perl-modules \
+	\
+	--disable-ipv6 \
+	--disable-manuals \
+	--disable-ucd-snmp-compatibility \
+	--enable-as-needed \
+	--disable-applications \
+	--disable-scripts \
+	\
+	--disable-mibs \
+	--disable-mib-loading \
+	--disable-debugging \
+	--with-mib-modules="agentx " \
+	--enable-mini-agent \
+#	--with-out-transports="UDPIPv6 TCPIPv6 Unix Alias" \
+#	--with-out-mib-modules="utilities snmpv3mibs host disman/schedule disman/event " \
+
+
+.PHONY: all lib program clean config
+all: lib program
+#all: lib 
+
+lib: $(MODULE_LIB_DIR)/lib$(MODULE_NAME).a $(MODULE_LIB_DIR)/libnetsnmp.so.30 
+
+$(MODULE_LIB_DIR)/libnetsnmp.so.30: $(NET_SNMP_DIR)/Makefile
+	make -j$(JOBS) -C $(NET_SNMP_DIR)
+	make -j$(JOBS) install -C $(NET_SNMP_DIR)
+
+ifneq ($(NET_SNMP_DIR)/Makefile,$(wildcard $(NET_SNMP_DIR)/Makefile))
+$(NET_SNMP_DIR)/Makefile: config
+endif
+
+config:
+	cd net-snmp-5.7.3;$(SNMP_CONFIG_CMD)
+
+$(MODULE_LIB_DIR)/lib$(MODULE_NAME).a: $(MODULE_LIB_DEPS)
+	$(AR) $(LDFLAGS) crv $(MODULE_LIB_DIR)/lib$(MODULE_NAME).a $(MODULE_LIB_DEPS)
+
+program : $(INSTALL_DIR)/$(MODULE_NAME)
+$(INSTALL_DIR)/$(MODULE_NAME) : $(MODULE_OBJ_DIR)/snmpd
+	$(CP) $< $@ 
+	$(STRIP) $@
+
+clean:
+ifeq ($(NET_SNMP_DIR)/Makefile, $(wildcard $(NET_SNMP_DIR)/Makefile))
+	make -j$(JOBS) uninstall -C $(NET_SNMP_DIR)
+	make -j$(JOBS) clean -C $(NET_SNMP_DIR) 
+endif
+	$(RM) $(MODULE_OBJ_DIR)/*
+	$(RM) $(MODULE_LIB_DIR)/*
+
+test:
+	@$(ECHO) $(JOBS)
+	@$(ECHO) $(SNMP_CONFIG_CMD)

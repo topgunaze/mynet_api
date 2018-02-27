@@ -1,0 +1,207 @@
+/**************************************************************
+ * 文件名称:  sys_common.h
+ * 作            者:  keith.gong
+ * 日            期:  2014.12.20
+ * 文件描述:  工程通用定义
+ * 版            本:  V1.00
+ * 修改历史:  
+ *     <修改者>   <时间>    <版本 >   <描述>
+**************************************************************/
+
+#ifndef __PON_COMMON_H__
+#define __PON_COMMON_H__
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+
+#include <stdio.h>
+
+#include "lstLib.h"
+
+#include "cdt_types.h"
+
+
+
+/*................................................  System Common Macro  ......................................................*/
+/* 定义系统所支持的所有设备 */
+typedef enum
+{
+    FD1216S_16EPON,
+    FD1240S_40EPON,
+    FD1616S_16GPON,
+    FD1608S_08GPON
+}DEV_TYPE_DTE;
+
+/* 定义当前编译所选择的设备 */
+#define DEV_TYPE                            FD1616S_16GPON
+
+/*  定义系统和设备资源*/
+#define SYS_SERVICE_CARD_START              0       /* 第一块业务盘所在槽位*/
+#define SYS_SERVICE_CARD_END                0       /* 最后一块业务盘所在槽位*/
+
+#if (DEV_TYPE == FD1216S_16EPON) 
+#define SYS_MAX_SLOT_NUM                    1       /* 系统支持的最大槽位数*/
+#define SLOT_DEVICE_NUM                     4       /* 每个槽位支持的最大CS8022  芯片个数*/
+#define DEVICE_PON_NUM                      4       /* 芯片支持的最大PON MAC  个数*/
+#elif (DEV_TYPE == FD1240S_40EPON)
+#define SYS_MAX_SLOT_NUM                    5       /* 系统支持的最大槽位数*/
+#define SLOT_DEVICE_NUM                     2       /* 每个槽位支持的最大CS8022  芯片个数*/
+#define DEVICE_PON_NUM                      4       /* 芯片支持的最大PON MAC  个数*/
+#elif (DEV_TYPE == FD1616S_16GPON)
+#define SYS_MAX_SLOT_NUM                    1       /* 系统支持的最大槽位数*/
+#define SLOT_DEVICE_NUM                     1       /* */
+#define DEVICE_PON_NUM                      1       /* 芯片支持的最大PON MAC  个数*/
+#else
+#error "设备未定义"
+#endif
+
+#define SYS_MAX_EXIST_PON_NUM               (SYS_MAX_SLOT_NUM*SLOT_DEVICE_NUM*DEVICE_PON_NUM)     /* 系统支持的最大实际PON 口数*/
+#define SYS_MAX_PON_NUM                     (SYS_MAX_EXIST_PON_NUM)       /* 系统支持的最大PON 口数,包含虚拟pon口*/
+
+#define SYS_MAX_ONU_NUM                     64      /* 系统单PON 支持的最大ONU 数*/
+#define SYS_MAX_ONU_LLID_NUM                8       /* 系统单ONU 支持的最大LLID 数*/
+#define SYS_MAX_ONU_PORT_NUM                24      /* 系统单ONU 的单卡支持的最大端口数*/
+#define SYS_MAX_ONU_POTS_NUM                8       /* 系统单ONU 的单卡支持的最大POTS 端口数*/
+#define SYS_MAX_ONU_E1_NUM                  4       /* 系统单ONU 的单卡支持的最大E1 端口数*/
+#define SYS_MAX_ONU_CARD_NUM                4       /* 系统单ONU 支持的最大子卡数*/
+#define SYS_MAX_ONU_PON_IF_NUM              2       /* 系统单ONU 支持的最大PON 口数*/
+#define SYS_MAX_ONU_VLAN_TL_PAIR            8       /* 系统支持的ONU VLAN 转换的最大数目*/
+#define SYS_MAX_ONU_VLAN_N1_AG_NUM          4       /* 系统支持的ONU VLAN  N:1  聚合的最大数目*/
+#define SYS_MAX_ONU_VLAN_TRUNK_NUM          8       /* 系统支持的ONU VLAN TRUNK 的最大数目*/
+#define SYS_MAX_ONU_MVLAN_SWITCHING_NUM     8       /* 系统支持的ONU MVLAN 切换最大数目*/
+#define SYS_MAX_ONU_QUEUE_NUM               8       /* 表示queue最大数目*/
+#define SYS_MAX_ONU_IPHOST_NUM              1
+
+#define SYS_VID_START                       1    
+#define SYS_VID_END                         4094    
+
+//#define MAX_ONU_NUM                         129
+
+#define SYS_MAINBOARD_SLOT1                 0
+#define SYS_MAX_FRAME_PON_NUM               16      /* 主控的保护组 是从17开始 ，兼顾16EPON*/ /* kth.debug */
+
+#define ONU_MAX_LOID_USER_LEN               25      /* ONU LOID 最大的用户名长度 + 1*/
+#define ONU_MAX_LOID_PWD_LEN                13      /* ONU LOID 最大的密码长度 + 1*/
+#define ONU_MAX_SN_PWD_LEN                  10      /* ONU SN  匹配密码长度*/
+#define PON_ONU_MAX_IF_TYPE                 10      /* ONU 最多的接口类型*/
+
+
+#define INVALID_MSGID_NUMBER                0xffff
+#define INVALID_LINK_NUMBER                 0xff
+#define INVALID_ONUID_NUMBER                0xffff
+#define INVALID_PORTID_NUMBER               0xffff
+
+#define ONUID_2_OMCI_PORT(onu_id)           ((onu_id)+1) /* kth.debug */
+
+#define MCAST_DOMAIN_ID                     1200    /* 组播DOMAIN  使用的ID */
+
+#define SNMP_PROTO_PARAM_STR_LEN            32
+
+#define DISPATCH_RETRY_TIME                 1
+
+#define ALARM_REPORT_MSG_LENGTH             160
+
+#define ONU_CFG_MAX_PORT_CAM_NUM            8       /* ONU  最多支持的端口流分类的条目数*/
+#define ONU_CFG_MAX_PORT_CAM_RULE_NUM       4       /* 每条流分类中最大的规则数*/
+
+#define  PHY_ADDR_LENGTH                    6
+
+#define VALIDATE_SLOT_ID(slotId)            ((slotId) >= SYS_SERVICE_CARD_START && (slotId) <= SYS_SERVICE_CARD_END)
+#define VALIDATE_PON_ID(ponId)              ((ponId) < SYS_MAX_PON_NUM)
+#define VALIDATE_ONU_ID(onuId)              ((onuId) < SYS_MAX_ONU_NUM)
+#define VALIDATE_LLID_ID(llid)              ((llid) < SYS_MAX_ONU_LLID_NUM)
+#define SYS_VALID_PTR(p)                    (p != NULL)
+
+
+/*对某个给定操作进行重复进行*/
+#define PON_OBJ_MULTIPLE_OPERATION(rc, func) do{ \
+    int attempt = 3; \
+    while(attempt-- > 0){ \
+        rc = (func); \
+        if (OK == rc)break;\
+        taskDelay(1);}\
+}while(0)
+
+
+#if 0
+/*................................................  System Common Enum  ......................................................*/
+/*-------------- ONU  以太网端口VLAN  模式--------------*/
+typedef enum
+{
+    ONU_ETH_PORT_VLAN_TP = 0,
+    ONU_ETH_PORT_VLAN_NTP,
+}onuEthPortVlanMode_t;
+#endif
+/*-------------- ONU  以太网端口CAM  相关--------------*/
+
+/*...................  规则匹配域的类型.....................  */
+typedef enum
+{
+    ONU_ETH_PT_CAM_FIELD_DA_MAC             = 0x00,
+    ONU_ETH_PT_CAM_FIELD_SA_MAC             = 0x01,
+    ONU_ETH_PT_CAM_FIELD_ETHERNET_PRIORITY  = 0x02,
+    ONU_ETH_PT_CAM_FIELD_VLAN_ID            = 0x03,
+    ONU_ETH_PT_CAM_FIELD_ETHER_TYPE         = 0x04,
+    ONU_ETH_PT_CAM_FIELD_DST_IP             = 0x05,
+    ONU_ETH_PT_CAM_FIELD_SRC_IP             = 0x06,
+    ONU_ETH_PT_CAM_FIELD_IP_PROTOCOL_TYPE   = 0x07,
+    ONU_ETH_PT_CAM_FIELD_IPV4_TOS_DSCP      = 0x08,
+    ONU_ETH_PT_CAM_FIELD_IPV6_PRECEDENCE    = 0x09,
+    ONU_ETH_PT_CAM_FIELD_L4_SRC_PORT        = 0x0A,
+    ONU_ETH_PT_CAM_FIELD_L4_DEST_PORT       = 0x0B,
+    ONU_ETH_PT_CAM_FIELD_RESERVE            = 0x0C
+} onuEthPtCamRuleField_t;
+
+/*规则操作符的类型*/
+typedef enum
+{
+    ONU_ETH_PT_CAM_OPERS_NEVER_MATCH            = 0x00,
+    ONU_ETH_PT_CAM_OPERS_EQUAL                  = 0x01,
+    ONU_ETH_PT_CAM_OPERS_NOT_EQUAL              = 0x02,
+    ONU_ETH_PT_CAM_OPERS_LESS_THAN_OR_EQUAL     = 0x03,
+    ONU_ETH_PT_CAM_OPERS_GREATER_THAN_OR_EQUAL  = 0x04,
+    ONU_ETH_PT_CAM_OPERS_FIELD_EXIST            = 0x05,
+    ONU_ETH_PT_CAM_OPERS_FIELD_NOT_EXIST        = 0x06,
+    ONU_ETH_PT_CAM_OPERS_ALWAYS_MATCH           = 0x07,
+    ONU_ETH_PT_CAM_OPERS_RESERVE                = 0x08
+} onuEthPtCamRuleOper_t;
+
+
+/*流分类的规则*/
+typedef struct
+{
+    onuEthPtCamRuleField_t      ruleField;
+    UINT8                       ruleVal[6];
+    onuEthPtCamRuleOper_t       ruleOper;
+} onuEthPtCamRule_t;
+
+
+typedef struct
+{
+    NODE                        node;
+    UINT8                       failedCount;        /*下发硬件失败的次数*/
+    UINT8                       precedence;         /*值越小,  优先级越高,  1 为最高优先级*/
+    UINT8                       queueMapped;
+    UINT8                       priorityMark;
+    UINT8                       ruleNum;
+    onuEthPtCamRule_t           ruleTable[ONU_CFG_MAX_PORT_CAM_RULE_NUM];
+}onuEthPtCamNode_t;
+
+
+/*--------------   ONU  PORT  classification and marking (CAM)  属性结构 --------------*/
+typedef struct
+{
+    LIST                        camList;            /*被添加的CAM  链, node is onuEthPtCamNode_t */
+} onuEthPtCam_t;
+
+typedef int cfgAction_t(void *arg, char *msg, int len);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
+#endif /* _GEPON_COMMON_H */
+

@@ -1,0 +1,35 @@
+
+#ifndef _GPON_OMCI_EXPO_H
+#define _OMCI_OLT_FUNCTION_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
+
+#include "GponLineMgmtExpo.h"/*alloc  gemport info*/
+
+
+
+
+int OnuTrafficProfile(UINT16 link_id,UINT16 onu_id,ONU_INFO_FOR_OMCI *onu_info_for_omci);
+int DelOnuTrafficProfile(UINT16 link_id,UINT16 onu_id);
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
+
+#endif
+
+
+
+
+
+
+
+

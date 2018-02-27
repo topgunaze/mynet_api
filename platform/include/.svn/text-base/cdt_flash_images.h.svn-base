@@ -1,0 +1,194 @@
+/**************************************************************
+ * 文件名称:  cdtFlashImages
+ * 作    者:  tonson tang
+ * 日    期:  2015.05.12
+ * 文件描述:  Flash Image文件头定义
+ * 版    本:  V1.00
+ * 修改历史:  
+ *     <修改者>   <时间>    <版本 >   <描述>
+
+                                                                                
+                                                                                Firmware Header
+                                                                                -------------------------------
+                                                                                | 字节  |   字段              |
+                                                                                |-----------------------------|
+  CData File Header                                                             |  1    |   Header Version    |
+  ---------------------------                                                   |-----------------------------|
+  |  字节   |   字段        |                                                   |  3    |   Reserved          |
+  |-------------------------|                                                   |-----------------------------|
+  |  4      |   Seal        |        TLV Header                                 |  4    |   Flage             |
+  |-------------------------|        ---------------------------------        / |-----------------------------|
+  |  1      |   Version     |       /|     |  字节   |   字段        |       /  |  4    |   Firmware Version  |
+  |-------------------------|      / |  T  |-------------------------|      /   |-----------------------------| 
+  |  51     |   Reserved    |     /  |  L  |  1      |   Type        |     /    |  44   |   Reserved          |
+  |-------------------------|    /   |  V  |-------------------------|    /     |-----------------------------| 
+  |  4      |   CrC32       |   /    |     |  3      |   Reserved    |   /      |  4    |   CrC32             |
+  |-------------------------|  /     |  0  |-------------------------|  /       |-----------------------------|
+  |  4      |   Length      | /      |  ~  |  4      |   Length      | /        |  4    |   Size              |       
+  |-------------------------|/       |  n  |-------------------------|/         |-----------------------------|
+  |  N      |   Payload     |        |     |  N      |   Value       |          |  N    |   File Content      |
+  ---------------------------  -->   ---------------------------------   -->    -------------------------------
+  
+**************************************************************/
+#ifndef __CDT_FLASH_IMAGE_H__
+#define __CDT_FLASH_IMAGE_H__
+
+/* file type define */
+#define CDTFT_NULL      0x00
+#define CDTFT_BOOT      0x01
+#define CDTFT_KERNEL    0x02
+#define CDTFT_FW        0x03
+#define CDTFT_CFG       0x04
+#define CDTFT_COMMON    0x05
+
+/* version of file box header */
+#define CDT_IMG_HEADER_VER    0x01
+
+
+#define CDT_FILE_BOX_MAX_FILES  4
+
+#define CDT_NVRAM_LICENSE_LEN   16
+#define CDT_NVRAM_MODEL_LEN     65      /* 64+1 */
+#define CDT_NVRAM_SN_LEN        65      /* 64+1 */
+#define CDT_NVRAM_VENDOR_LEN    128     /* 128+1 */
+#define CDT_NVRAM_CUSTOMTYPE_LEN    8     /* 8+1 */
+#define CDT_NVRAM_CLASS_LEN 1
+
+#define CDT_FLASH_NAME_BOOT     "flash0.boot"
+#define CDT_FLASH_NAME_ENV      "flash0.env"
+#define CDT_FLASH_NAME_PARAM    "flash0.param"
+#define CDT_FLASH_NAME_KERNEL   "flash0.kernel"
+#define CDT_FLASH_NAME_FW1      "flash0.fw1"
+#define CDT_FLASH_NAME_FW2      "flash0.fw2"
+#define CDT_FLASH_NAME_FS       "flash0.fs"
+
+#define CDT_NVRAM_PARAM_SEAL        "CDT"
+#define CDT_NVRAM_PARAM_SEAL_SIZE   4
+
+#define CDT_DEF_MODEL_STR       "FD1216S"
+
+
+/* enable structure packing */
+#if defined (__GNUC__)
+#define	PACKED	__attribute__((packed))
+#else
+#pragma pack(1)
+#define	PACKED
+#endif
+
+typedef struct cdtFileHeaderTlv_s {
+    unsigned char type;				    /* file type:
+                                            0x01  boot(CFE)
+                                            0x02  image(Firmware)
+                                            0x03  configuration files
+                                            0x04  other common files
+                                        */
+    unsigned char rsvd[3];				/* reserved */
+    unsigned char length[4];		    /* size of value, in bytes, always big-endian */
+    unsigned char value[0];				/* file content */
+} PACKED cdtFileHeaderTlv_t;		    /* should be 8 bytes */
+
+typedef struct cdtFileHeader_s {
+    unsigned char seal[4];				/* device id */
+    unsigned char version;				/* version of header format,start at 0x01 */
+    unsigned char rsvd[51];				/* reserved */
+    unsigned char crc32[4];				/* CRC-32 of payload,excluding this header, always big-endian */
+    unsigned char length[4];			/* length of payload,excluding this header, always big-endian*/
+    unsigned char payload[0];			/* tlv content */
+} PACKED cdtFileHeader_t;		        /* should be 64 bytes */
+
+
+#if 111
+/* header for boot,kernel,firmware files */
+typedef struct cdtBKFHeader_s {
+    unsigned char seal[4];                      /* device id */
+    unsigned char type;				            /* file type: boot(0x01) kernel(0x02) firmware(0x03) */                                 
+    unsigned char headerVer;				    /* version of this header format,start at 0x01 */
+    unsigned char rsvd1[2];				        /* reserved */
+    unsigned char flags[4];				        /* Various flags, always big-endian */
+    unsigned char majver,minver,ecover,miscver;	/* Firmware version */
+    unsigned char buildDate[6];                 /* build date of firmware, yy-mm-dd hh:min:ss*/
+    unsigned char rsvd2[34];                    /* reserved */
+    unsigned char crc32[4];				        /* CRC-32, excluding header, always big-endian */
+    unsigned char size[4];					    /* data size, excluding header, in bytes, always big-endian */
+    unsigned char data[0];				        /* file content */
+} PACKED cdtBKFHeader_t;		                /* should be 64 bytes */
+#else
+/* header for boot,firmware,configuration files */
+typedef struct cdtFwCfgHeader_s {
+    unsigned char headerVer;				    /* version of this header format,start at 0x01 */
+    unsigned char rsvd1[3];				        /* reserved */
+    unsigned char flags[4];				        /* Various flags, always big-endian */
+    unsigned char majver,minver,ecover,miscver;	/* Firmware version */
+    unsigned char rsvd2[44];                    /* reserved */
+    unsigned char crc32[4];				        /* CRC-32, excluding header, always big-endian */
+    unsigned char size[4];					    /* data size, excluding header, in bytes, always big-endian */
+    unsigned char data[0];				        /* file content */
+} PACKED cdtFwCfgHeader_t;		                /* should be 64 bytes */
+#endif
+
+/* header for common files */
+typedef struct cdtCommonHeader_s {
+    unsigned char headerVer;				    /* version of this header format,start at 0x01 */
+    unsigned char rsvd1[3];				        /* reserved */
+    unsigned char flags[4];				        /* Various flags, always big-endian */
+    unsigned char path[128];	                /* absolute path including file name */
+    unsigned char rsvd2[112];                   /* reserved */
+    unsigned char crc32[4];				        /* CRC-32, excluding header, always big-endian */
+    unsigned char size[4];					    /* data size, excluding header, in bytes, always big-endian */
+    unsigned char data[0];				        /* file content */
+} PACKED cdtCommonHeader_t;		                /* should be 256 bytes */
+
+
+/* boot parameter */
+typedef struct cdtBootParamter_s {
+    char seal[4];				                /* seal = "CDT" */
+    unsigned char run;				            /* which firmware is runing,0x00:os0 0x01:os1 */
+    struct {
+        unsigned char   status;                 /* 0x00:good 0x01:try1 0x02:try2 0x03:try3 0xff:new */
+        unsigned char   version[4];             /* version of firmware  ver[0].ver[1].ver[2] */
+        unsigned char   buildDate[6];           /* build date of firmware, yy-mm-dd hh:min:ss*/
+        unsigned int    size;                   /* size of firmware */
+    }fw[2];
+} PACKED cdtBootParamter_t;
+
+/* env parameter */
+typedef struct cdtEnvParamter_s {
+    char    seal[4];				                    /* seal = "CDT" */
+    unsigned char   mac[6];                             /* first mac address of device */
+    unsigned char   license[CDT_NVRAM_LICENSE_LEN];     /* license */
+    char    model[CDT_NVRAM_MODEL_LEN];                 /* model */
+    char    sn[CDT_NVRAM_SN_LEN];                       /* serial number */
+    char    vendor[CDT_NVRAM_VENDOR_LEN];               /* vendor */
+    int      customType;               /* customType */
+} PACKED cdtEnvParamter_t;
+
+
+/* disable structure packing */
+#undef PACKED
+#if !defined (__GNUC__)
+#pragma pack()
+#endif
+
+/* get 32bit for big-endian */
+#define BE_GET32(x) (((unsigned int) (x[0] << 24)) | \
+                    ((unsigned int) (x[1] << 16)) | \
+                    ((unsigned int) (x[2] << 8)) |  \
+                    ((unsigned int) (x[3] << 0)))
+
+/* set 32bit for big-endian
+static void BE_SET32(unsigned char *dest,unsigned int src)
+{
+    *dest++ = (src >> 24) & 0xFF;
+    *dest++ = (src >> 16) & 0xFF;
+    *dest++ = (src >>  8) & 0xFF;
+    *dest++ = (src >>  0) & 0xFF;
+}
+*/
+
+
+/* device type of fd1508gs 
+#define CDT_DEV_TYPE    0x04010101
+*/
+
+#endif /* __CDT_FLASH_IMAGE_H__ */

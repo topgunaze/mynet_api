@@ -1,0 +1,585 @@
+#ifndef _OMCI_CONSTANTS_H
+#define _OMCI_CONSTANTS_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#include "sys_common.h"
+
+#define MAX_ETH_MAC_CFG_NUM                     8 /*一个端口MAC 配置的最大数 */
+
+#define MAX_CARD_HOLDER_INST_NUM                8 /* used to be 8 */
+#define MAX_CIRCUIT_PACK_INST_NUM               8
+#define MAX_CARD_HOLDER_INST_NUM_ONU            3
+#define MAX_CIRCUIT_PACK_INST_NUM_ONU           3
+
+#define MAX_MULTICAST_ADDR_TABLE_SECONDINDEX    4
+
+#define BRIDGING_MODE                           1 /*N:1 bridging*/
+#define MAPPING_MODE                            2 /*1:M mapping*/
+#define FILTERING_MODE                          3 /*1:P filtering*/
+#define BRIDGE_MAPPING_MODE                     4 /*N:M bridge-mapping*/
+#define MAP_FILTERING_MODE                      5 /*1:MP bridge-filtering*/
+#define BRIDGE_FILTERING_MODE                   6 /*N:P bridge-filtering*/
+#define BRIDGE_MAP_FILTERING_MODE               7 /*N:MP bridge-map-filtering*/
+#define MAC_BRIDGE_MODE                         8 /*MAC briding*/
+#define P_MAPPER_MODE                           9 /*802.1P mapper*/
+
+#define ONU_FE_PORT_BASE                        0x401
+#define ONU_FE_PORT_BASE_OTHER_DEVICE           0x101
+
+
+#define ONU_TYPE_AN5506_04B                     340
+#define ONU_TYPE_AN5506_04A                     348
+#define ONU_TYPE_AN5506_06                      341
+#define ONU_TYPE_AN5506_07                      345
+#define ONU_TYPE_AN5506_07_A2H                  752
+#define ONU_TYPE_AN5506_09_A1                   756
+#define ONU_TYPE_AN5006_15                      27
+#define ONU_TYPE_AN5006_20                      32
+
+#define ONU_TYPE_AN5506_07_A1                   754
+#define ONU_TYPE_AN5506_07_B1                   755
+#define ONU_TYPE_AN5506_04_C1                   750
+#define ONU_TYPE_AN5506_09_B1                   757
+#define ONU_TYPE_AN5506_10_A1                   758
+#define ONU_TYPE_AN5506_10_B1                   759
+#define ONU_TYPE_AN5506_HG260                   762
+#define ONU_TYPE_AN5506_04B2G                   768
+#define ONU_TYPE_AN5506_04A1G                   767
+
+#define ONU_TYPE_AN5506_04_F1                   765 /*设备子型号AN5506-04-F1(4路FE＋2路POTS＋1路WiFi，交流)*/
+#define ONU_TYPE_AN5506_04_G1                   766 /*设备子型号AN5506-04-F1(4路FE＋2路POTS＋1路WiFi+CATV，交流)*/
+#define ONU_TYPE_AN5506_04_A1G                  767
+#define ONU_TYPE_AN5506_06_B2G                  768
+
+#define MAX_TDM_NUM                             2    
+#define MAX_E1_CFG_NUM                          4
+#define MAX_ONU_SYSTEM                          (SYS_MAX_PON_NUM * MAX_ONU_NUM)
+
+#define MAX_TMP_ONU_NUM	                        128
+#define MAX_ONU_NUM_FOR_ONUTYPE                 110
+#define MAX_ONU_NUM_TEST                        128 /*与xyg定义统一*/
+
+#define buffer_malloc                           malloc
+#define my_buffer_free                          free
+
+#define table_malloc                            calloc
+#define table_free                              free
+
+#define message_malloc                          malloc
+#define message_free                            free
+
+#define OMCI_PRIORITY_NUM                       2
+#define OMCI_ATTRIBUTR_MASK_LENGTH              2
+
+#define MAC_ADDRESS_BYTE_NUM                    6
+#define OMCI_MAX_ONU_CONNECTION_NUM             64/*used to be 64*//*used to be 75*/
+#define OMCI_MAX_ONU_T_CONT_NUM                 8/*used to be 8*/
+#define OMCI_MAX_ONU_PRIORITY_QUEUE_NUM         8
+#define OMCI_MAX_ONU_TRAFFIC_SHCEDULER_NUM      8
+#define OMCI_MAX_ONU_BRIDGE_PORT_NUM            64/*used to be 64*//*used to be 75*/
+#define OMCI_MAX_ONU_BRIDGE_PORT_NUM_FOR_IGMP   75
+#define OMCI_MAX_ONU_FLOW_NUM                   16
+#define OMCI_INVALID_ONU_FLOW_NUM               0
+#define OMCI_MAX_IP_HOST_CONFIG_DATA_INSTANCE_NUM   4 /* used to be 3 */
+#define OMCI_MAX_8021P_MAPPPING_SERVICE_PROFILE_NUM 24 /*MAX_GEM_PORT_SINGLE_ONU-*/
+#define OMCI_MAX_MAC_BRIDGE_SERVICE_PROFILE_NUM     8
+/*#define OMCI_MAX_THRESHOLD_ID_NUM 2*/
+#define ONU_MAX_Ethernet_Frame_Extended_PM_Instance 48/*  仅仅用于这个ME的范围*/
+#define ONU_MAX_Ethernet_Frame_Extended_PM_Instance_Gem 8192/*  仅仅用于这个ME的范围  4096个GEM port 0-8191 */
+
+#define ONU_MAX_Gem_Network_CTP_PM_NUM          4096/*  仅仅用于这个ME的范围 */
+
+
+#define ONU_MAX_ETHERNET_UNI_PORTS_OTHER_DEVICE 2
+#define ONU_MAX_ETHERNET_UNI_PORTS              4 /*used to be 24*/
+#define ONU_MAX_VEIP_PORTS                      1 
+#define ONU_MAX_POTS_UNI_PORTS                  4 /*used to be 16*/
+
+#define ONU_MAX_ETHERNET_UNI_PORTS_04           4
+#define ONU_MAX_ETHERNET_UNI_PORTS_06           16
+#define ONU_MAX_ETHERNET_UNI_PORTS_07           16
+#define ONU_MAX_ETHERNET_UNI_PORTS_09           8
+#define ONU_MAX_ETHERNET_UNI_PORTS_10           24
+#define ONU_MAX_POTS_UNI_PORTS_04               2
+#define ONU_MAX_POTS_UNI_PORTS_07               16
+
+#define MAX_FE_QOS_RULE_NUM                     8
+#define MAX_FE_ACL_RULE_NUM                     8
+#define MAX_QUEUE_NUM                           8
+#define MAX_QOS_RULE_INSTANCE_NUM               (MAX_FE_QOS_RULE_NUM * ONU_MAX_ETHERNET_UNI_PORTS)
+#define MAX_ACL_RULE_INSTANCE_NUM               (MAX_FE_ACL_RULE_NUM * ONU_MAX_ETHERNET_UNI_PORTS)
+
+#define  MAX_ATTRIBUTE_VALUE_LENGTH             100
+
+#define OMCI_CHAR                               0x01
+#define OMCI_SHORT                              0x02
+#define OMCI_INTEGER                            0x03        /* len 4*/
+#define OMCI_OCTET_STR                          0x04
+#define OMCI_LONG_LONG                          0x05        /* len 8*/
+#define OMCI_STRING                             0x06
+#define OMCI_LONG                               0x07        /* len 4*/
+
+/*ME 标识符*/
+#define OMCI_ME_ONT_DATA                            2
+#define OMCI_ME_PON_IF_LINE_CARDHOLD                3
+#define OMCI_ME_CARD_HOLDER                         5
+#define OMCI_ME_CIRCUIT_PACK                        6
+#define OMCI_ME_SOFTWARE_IMAGE                      7
+#define OMCI_ME_ETHERNET_UNI_PHYSICAL_TP            11
+#define OMCI_ME_ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA    24
+#define OMCI_ME_MAC_BRIDGE_TRAFFIC_PROFILE          45
+#define OMCI_ME_MAC_BRIDGE_CFG_DATA                 46
+#define OMCI_ME_MAC_BRIDGE_PORT_CONFIG_DATA         47
+#define OMCI_ME_MAC_BRIDGE_PORT_DESIGNATION_DATA    48
+#define OMCI_ME_MAC_BRIDGE_PORT_FILTER_TABLE        49
+#define OMCI_ME_MAC_BRIDGE_PORT_BRIDGE_TABLE        50
+#define OMCI_ME_POTS_UNI_PHYSICAL_TP                53
+#define OMCI_ME_PPTP_POTS_UNI                       53
+#define OMCI_ME_VLAN_TAG_OPERATION_CFG_DADA         78
+#define OMCI_ME_VIDEO_UNI_PHYSICAL_TP               82
+#define OMCI_ME_VLAN_TAG_FILTERING_DATA             84
+#define OMCI_ME_ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA_2  89
+#define OMCI_ME_XDSL_UNI_PHYSICAL_TP                98
+#define OMCI_ME_8021P_MAPPER_TRAFFIC_PROFILE        130
+#define OMCI_ME_IP_HOST_CONFIG_DATA                 134
+#define OMCI_ME_ONT_REMOTE_DEBUG                    158
+#define OMCI_ME_MoCA_UNI_PHYSICAL_TP                162
+#define OMCI_ME_EXTEND_VLAN_TAG_OPERATION_CFG_DADA  171
+#define OMCI_ME_ONT_G                               256
+#define OMCI_ME_ONT2_G                              257
+#define OMCI_ME_ONU_G                               258
+#define OMCI_ME_ONU2_G                              259
+#define OMCI_ME_PON_IF_LINE_CARD_G                  260
+
+#define OMCI_ME_PON_TC_ADAPTER_G                    261
+#define OMCI_ME_T_CONT                              262
+#define OMCI_ME_ANI_G                               263
+#define OMCI_ME_UNI_G                               264
+#define OMCI_ME_GEM_INTERWORKING_TERMINATION_POINT  266
+#define OMCI_ME_GEM_PORT_PROTOCOL_MONITORING_HISTROY_DATA       267
+#define OMCI_ME_GEM_PORT_NETWORK_CTP                268
+#define OMCI_ME_GAL_TDM_PROFILE                     271
+#define OMCI_ME_GAL_ETHERNET_PROFILE                272
+#define OMCI_ME_THRESHOLD_DATA_1                    273
+#define OMCI_ME_THRESHOLD_DATA_2                    274
+#define OMCI_ME_GAL_TDM_PROTOCOL_MONITORING_HISTROY_DATA        275
+#define OMCI_ME_GAL_ETHERNET_PROTOCOL_MONITORING_HISTROY_DATA   276
+#define OMCI_ME_PROTECTION_DATA                     279
+#define OMCI_ME_GEM_TRAFFIC_DESCRIPTORS             280 
+#define OMCI_ME_MULTICAST_GEM_INTERWORKING_TERMINATION_POINT    281  
+#define OMCI_ME_GEM_PORT_NETWORK_CTP_MONITORING_HISTROY_DATA    341  /*267的替代方案????*/
+
+#define OMCI_ME_PRIORITY_QUEUE_G                    277
+#define OMCI_ME_TRAFFIC_SCHEDULER_G                 278
+#define OMCI_ME_OMCI                                287
+#define OMCI_ME_ME                                  288  
+#define OMCI_ME_ETHERNET_PERFORMANCE_MONITORING_HISTROY_DATA_3  296
+#define OMCI_ME_PORT_MAPPING_PACKAGE                297
+#define OMCI_ME_MULTICAST_OPERATION_PROFILE         309
+#define OMCI_ME_MULTICAST_SUBSCRIBER_CFG            310
+#define OMCI_ME_MULTICAST_SUBSCRIBER_MONITOR        311
+#define OMCI_ME_VIRTUAL_ETHERNET_INTERFASE_POINT    329
+#define OMCI_ME_Ethernet_Frame_Extended_PM          334
+
+
+#if 0
+#define OMCI_ME_TDM_CFG                             300 /*xujun,自定义，该me不属于标准me。*/
+#define OMCI_ME_ONT_FIBERHOME_G                     302 /*xujun,自定义，该me不属于标准me。*/
+#define OMCI_ME_MANAGE_VLAN_FB_G                    303 /*xujun,自定义，该me不属于标准me。*/
+#define OMCI_ME_PM_WINDOW_TIME_G                    304 /*xujun,自定义，该me不属于标准me。*/
+#define OMCI_ME_ONT_FIBERHOME_G_2                   305 /*xujun,自定义，该me不属于标准me。*/
+#endif
+
+#define OMCI_ME_FH_IGMP_ONU_VLAN_CFG_DATA           65280
+#define OMCI_ME_FORCE_PON_SWITCH                    65281
+#define OMCI_ME_FE_LOOPCHECK_PARAMS                 65282
+#define OMCI_ME_UP_QOS_ACTION                       65283
+#define OMCI_ME_DOWN_QOS_ACTION                     65284
+#define OMCI_ME_OMCI_SWITCH_PORT_PACKET_CONTROL     65285
+#define OMCI_ME_SCHEDULE_QUEUE_CONFIG               65286
+#define OMCI_ME_FH_MAC_BRIDGE_SERVICE_PROFILE       65287
+#define OMCI_ME_sw_port_acl_rule                    65288
+#define OMCI_ME_QOS_RULE_POINTER                    65289
+#define OMCI_ME_acl_rule_pointer                    65290
+#define OMCI_ME_static_route                        65291
+
+#define OMCI_ME_group_vlan                          65308
+
+#define OMCI_ME_ONU_CAPABILITY                      65529
+#define OMCI_ME_LOID_AUTHENTICATION                 65530   
+#define OMCI_ME_EXTENDED_MULTICAST_OPERATIONS_PROFILES 65531
+
+/*omci消息类型*/
+#define OMCI_MESSAGE_TYPE_CREATE                    4   
+#define OMCI_MESSAGE_TYPE_CREATE_COMPLETE_CONNECTION 5
+#define OMCI_MESSAGE_TYPE_DELETE                    6 
+/*#define OMCI_MESSAGE_TYPE_DELETE_COMPLETE_CONNECTION  7 */
+#define OMCI_MESSAGE_TYPE_SET                       8   
+#define OMCI_MESSAGE_TYPE_GET                       9  
+#define OMCI_MESSAGE_TYPE_GET_COMPLETE_CONNECTION   10   
+#define OMCI_MESSAGE_TYPE_GET_ALL_ALARMS            11   
+#define OMCI_MESSAGE_TYPE_GET_ALL_ALARMS_NEXT       12   
+#define OMCI_MESSAGE_TYPE_MIB_UPLOAD                13 
+#define OMCI_MESSAGE_TYPE_MIB_UPLOAD_NEXT           14   
+#define OMCI_MESSAGE_TYPE_MIB_RESET                 15   
+#define OMCI_MESSAGE_TYPE_ALARM                     16   
+#define OMCI_MESSAGE_TYPE_ATTRIBUTE_VALUE_CHANGE    17   
+#define OMCI_MESSAGE_TYPE_TEST                      18      /*.................*/    
+#define OMCI_MESSAGE_TYPE_START_SOFTWARE_DOWNLOAD   19  
+#define OMCI_MESSAGE_TYPE_DOWNLOAD_SECTION          20 
+#define OMCI_MESSAGE_TYPE_END_SOFTWARE_DOWNLOADE    21  
+#define OMCI_MESSAGE_TYPE_ACTIVE_SOFTWARE           22   
+#define OMCI_MESSAGE_TYPE_COMMIT_SOFTWARE           23   
+#define OMCI_MESSAGE_TYPE_SYNCHRONIZE_TIME          24   
+#define OMCI_MESSAGE_TYPE_REBOOT                    25 
+#define OMCI_MESSAGE_TYPE_GET_NEXT                  26  
+#define OMCI_MESSAGE_TYPE_TEST_RESULT               27      /*.................*/   
+#define OMCI_MESSAGE_TYPE_GET_CURRENT_DATA          28  
+#define OMCI_MESSAGE_TYPE_AUTO_NOTIFY               30      /* 新增主动上报消息类型 */
+
+#define OMCI_GPON_DEVICE_IDENTIFIER                 0x0A    /*GPON设备标识符 */   
+
+
+/*属性访问类型*/
+#define OMCI_READ                                   1
+#define OMCI_WRITE                                  2
+#define OMCI_SET_BY_CREATE                          4
+
+#define OMCI_ACL_READ                               OMCI_READ
+#define OMCI_ACL_WRITE                              OMCI_WRITE
+#define OMCI_ACL_READ_WRITE                         (OMCI_READ | OMCI_WRITE)
+#define OMCI_ACL_READ_SET_BY_CREATE                 (OMCI_READ | OMCI_SET_BY_CREATE)
+#define OMCI_ACL_WRITE_SET_BY_CREATE                (OMCI_SET_BY_CREATE | OMCI_WRITE)
+#define OMCI_ACL_READ_WRITE_SET_BY_CREATE           (OMCI_READ | OMCI_WRITE | OMCI_SET_BY_CREATE)
+
+
+#define CE_ONT_G_TRAFFIC_MGMT_PRIORITY_QUEUE        0
+#define CE_ONT_G_TRAFFIC_MGMT_RATE_CONTROL          1
+
+
+/*结果和原因*/
+enum RETURN_CODE{
+    COMMAND_PROCESSED_SUCCESSFUL    = 0,    /*命令处理成功*/
+    COMMAND_PROCESSING_ERROR        = 1,    /*命令处理错误*/
+    COMMAND_NOT_SUPPORTTED          = 2,    /*命令不支持*/
+    PARAMETER_ERROR__                 = 3,    /*参数错误*/
+    UNKNOWN_MANAGED_ENTITY          = 4,    /*未知受管实体*/
+    UNKNOWN_MANAGED_ENTITY_INSTANCE = 5,    /*未知受管实体实例*/
+    DEVICE_BUSY                     = 6,    /*设备繁忙*/
+    ATTIBUTES_FAILED_OR_UNKNOWN     = 7,    /*属性失败或未知*/
+
+    /*自定义的*/
+    NO_RESPONSE_FROM_ONU            = 8,
+    ATTIBUTES_UNSURPPORTED          = 9,
+    COMMAND_NOT_SEND_TO_REMOTE      = 10
+};
+
+#define ERR_OMCI_RET_OVERTIME       8;
+#define ERR_TCI_NOT_MATCH           -10;
+
+
+#define RESPONSE_CODE(i,j)          olt_omci.onu_info[i]->response_code[j]
+
+#define OMCI_MESSAGE_LEN                    48
+
+#define OMCI_FET_RESPONSE_VALUE_LEGTH       25
+
+#define OMCI_PRIORITY_HIGH          1
+#define OMCI_PRIORITY_LOW           0
+
+
+/*ONT_G 告警编码*/
+enum ONT_G_ALARM
+{
+    ONT_G_EQUIPMENT_ALARM           = 0,    /*设备告警，内部接口的功能故障*/
+    ONT_G_POWERING_ALARM            = 1,    /*供电告警，外部电源丢失*/
+    /*ONT_G_BATTERY_MISSING_ALARM =2 ,电池遗漏，电池已配置，但检测不到*/
+    /*ONT_G_BATTERY_FAILURE_ALARM =3  电池故障，电池已配置并可检测到，但不能充电*/
+    ONT_G_BATTERY_LOW_ALARM         = 9 ,   /*电池低压，电池得以配置并在现场，但电压过低*/
+    /*ONT_G_PHYSICAL_INTRUSION_ALARM    = 5 ,物理侵入告警，如果ont支持诸如门或盒子打开之类的检测，则使用该告警*/
+    /*ONT_G_ONT_SELFTEST_FAILURE_ALARM  =   6 , ont自测故障，ont的自动自检失败*/
+    ONT_G_CONFIG_CONFLICT           = 2,    /*onu配置执行错误，事件上报*/
+    ONT_G_MGC_LINK_DOWN             = 3,
+    ONT_G_FE_LOOPBACK_ALARM         = 4,
+    ONT_G_INCRC_ALARM               = 5,
+    ONT_G_OUTCRC_ALARM              = 6,
+    ONT_G_DYING_GASP                = 7, 
+    ONT_G_FE_LOS_ALARM              = 8, /*add,ONU FE端口连接丢失*/
+    /*ONT_G_LOSi_ALARM = 9, */ /*ONU光信号丢失,add*/
+    ONT_G_TDM_LOS_ALARM             = 10,
+    ONT_G_TDM_AIS_ALARM             = 11,
+    ONT_G_TX_OPTICAL_UPPER_ALARM    = 12,
+    ONT_G_RX_OPTICAL_UPPER_ALARM    = 13,
+    ONT_G_TX_OPTICAL_LOWER_ALARM    = 14,
+    ONT_G_RX_OPTICAL_LOWER_ALARM    = 15,
+    ONT_G_TEMPERATURE_LOWER_ALARM   = 16,
+    ONT_G_TEMPERATURE_UPPER_ALARM   = 17,
+    ONT_G_VOLTAGE_LOWER_ALARM       = 18,
+    ONT_G_VOLTAGE_UPPER_ALARM       = 19,
+    ONT_G_BIAS_LOWER_ALARM          = 20,
+    ONT_G_BIAS_UPPER_ALARM          = 21,
+    OLT_RX_LOWER_ALALRM             = 22,
+    OLT_RX_UPPER_ALALRM             = 23,
+    ONT_G_ALARM_NUM                 = 24, 
+
+    /*OMCI_ALARM_ONU_G_AC_POWER_LOSS = 25, */
+    /*OMCI_ALARM_ONU_G_POWER_LOW = 26, */
+};
+
+/* 2010.6.23 added for alarms of ONT_FIBERHOME_G_2_ALARM */
+
+enum FX8680_ONT_G_ALARM        /**只有两种状态量，产生或者清除**/
+{
+    ONT_G_EquipmentAlarm            = 0,    /*内部接口的功能故障*/
+    ONT_G_PoweringAlarm             = 1,    /*外部电源丢失,但是可能有备用电源*/
+    ONT_G_BatteryMissing            = 2,    /*电池已配置，但检测不到*/
+    ONT_G_BatteryFailure            = 3,    /*电池已配置并可检测到，但不能充电*/
+    ONT_G_BatteryLow                = 4,    /*电池已配置并在现场，但电压过低*/
+    ONT_G_PhysicalIntrusionAlarm    = 5,    /*物理侵入告警*/
+    ONT_G_ONUSelfTestFailure        = 6,    /*ONT自测故障*/
+    ONT_G_ONUDyingGasp              = 7,    /*onu  电源故障导致关机*/
+    ONT_G_ONUTemperatureYellow      = 8,    /*ONU温度故障，没有服务关闭*/
+    ONT_G_ONUTemperatureRed         = 9,    /*ONU温度故障，部分服务关闭*/
+    ONT_G_ONUVoltageYellow          = 10,   /*ONU电压过高，部分服务关闭*/
+    ONT_G_ONUVoltageRed             = 11,   /*ONU电压过低，部分服务关闭*/
+    ONT_G_ONUmanualpoweroff         = 12,   /*用户主动断电*/
+};
+
+enum FX8680_ANI_G_ALARM
+{
+    ANI_G_LowReceivedOpticalPowerAlarm  = 0,  
+    ANI_G_HighReceivedOpticalPowerAlarm = 1, 
+    ANI_G_SF                            = 2,    /*ONU信号失效*/
+    ANI_G_SD                            = 3,    /*信号降级*/ /*先用ploam消息来调试*/
+    ANI_G_LowTransmitOpticalPowerAlarm  = 4,
+    ANI_G_HighTransmitOpticalPowerAlarm = 5,
+    ANI_G_LaserBiasCurrentAlarm         = 6,    /*激光器偏置电流过高*/
+
+};
+
+enum FX8680_PPTP_UNI_ALARM
+{
+    PPTP_UNI_LanLosAlarm   = 0,  
+};
+
+enum FX8680_MAC_BRIDGE_PORT_CONFIG_DATA_ALARM
+{
+    MAC_BRIDGE_PORT_CONFIG_DATA_PortblockingFoLoopdetectionAlarm = 0,  
+};
+
+
+enum ONT_FIBERHOME_G_2_ALARM
+{
+    ONT_INNER_TEMPERATURE_UPPER_ALARM   = 0,
+    ONT_INNER_TEMPERATURE_LOWER_ALARM   = 1,
+    ONT_FIBERHOME_G_2_ALARM_NUM         = 2
+};
+
+#define DM_ALARM_ONU_AC_POWER_LOSS          161
+#define DM_ALARM_ONU_POWER_LOW              204
+
+#define ONU_ALARM_DGi                       27 /*ONU断电*/
+#define ONU_ALARM_LOSi                      28 /*ONU光信号丢失*/
+#define ONU_ALARM_LOFi                      29 /*ONU帧定界丢失*/
+#define ONU_ALARM_DOWi                      30 /*ONU窗口漂移*/
+#define ONU_ALARM_SFi                       31 /*ONU信号失效*/
+#define ONU_ALARM_SDi                       32 /*ONU信号降级*/
+#define ONU_ALARM_LCDGi                     33 /*ONU GEM通道定界丢失*/
+#define ONU_ALARM_RDIi                      34 /*ONU远端缺陷指示*/
+#define ONU_ALARM_SUFi                      35 /*ONU启动失败*/
+#define ONU_ALARM_LOAi                      36 /*ONU确认丢失*/
+#define ONU_ALARM_LOAMi                     37 /*ONU的PLOAM丢失*/
+#define ONU_ALARM_MEMi                      38 /*ONU的消息错误*/
+#define ONU_ALARM_PEEi                      39 /*ONU物理设备错误*/
+#define ONU_ALARM_MISi                      40 /*ONU链路失配*/
+#define ONU_ALARM_FE_LOS                    41 /*ONU FE端口连接丢失*/
+#define ONU_ALARM_COMMU_ERR                 42 /*ONU升级通信故障*/
+#define ONU_ALARM_UPGRADE_FILE_DISMATCH     43 /*ONU升级文件不匹配*/
+#define ONU_ALARM_UPGRADE_SUCCESS           44 /*ONU自动升级成功*/
+#define ONU_ALARM_UPGRADE_FAIL              45 /*ONU自动升级失败*/
+#define ONU_ALARM_UP_CRC_THRESHOLD          46 /*上行CRC错误达到门限值*/
+#define ONU_ALARM_DOWN_CRC_THRESHOLD        47 /*下行CRC错误达到门限值*/
+#define ONU_ALARM_DEVICE_TYPE_CHANGE        48 /*ONU FE端口下接设备类型更改*/
+#define ONU_ALARM_HG_REG_FAIL               49 /*家庭网关入网失败*/
+#define ONU_ALARM_MGC_LINK_DOWN             56 /*MGC连接断开*/
+#define ONU_ALARM_OLT_RX_UPPER_LIMIT        64 /*ONU到OLT接收光功率超过上限告警*/
+#define ONU_ALARM_TDM_LOS                   65 /*TDM 2M中断*/
+#define ONU_ALARM_TDM_AIS                   66 /*TDM 2M全1告警*/
+#define ONU_ALARM_OLT_RX_LOWER_LIMIT        83 /*ONU到OLT接收光功率超过下限告警*/
+#define ONU_ALARM_FE_LOOPBACK               217 /*FE端口环回告警*/
+#define ONU_ALARM_RX_OPTICAL_UPPER_LIMIT    997 /*接收光功率超过上限告警*/
+#define ONU_ALARM_RX_OPTICAL_LOWER_LIMIT    998 /*接收光功率超过下限告警*/
+#define ONU_ALARM_TX_OPTICAL_UPPER_LIMIT    999 /*发送光功率超过上限告警*/
+#define ONU_ALARM_TX_OPTICAL_LOWER_LIMIT    1000 /*发送光功率超过下限告警*/
+#define ONU_ALARM_BIAS_UPPER_LIMIT          1001 /*光模块偏置电流超过上限告警*/
+#define ONU_ALARM_BIAS_LOWER_LIMIT          1002 /*光模块偏置电流超过下限告警*/
+#define ONU_ALARM_VOLTAGE_UPPER_LIMIT       1003 /*光模块电压超过上限告警*/
+#define ONU_ALARM_VOLTAGE_LOWER_LIMIT       1004 /*光模块电压超过下限告警*/
+#define ONU_ALARM_INNER_TEMPERATURE_UPPER_ALARM 1021
+#define ONU_ALARM_INNER_TEMPERATURE_LOWER_ALARM 1022
+#define ONU_ALARM_TEMPERATURE_UPPER_LIMIT   1023 /*光模块温度超过上限告警*/
+#define ONU_ALARM_TEMPERATURE_LOWER_LIMIT   1024 /*光模块温度超过下限告警*/
+
+
+#define ONU_EVENT_FE_LINK_UP                49159 /*FE 端口连接事件*/
+#define ONU_EVENT_FE_LINK_DOWN              49158 /*FE 端口连接丢失事件*/
+#define ONU_EVENT_CONFIG_CONFLICT           50022 /*ONU配置失败，与线卡配置不一致*/
+
+/*定时器相关*/
+#define OMCI_GET_MAX_INTERVAL               60  /*单位秒，GET/GET NEXT类消息的最大时间间隔*/
+#define OMCI_RETRANSMISSION_TIMEOUT_VALUE0  5   /*cxw 3  ->4*/ /*单位秒，缺省 OMCI消息应答最大超时时间*/
+#define OMCI_RETRANSMISSION_TIMEOUT_VALUE1  60  /*cxw 60  ->70*/ /*单位秒，缺省60   OMCI消息应答最大超时时间,for 高优先级*/
+#define OMCI_MAXIMUM_RETRANSMISSION_COUNT   2   /*cxw 2 ->3*//*缺省OMCI消息最大重发次数*/
+
+#define  OMCI_MESSAGE_SEMPORE_WAIT_TICKS(i)   WAIT_FOREVER    /*07/8/20*/
+/*#define  OMCI_MESSAGE_SEMPORE_WAIT_TICKS(i)   (sysClkRateGet() * (olt_omci.maximum_retransmission_timer[i]) * (OMCI_MAXIMUM_RETRANSMISSION_COUNT+1))*/
+/*#define  OMCI_MESSAGE_SEMPORE_WAIT_TICKS(i)   (sysClkRateGet() * OMCI_RETRANSMISSION_TIMEOUT_VALUE0 * (OMCI_MAXIMUM_RETRANSMISSION_COUNT+1))*/
+#define MAX_UPLINK_WAIT_CONTROL_TIMEOUT_COUNT 3 /*缺省主控盘消息应答超时、上联盘最大重发次数*/
+#define MAX_UPLINK_WAIT_CONTROL_TIMEOUT       1 /*单位秒，缺省主控盘消息应答最大超时时间*/
+#define UPLINK_WAIT_FOR_CONTROL_TICKS       sysClkRateGet() * MAX_UPLINK_WAIT_CONTROL_TIMEOUT
+
+#define OMCI_TASK_PRIORITY                  100
+#define OMCI_TASK_STACK                     (40960 * 10)
+
+#define GETONUID(x,y)                       ((UINT16)(x) * MAX_ONU_NUM + (UINT16)(y))
+#define GETONUNOFROMONUID(x)                ((x) % MAX_ONU_NUM)
+#define GETLINKIDFROMONUID(x)               ((x) / MAX_ONU_NUM)
+
+
+#define INTERWORKING_OPTION_CES             0
+#define INTERWORKING_OPTION_MAC_BRIDGE_LAN  1
+#define INTERWORKING_OPTION_RESERVED        2   /*USED AS IGMP PROTOCOL FOR BROADLIGHT*/
+#define INTERWORKING_OPTION_IP_DATA_SERVICE 3   /*USED AS VOIP FOR BROADLIGHT*/
+#define INTERWORKING_OPTION_VIDEO           4
+#define INTERWORKING_OPTION_8021P_MAPPING   5
+#define INTERWORKING_OPTION_BROADCAST_SERVICE 6 /*USED AS BROADCAST FOR BROADLIGHT*/
+
+/* 方哲 用于wan连接的类型 */
+#define INTERWORKING_OPTION_WAN_CONNECTION    0x10
+
+#define DEFAULT_OMCI_SOFTWARE_DOWNLOAD_WINDOW_SIZE      256  /*256 setction*/
+
+#define DEFAULT_OMCI_SOFTWARE_DOWNLOAD_SECTION_SIZE     31
+
+#define SOFTWARE_IMAGE_CODE_SIZE                        0x400000 /*4M */
+
+#define NOT_CONFIGED                                    (-1)     /* 没有配置过 */
+
+#define RETURN_CODE_OMCI_CAHNNEL_NOT_VALID              15 /*onu */
+
+#define OMCI_MAX_ME_INSTANCE_NUM        16  /*used to be 64*/
+#define OMCI_MAX_ME_ATTRIBUTE_NUM       20  /*used to be 24*/
+#define OMCI_MAX_ME_ALARM_TABLE_NUM     16
+#define OMCI_MAX_ME_AVC_TABLE_NUM       6   /*used to be 16*/
+#define OMCI_MAX_ME_MESSAGE_TYPE_NUM    30
+#define OMCI_MAX_ME_TYPE_NUM            297
+
+#define OMCI_MAX_MIBUPLOAD_ENTRY_NUM    500
+
+
+#define OMCI_TABLE_ATTRIBUTE_SIZE       4   /*用于get response 中的返回4字节的属性值长度*/
+
+
+#define OMCI_GET_NEXT_RESPONSE_MESSAGE_CONTENT_LEN  29
+
+#define GET_TCONTID_FROM_QUEUE_ID(x)   (((x) & 0x7f00) >> 8)
+
+#define TCONT_ALLOC_ID_DEFAULT_VALUE    0xff
+
+
+#define DEVICE_UPLINK_BRIDGE_PORT_NUMBER_04B    10
+#define DEVICE_UPLINK_BRIDGE_PORT_NUMBER_06     25
+#define DEVICE_UPLINK_BRIDGE_PORT_NUMBER_07     25
+
+#define DEFUALT_GEM_BLOCK_MAX_PALOAD_LENGTH     1600
+
+
+#define MAC_BRIDGE_PORT_TP_TYPE_UNI         1
+#define MAC_BRIDGE_PORT_TP_TYPE_8021P       3
+#define MAC_BRIDGE_PORT_TP_TYPE_IPHOST      4
+#define MAC_BRIDGE_PORT_TP_TYPE_IW          5
+#define MAC_BRIDGE_PORT_TP_TYPE_MULTI_IW    6
+#define MAC_BRIDGE_PORT_TP_TYPE_PP          9
+#define MAC_BRIDGE_PORT_MULTICAST_VLAN      10
+#define MAC_BRIDGE_PORT_TP_TYPE_VEIP        11
+
+
+#define ONU_POST_WRITE_FLAH_IND             0xaa     /*在sofeware升级时，要求onu 先应答后写flash的标志，用于批量升级命令中*/
+
+extern int omci_port_id[][MAX_ONU_NUM_TEST];
+
+#define OMCIPORTID(x,y)                     omci_port_id[x][y]
+
+#define INVALID_OMCI_PORTID                 65535
+#define INVALID_OMCI_PORTID_0               0
+
+#define ONU_PUBLIC_CONFG_BUFFER_MAX_LEN     1024
+
+#define DEFAULT_ONU_UNI_FE_MAX_FRAME_SIZE   1518
+
+
+/*snmp manager onu类型编码*/
+#define  AN5506_03B1    323
+#define  AN5506_03B2    324
+#define  AN5506_03B3    325
+#define  AN5506_03B4    326
+#define  AN5506_04B1    327
+#define  AN5506_04B2    328
+#define  AN5506_04B3    329
+#define  AN5506_04B4    330
+#define  AN5506_OTHER   331
+
+
+/*设备方onu类型编码*/
+#define  AN5506_03B1_DV     101
+#define  AN5506_03B2_DV     102
+#define  AN5506_03B3_DV     103
+#define  AN5506_03B4_DV     104
+#define  AN5506_04B1_DV     105
+#define  AN5506_04B2_DV     106
+#define  AN5506_04B3_DV     107
+#define  AN5506_04B4_DV     108
+#define  AN5506_OTHER_DV    109
+
+
+#define VOIP_CHANNEL_MAX_VID                    4095
+
+#define ONU_NUMS_PER_SEMMUX                     65 /*MAX_ONU_NUM,65个ONU共用一个信号量*/
+/*#define SEMMUX_MAX_NUM   (MAX_OLT_PON_NUM * MAX_ONU_NUM)/ONU_NUMS_PER_SEMMUX+1 *//*信号量个数增加1个，为临时分配的onuid(66~110)增加,以防4号pon口getSemMuxIndex(i)越界，add by xujun,2009-10-21*/
+#define SEMMUX_MAX_NUM                          (MAX_ONU_SYSTEM / ONU_NUMS_PER_SEMMUX + 1) /*信号量个数增加1个，为临时分配的onuid(66~110)增加,以防4号pon口getSemMuxIndex(i)越界，2010.2.23  8pon*/
+
+#define getSemMuxIndex(i)                       ((i)/ONU_NUMS_PER_SEMMUX)
+
+#define MBIUPLOADNEXT_CONTENT_LENGTH            31  /*为处理方便，保持与get response中的属性长度相同25字节*/
+
+/*#define VTY_NEWLINE  "\r\n"*/
+#define ONU_FE_DEFAULT_PVID                     4088/*used to be 1*/
+#define ONU_MAX_PORT_MACADDR_NUM                512 /*最大8k个: 20090605修改8096->512*/
+#define ONU_MAX_MULTICAST_IP_NUM                512/*200->512*/
+
+#define GEMPORTID_DEFAULT_ONUID                 0xff
+#define MAXGEMPORTID                            4096
+
+#define ONU_PEIORITY_QUEUE_MAX_QUEUE_SIZE       1024
+
+#define DEFAULT_TPID_VALUE                      0x8100
+
+ 
+#define  IGMP_USER_AUTHRIZATION_TABLE_MAX_NUM   4
+#ifndef OMCI_MALLOC_FREE
+#define OMCI_MALLOC_FREE
+#endif
+
+#define max_onu_port_num                        ONU_MAX_ETHERNET_UNI_PORTS+1    /*每个ONU上最多的端口个数(包括一个pon口)*/
+#define ONU_MAX_ETHERNET_MULTICAST_GROUP_NUM    32
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif/*_OMCI_CONSTANTS_H*/
+

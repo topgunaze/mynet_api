@@ -1,0 +1,58 @@
+
+
+#ifndef _CDT_PBMP_H
+#define _CDT_PBMP_H
+
+#define _CDT_PORT_MAX_NUM 16 /* fd1216s:16 */
+
+#define	_CDT_PBMP_WENT(port)		((port)/32)
+#define	_CDT_PBMP_WBIT(port)		(1U<<((port) % 32))
+
+#define _CDT_PBMP_WORD_MAX (_CDT_PORT_MAX_NUM / 32)
+
+#define	_CDT_PBMP_WORD_GET(bm, word)		((bm).pbits[(word)])
+#define	_CDT_PBMP_WORD_SET(bm, word, val)	((bm).pbits[(word)] = (val))
+
+#define	_CDT_PBMP_ENTRY(bm, port)	\
+	(_CDT_PBMP_WORD_GET(bm,_CDT_PBMP_WENT(port)))
+
+#define _CDT_PBMP_PORT_ADD(bm, port)	\
+	(_CDT_PBMP_ENTRY(bm, port) |= _CDT_PBMP_WBIT(port))
+	
+#define _CDT_PBMP_PORT_REMOVE(bm, port)	\
+        (_CDT_PBMP_ENTRY(bm, port) &= ~ _CDT_PBMP_WBIT(port))
+
+#define _CDT_PBMP_BMCLEAR(bm)		do { \
+		int	_w; \
+		for (_w = 0; _w < _CDT_PBMP_WORD_MAX; _w++) { \
+			_CDT_PBMP_WORD_GET(bm, _w) = 0; \
+		} \
+	} while (0)
+
+#define _CDT_PBMP_CLEAR(bm)		_CDT_PBMP_BMCLEAR(bm)
+
+#define CDT_PBMP_PORT_SET(pbm, port) \
+        do { \
+            _CDT_PBMP_CLEAR(pbm); \
+            _CDT_PBMP_PORT_ADD(pbm, port); \
+        } while(0)
+#define CDT_PBMP_PORT_ADD(pbm, port)    _CDT_PBMP_PORT_ADD(pbm, port)
+#define CDT_PBMP_PORT_REMOVE(pbm, port) _CDT_PBMP_PORT_REMOVE(pbm, port)
+
+#define _CDT_PBMP_MEMBER(bm, port)	\
+	((_CDT_PBMP_ENTRY(bm, port) & _CDT_PBMP_WBIT(port)) != 0)
+
+#define _CDT_PBMP_ITER(bm, port, total)	\
+	for ((port) = 0; (port) < total; (port)++) \
+		if (_CDT_PBMP_MEMBER((bm), (port)))
+
+#define CDT_PBMP_ITER(bmp, port, total) _CDT_PBMP_ITER((bmp), (port))
+
+typedef struct
+{
+    unsigned long bits[_CDT_PBMP_WORD_MAX];
+}__cdt_pbmp_t;
+typedef __cdt_pbmp_t cdt_pbmp_t;
+
+#endif
+

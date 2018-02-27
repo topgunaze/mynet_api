@@ -1,0 +1,71 @@
+#  Name         : Makefile
+#  Version      : V2.00
+#  Author       : keith.gong (kizerg@163.com)
+#  Time         : 2014.12.18
+#  Description  : Makefile for FD1508GS CLI
+#                 Copyright (c) 2009-2015 C-Data Co.,Ltd.
+#                 All Rights Reserved.
+#  Modification : 2014.12.18, keith.gong, created
+#                 2015.01.05, keith.gong, add cli_app for test
+#                 2015.01.06, keith.gong, build cli use shared libs
+
+CLI_DIR              ?= $(shell pwd)
+PRJ_ROOT_DIR         ?= $(shell cd ../..; pwd)
+
+#  Include GPON project configure file
+include $(PRJ_ROOT_DIR)/make/Make.config
+
+include $(PRJ_ROOT_DIR)/make/Make.cli-config
+
+#  Create some depend directory 
+$(shell $(MKDIR) $(CLI_LIB_DIR) $(CLI_OBJ_DIR))
+
+#CC_COMPILER         += -ansi -pedantic
+### if -pipe not is supported on this host
+#CC_COMPILER         += -ansi -pedantic -pipe -nostdinc
+CC_FLAGS             += -g -O2 -Wall -D__LINUX__
+CFLAGS               += $(CLI_INCLUDE) $(CC_COMPILER) $(CC_FLAGS)
+CFLAGS		     += -DLINUX_SAL_DMA_ALLOC_OVERRIDE -DLINUX_SAL_USLEEP_OVERRIDE -DLINUX_SAL_SEM_OVERRIDE -DLINUX_SAL_UDELAY_OVERRIDE -O2 -D_REENTRANT -DLINUX -DSYS_BE_PIO=0 -DSYS_BE_PACKET=1 -DSYS_BE_OTHER=0 -DBCM_ICS -DBE_HOST=1 -DBCM_PLATFORM_STRING=\"Raptor_BCM56218\" -DNO_BCM_5650_C0 -DNO_BCM_5665_A0 -DNO_BCM_5665_B0 -DNO_BCM_5670_A0 -DNO_BCM_5673_A0 -DNO_BCM_5674_A0 -DNO_BCM_5675_A0 -DNO_BCM_5690_A0 -DNO_BCM_5695_A0 -DNO_BCM_56601_A0 -DNO_BCM_56602_A0 -DNO_BCM_56601_B0 -DNO_BCM_56602_B0 -DNO_BCM_56601_C0 -DNO_BCM_56602_C0 -DNO_BCM_56504_A0 -DNO_BCM_56504_B0 -DNO_BCM_56314_A0 -DNO_BCM_56112_A0 -DNO_BCM_56304_B0 -DNO_BCM_56102_A0 -DNO_BCM_56580_A0 -DNO_BCM_56700_A0 -DNO_BCM_56800_A0 -DNO_BCM_56218_A0 -DNO_BCM_56514_A0 -DNO_BCM_56624_A0 -DNO_BCM_56680_A0 -DNO_BCM_56224_A0 -DNO_BCM_56224_B0 -DNO_BCM_56820_A0 -DNO_BCM_56725_A0 -DNO_BCM_56624_B0 -DNO_BCM_56680_B0 -DNO_BCM_56634_A0 -DNO_BCM_56634_B0 -DNO_BCM_56524_A0 -DNO_BCM_56524_B0 -DNO_BCM_56685_A0 -DNO_BCM_56685_B0 -DNO_BCM_56334_A0 -DNO_BCM_56334_B0 -DNO_BCM_56840_A0 -DNO_BCM_56840_B0 -DNO_BCM_56142_A0 -DNO_BCM_53324_A0 -DNO_BCM_88732_A0  -DINCLUDE_L3  -DINCLUDE_I2C  -DINCLUDE_MEM_SCAN  -DINCLUDE_EDITLINE  -DINCLUDE_BCM_SAL_PROFILE  -DINCLUDE_KNET  -DBCM_ESW_SUPPORT  -DINCLUDE_PHY_54682  -DINCLUDE_PHY_54684  -DINCLUDE_PHY_54680 -DINCLUDE_LONGREACH -DNO_BCM_88732_A0 -DBE_HOST=1 -D__BSD_SOURCE -DUNIX  -D_REENTRANT -DSOURCE_CHECK_LIBAPPL -DBROADCOM_DEBUG  -D_REENTRANT -D"KBUILD_BASENAME=KBUILD_STR(vlan)"  -D"KBUILD_MODNAME=KBUILD_STR(vlan)"
+CC_LIBS              := -lpthread -lrt
+
+#  Pattern matching rules: 
+$(CLI_OBJ_DIR)/%.o:     $(COMMON)/%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
+$(CLI_OBJ_DIR)/%.o:     $(OCB)/%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
+$(CLI_OBJ_DIR)/%.o:     $(ROS)/%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
+$(CLI_OBJ_DIR)/%.o:     $(RCC)/%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
+$(CLI_OBJ_DIR)/%.o:     $(USER)/src/%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+#  Dependency variables:
+RLI_OBJS             = $(COMMON_OBJ) $(OCB_OBJ) $(ROS_OBJ) $(RCC_OBJ)
+RLI_DEP              = $(RLI_OBJS:%=$(CLI_OBJ_DIR)/%)
+USER_DEP             = $(USER_OBJ:%=$(CLI_OBJ_DIR)/%)
+
+.PHONY: all lib clean 
+all: $(ROOTFS_BIN_DIR)/cli
+
+lib: $(CLI_LIB_DIR)/libcli.a
+
+$(CLI_LIB_DIR)/libcli.a : $(RLI_DEP)
+	$(LD) $(LDFLAGS) -rv $(CLI_LIB_DIR)/libcli.a $(RLI_DEP)
+
+$(ROOTFS_BIN_DIR)/cli : $(APP_DEP_LIBS) $(USER_DEP) $(USER)/src/rcc_main.c
+	$(CC) $(CFLAGS) -D__MAKE_CLI_APP__ -DSTT_UNDERLYING_OS=U_LINUX -o $@ $(USER)/src/rcc_main.c $(USER_DEP) -Wl,--start-group $(APP_DEP_LIBS) -Wl,--end-group $(CC_LIBS)
+	$(STRIP) $@
+
+clean:
+	$(RM) $(USER_DEP)
+
+clean_all: clean
+	$(RM) $(RLI_DEP)
+	$(RM) $(CLI_LIB_DIR)/libcli.a
+	$(RM) $(ROOTFS_BIN_DIR)/cli
+
+test:
+	@$(ECHO) CLI_LIB_DIR=$(CLI_LIB_DIR)
+	@$(ECHO) $(ROOTFS_BIN_DIR)/cli : $(APP_DEP_LIBS)
+	

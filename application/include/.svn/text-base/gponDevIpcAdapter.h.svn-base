@@ -1,0 +1,193 @@
+/**************************************************************
+ * 文件名称:  gponDevIpcAdapter.h
+ * 作           者:  keith.gong
+ * 日           期:  2015.05.30
+ * 文件描述:  GPON  IPC  适配层
+ * 版           本:  V1.00
+ * 修改历史:  
+ *     <修改者>   <时间>    <版本 >   <描述>
+**************************************************************/
+
+
+#ifndef __GPON_DEV_IPC_ADAPTER_H__
+#define __GPON_DEV_IPC_ADAPTER_H__
+
+#include "GponLineMgmtExpo.h"
+#include "GponAppOnuCfg.h"
+#include "OnuRaExpo.h"
+
+
+#pragma pack(1)
+
+#if DEF_FUNC("DBA PROFILE ")
+
+typedef struct
+{
+    UINT16 profileId;
+    UINT8  profileName[DBA_PROFILE_NAME_LEN];
+}DBA_PROFILE_ID_AND_NAME;
+
+typedef struct
+{
+    UINT16 profileId;
+    DBA_DATA_T profileData;
+}DBA_PROFILE_ID_AND_PROFILE;
+
+typedef struct
+{
+    UINT16 profileIdCounter;
+    UINT16 profileIdArray [MAX_DBA_PROFILE_NUM];
+}DBA_PROFILE_SUM_NUM_AND_ID;
+
+typedef struct
+{
+    UINT16 dbaProfileId;
+    UINT16 lineProfileId;
+    UINT16 llidId;
+}DBA_PROFILE_BIND_INFO;
+
+
+#endif
+
+#if DEF_FUNC("LINE PROFILE")
+
+typedef struct
+{
+    UINT16 profileId;
+    UINT8  profileName[LINE_PROFILE_NAME_LEN];
+    UINT32 bindTimes;
+}LINE_PROFILE_ID_AND_NAME;
+
+typedef struct
+{
+    UINT16 profileId;
+    UINT16 gemPortId;
+    UINT16 llidId;
+    UINT8  gemMappingId;
+    UINT32 vlan;
+    UINT8  priority;
+    UINT8  mappingMode;
+    LINE_PROFILE_INFO profileData;
+}LINE_PROFILE_ID_AND_PROFILE;
+
+typedef struct
+{
+    UINT8  ponId;
+    UINT8  onuId;
+    UINT16 profileId;    
+}LINE_PROFILE_BIND_INFO;
+
+typedef struct
+{
+    UINT16 profileIdCounter;
+    UINT16 profileIdArray [MAX_LINE_PROFILE_NUM];
+}LINE_PROFILE_SUM_NUM_AND_ID;
+
+typedef struct
+{
+    UINT16 profileId;
+    LINE_PROFILE_INFO profileData;
+    UINT8  llidList[128]; /* kth.debug length*/
+    UINT16 dbaProfileId;
+    UINT8  dbaProfileName[DBA_PROFILE_NAME_LEN];
+}LINE_PROFILE_DBA_INFO;
+
+
+typedef struct
+{
+    T_CONT_INFO llidInfo;
+    UINT8 gemPortNum;
+    UINT8 gemPortList[MAX_GEM_PORT_SINGLE_ONU];
+}LINE_PROFILE_TCONT_GEM_INFO;
+
+#endif
+
+typedef struct
+{
+    UINT8  ponId;
+    UINT8  onuId;
+    UINT16 profileId;    
+}SRV_PROFILE_BIND_INFO;
+
+
+typedef struct
+{
+    UINT16 profileId;
+    char   profileName[SRV_PROFILE_NAME_LEN];
+    UINT32 bindTimes;
+}IPC_SRV_PROFILE_ID_AND_NAME;
+
+typedef struct
+{
+    UINT16 profileId;
+    SRV_PROFILE_INFO profileData;
+}IPC_SRV_PROFILE_ID_AND_PROFILE;
+
+typedef struct
+{
+    UINT16 profileIdCounter;
+    UINT16 profileIdArray [MAX_SRV_PROFILE_NUM];
+}IPC_SRV_PROFILE_SUM_NUM_AND_ID;
+
+
+typedef struct
+{
+    UINT16 ponId;
+    UINT16 onuId;
+    UINT8  portId;
+    UINT16 status;    
+}IPC_ONUCFG_INFO;
+
+typedef struct
+{
+    UINT16 ponId;
+    UINT16 onuId;
+    UINT16 regId;
+    UINT8  phyAddr[PHY_ADDR_LENGTH];
+    UINT8  desc[ONU_MAX_DESC_LEN];
+    UINT16 srvProfileId;
+    UINT16 lineProfileId;
+    UINT8  silence;
+    UINT8  autofind;
+}IPC_ONURA_INFO;
+
+typedef struct
+{
+    UINT8 ponId;
+    UINT8 openState;
+}IPC_PONCFG_INFO;
+
+typedef struct
+{
+    UINT8  equipmentID[21];
+    UINT8  ponPortNum;
+    UINT8  fePortNum;
+    UINT8  gePortNum;
+    UINT8  potsPortNum;
+    UINT16 llidNum;
+    UINT16 gemNum;
+    UINT8  trafficSchedulerNum;
+}IPC_ONU_CAP_INFO;
+
+typedef struct
+{
+    UINT16 ponId;
+    UINT16 onuId;
+}IPC_ONU_ID;
+
+typedef struct
+{
+    UINT32 successNum;
+    UINT32 failedNum;
+}IPC_GPON_CMD_RESULT;
+
+typedef struct
+{
+    UINT8 module;
+    UINT8 switchVal;
+}IPC_MOD_DEBUG_CFG;
+
+#pragma pack()
+
+#endif /* __GPON_DEV_IPC_ADAPTER_H__ */
+

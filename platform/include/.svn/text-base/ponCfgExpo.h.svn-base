@@ -1,0 +1,26 @@
+/**************************************************************
+ * 文件名称:  ponCfgExpo.h
+ * 作           者:  keith.gong
+ * 日           期:  2015.07.07
+ * 文件描述:  
+ * 版           本:  V1.00
+ * 修改历史:  
+ *     <修改者>   <时间>    <版本 >   <描述>
+**************************************************************/
+
+
+#ifndef __GPON_APP_PON_CFG_H__
+#define __GPON_APP_PON_CFG_H__
+
+RTN_STATUS
+PonCfgPortStateSet(
+                UINT32 portId,
+                UINT32 state);
+
+RTN_STATUS
+PonCfgPortAvailableBwGet(
+                UINT32 portId,
+                UINT32 *pBw);
+
+#endif
+

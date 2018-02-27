@@ -1,0 +1,13 @@
+prefix=/home/ltf/mypro/1616/FD1616GS/trunk/buildroot/platform/zlib/install
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+sharedlibdir=${libdir}
+includedir=/home/ltf/mypro/1616/FD1616GS/trunk/buildroot/platform/zlib/include
+
+Name: zlib
+Description: zlib compression library
+Version: 1.2.11
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lz
+Cflags: -I${includedir}

@@ -1,0 +1,489 @@
+/**************************************************************
+ * 文件名称:  OnuRaExpo.h
+ * 作           者:  keith.gong
+ * 日           期:  2015.02.26
+ * 文件描述:  ONU 注册授权模块系统层头文件
+ * 版           本:  V1.00
+ * 修改历史:  
+ *     <修改者>   <时间>    <版本 >   <描述>
+**************************************************************/
+
+#ifndef __ONU_RA_EXPO_H__
+#define __ONU_RA_EXPO_H__
+
+#include "time.h"
+#include "sys_debug.h"
+#include "sys_common.h"
+
+
+#define  CORE_EXTRA_LENGTH      72
+#define  ONU_MAX_DESC_LEN       65
+#define  PON_PORT_RESERVE_BW    0   /*kbps*/
+
+/*--------------  认证模式  -------------- */
+typedef enum
+{
+    ONU_AUTH_MODE_MAC,                              /* MAC mode    0*/
+    ONU_AUTH_MODE_LOID,                             /* LOID mode   1*/
+    ONU_AUTH_MODE_LOID_NOT_CHK_PWD,                 /* LOID mode but not check password */
+    ONU_AUTH_MODE_HYBRID,                           /* Hybrid mode */
+    ONU_AUTH_MODE_HYBRID_NOT_CHK_PWD,               /* Hybrid mode but not check password */
+    ONU_AUTH_MODE_SN,                               /* SN mode      5*/
+    ONU_AUTH_MODE_PASSWORD,                         /* The password with SN, 10 bytes password */
+    ONU_AUTH_MODE_SN_AND_PASSWORD,
+}ONURA_ONU_AUTH_MODE_EN;
+
+
+/*--------------  认证策略  -------------- */
+typedef enum
+{
+    ONU_REG_AUTH_POLICY_MANUAL  = 0,     
+    ONU_REG_AUTH_POLICY_AUTO    = 1,      
+}ONURA_ONU_AUTH_POLICY_EN;
+
+
+/*--------------  授权校验结果 --------------*/     
+typedef enum
+{
+    AUTH_INIT = 0,                                  /* 未校验的初始状态*/ 
+    AUTH_SUCCESS,                                   /* 校验成功状态*/
+    AUTH_LOID_INVALID,                              /* LOID 不存在*/
+    AUTH_LOIDPASSWORD_INVALID,                      /* LOID 存在，但是LOID_PASSWORD 错误*/
+    AUTH_LOID_COLLISION,                            /* LOID冲突，两个上线的ONU携带相同的LOID信息*/
+    AUTH_SN_INVALID,  
+    AUTH_MAC_INVALID, 
+    AUTH_SNPASSWORD_COLLISION,                      /* 仅校验SNPASSWORD 模式下，两个ONU SN 不同但是SNPASSWORD 一致*/
+    AUTH_SNPASSWORD_INVALID,                        /* SNPASSWORD 模式下，SN 信息存在，但是SN_PASSWORD 错误*/
+    AUTH_MAC_INVALID_LOID_INVALID,
+    AUTH_MAC_INVALID_LOIDPASSWORD_INVALID,
+    AUTH_MAC_INVALID_LOID_COLLISION,
+    AUTH_SUCCESS_BY_AUTOAUTH,                       /* 自动认证校验成功*/
+    
+    AUTH_FAIL,                                      /* 未知的其它认证失败*/ 
+}ONURA_ONU_AUTH_RESULT_EN;
+
+
+
+/*--------------  注册到本模块的回调函数的函数类型  -------------- */
+typedef void (*onuRegAuthNotifyFunction)();
+
+
+/*--------------  注册到本模块的回调函数的消息类型  -------------- */
+typedef enum
+{
+    ONU_REG_AUTH_HANDLER_ONU_REGISTRATION = 0,      /* ONU registration to the PON */
+    ONU_REG_AUTH_HANDLER_ONU_DEREGISTRATION,        /* ONU deregistration (disconnection) from the PON */
+    ONU_REG_AUTH_HANDLER_ONU_AUTHORIZATION,         /* Authorization mode update of a single ONU */
+    ONU_REG_AUTH_HANDLER_ONU_DEAUTHORIZATION,       /* DeAuthorization mode update of a single ONU */
+    
+    ONU_REG_AUTH_HANDLER_RESERVE,
+}ONURA_ONU_REG_AUTH_NOTIFY_TYPE_ST;
+
+typedef enum
+{
+    ONURA_ONU_TYPE_SFU  = 0, 
+    ONURA_ONU_TYPE_HGU,
+    ONURA_ONU_TYPE_SBU,
+    ONURA_ONU_TYPE_FIX_MDU,
+    ONURA_ONU_TYPE_ETH_CHASSIS_MDU,
+    ONURA_ONU_TYPE_DSL_CHASSIS_MDU,
+    ONURA_ONU_TYPE_MEDIUM_DSL_CHASSIS_MDU,
+    ONURA_ONU_TYPE_MIX_CHASSIS_MDU,
+    ONURA_ONU_TYPE_MTU,
+        
+}ONURA_ONU_TYPE_EN;
+
+/**********************************************************************************************************************/
+#pragma pack(1) 
+
+
+typedef struct 
+{
+    UINT8       state;                              /* 0 or 1 */
+    UINT32      reportTime; 
+}ONURA_PERIOD_REPORT_ST;
+
+
+typedef struct
+{
+    UINT8       loidUsrName[ONU_MAX_LOID_USER_LEN];
+    UINT8       loidPwd[ONU_MAX_LOID_PWD_LEN];
+}ONURA_ONU_LOID_INFO_ST;
+
+/*--------------  注册表信息信息-------------- */
+typedef struct
+{
+    UINT8                       phyAddr[PHY_ADDR_LENGTH];   /*GPON 的SN*/
+    ONURA_ONU_LOID_INFO_ST      loidInfo;
+    UINT8                       snPwd[ONU_MAX_SN_PWD_LEN];  /*GPON 用于校验SN的10字节password*/
+    UINT32                      authId; 
+    UINT8                       extra[CORE_EXTRA_LENGTH];   /* 该域用来存放一些额外的注册信息,  内容自定义*/
+
+    UINT8                       timeStamp[8];               /* 注册时间*/ 
+}ONURA_REG_ONU_ENTRY_ST;
+
+/*--------------  ONU   授权表表目-------------- */
+typedef struct
+{
+    UINT16                      ponId;
+    UINT16                      authId;
+    UINT16                      regId;
+    UINT16                      srvProfileId;
+    UINT16                      lineProfileId;
+    UINT8                       phyAddr[PHY_ADDR_LENGTH];
+    UINT8                       deactiveFlag;
+    UINT8                       onlineFlag;
+    UINT8                       desc[ONU_MAX_DESC_LEN];
+} ONURA_AUTH_ONU_ENTRY_ST;
+
+
+/*--------------ONU注册、去注册消息数据结构-用于适配硬件抽象层相同的结构------------- */
+
+typedef struct
+{
+    UINT8       ponId;
+    UINT8       regId; 
+    UINT8       phyAddr[PHY_ADDR_LENGTH]; 
+    UINT8       loid[ONU_MAX_LOID_USER_LEN];
+    UINT8       loidpwd[ONU_MAX_LOID_PWD_LEN];
+    UINT8       snPwd[ONU_MAX_SN_PWD_LEN];          /*用于校验SN的10字节password*/ 
+    UINT8       onuInfo[CORE_EXTRA_LENGTH];
+}ONURA_REG_MSG_ADEPTER_ST;
+
+
+typedef enum
+{
+    ONURA_MSG_TYPE_EVENT_REGIST,                /* 注册消息*/
+    ONURA_MSG_TYPE_EVENT_DEREGIST,              /* 解注册消息*/
+    ONURA_MSG_TYPE_EVENT_ALARM,                 /* 上报告警处理*/
+    ONURA_MSG_TYPE_EVENT_SET_HARDWARE,          /* 硬件下发*/  
+}ONURA_MSG_TYPE_EN;
+
+typedef struct
+{
+    UINT8       vendor_id[4];/*ONU厂商*/
+    UINT8       model_id[4];/*ONU型号*/
+    UINT8       hw_ver[8];/*硬件版本号*/
+    UINT8       sw_ver[16];/*软件版本号*/
+    UINT8       mac_address[PHY_ADDR_LENGTH];/*BASE MAC*/    
+}ONURA_REG_ONU_EXTRA_INFO_SN;
+
+typedef struct 
+{
+    UINT8 venderId[2];/*芯片厂商*/
+    UINT8 chipModel[2];/*芯片型号*/
+    UINT8 Revision;/*芯片修订情况*/
+    UINT8 Date[3];/*芯片的版本*/
+}ONURA_REG_ONU_EXTRA_INFO_CHIP;
+
+typedef struct
+{
+    ONURA_REG_ONU_EXTRA_INFO_SN     sn;
+    ONURA_REG_ONU_EXTRA_INFO_CHIP   chip;
+    UINT8 fwVersion[32];/*Firmware版本*/
+}ONURA_REG_ONU_EXTRA_INFO;
+
+typedef struct
+{
+    UINT16                  phyId;
+    UINT8                   ouiVer;
+    UINT8                   ethNum;/*fe + ge*/
+    UINT8                   geNum;
+    UINT8                   potsNum;
+    UINT8                   catvNum;
+    UINT16                  distance;
+    ONURA_ONU_TYPE_EN       onuType;
+    ONURA_ONU_LOID_INFO_ST  loidInfo;
+    ONURA_REG_ONU_EXTRA_INFO    
+                            extraInfo;
+    struct tm               timeStamp;
+}ONURA_CORE_PHY_INFO;
+
+typedef struct
+{
+    ONURA_MSG_TYPE_EN       msgType;
+    UINT16                  ponId;
+    UINT8                   phyAddr[PHY_ADDR_LENGTH];
+    
+    ONURA_CORE_PHY_INFO     phyInfo;
+}ONURA_CORE_MSG_ST;
+
+typedef struct
+{
+    long        type;
+    ONURA_CORE_MSG_ST msg;
+}onura_core_msg_t;
+
+typedef struct
+{
+    UINT16                  ponId;
+    UINT16                  authId;
+    UINT16                  phyId;
+    UINT8                   var[8]; /*MAC 或者  授权状态值*/
+    UINT8                   state;  /*raise or clear*/
+    UINT32                  subId;
+    UINT32                  value;
+    UINT32                  type;   /*告警ID在这儿赋值,驱动的操作类型也是在这儿赋值*/
+
+    UINT32                  mscCmd;
+    UINT32                  bufLen;
+    UINT32                  *pDataBuf;
+    
+    ONURA_MSG_TYPE_EN       msgType;
+}ONURA_EXTRA_MSG_ST;
+
+
+/**********************************************************************************************************************/
+/*** 注册未授权ONU  信息***/
+/**********************************************************************************************************************/
+#if 0/*closed by Gerhard Lao	2016/02/23 */
+typedef struct
+{
+    UINT8       vendorId[4];
+    UINT8       version[14];
+    UINT8       vendorProductCode[2];
+    UINT8       equipmentId[20];
+    UINT8       softwareVersion[14];
+}ONURA_REG_ONU_EXTRA_INFO;
+
+typedef struct 
+{
+    UINT16      regId;
+    UINT8       phyAddr[PHY_ADDR_LENGTH];     
+    UINT8       snPwd[ONU_MAX_SN_PWD_LEN];
+    ONURA_ONU_LOID_INFO_ST      
+                loidInfo;
+    UINT8       timeStamp[8];   /* 注册时间*/
+    ONURA_REG_ONU_EXTRA_INFO    
+                extraInfo;
+} ONURA_REG_UNAUTH_ONU_INFO_ST;
+
+
+typedef struct 
+{
+    UINT8       ponId;
+    ONURA_REG_UNAUTH_ONU_INFO_ST 
+                regUnauthInfo;
+} ONURA_REG_UNAUTH_ONU_PER_PON_INFO_ST;
+#endif
+
+
+#pragma pack()
+/**********************************************************************************************************************/
+
+
+typedef enum
+{
+    ONURA_NO_ERROR,
+
+    /* 通用错误*/
+    ONURA_ERROR_INVALID_PARAM,
+    ONURA_ERROR_ONU_CONFIG_REPEAT,
+
+    /* 授权状态错误*/
+    ONURA_ERROR_ONU_HAS_NOT_REGED,
+    ONURA_ERROR_ONU_ALREADY_AUTHED,
+    ONURA_ERROR_AUTH_LIST_TABLE_FULL,
+    ONURA_ERROR_AUTH_ENTRY_NOT_EXIST,
+    ONURA_ERROR_AUTH_ENTRY_EXIST,
+    ONURA_ERROR_AUTH_ENTRY_CONFLLIC,
+    ONURA_ERROR_AUTH_NO_UNUSED_AUTHID,
+    
+    ONURA_ERROR_AUTH_GET_PROFILE_BW_FAILED,
+    ONURA_ERROR_AUTH_GET_AVAILABLE_BW_FAILED,
+    ONURA_ERROR_AUTH_NO_ENOUGH_BW,
+
+    /*注册状态错误*/
+    ONURA_ERROR_REG_LIST_TABLE_FULL,
+    ONURA_ERROR_REG_ENTRY_NOT_EXIST,
+    ONURA_ERROR_REG_ENTRY_EXIST, 
+    ONURA_ERROR_REG_ENTRY_CONFLLIC,
+    ONURA_ERROR_REG_ENTRY_ID_USED,
+    ONURA_ERROR_REG_ENTRY_SN_REGED,
+
+    /* 物理状态配置错误*/
+    ONURA_ERROR_SILENCE_FAILED,
+    ONURA_ERROR_DESILENCE_FAILED,
+    ONURA_ERROR_OFFLINE_FAILED,
+}ONURA_ERROR_DTE;
+
+
+#if 0//DEF_FUNC(" 授权类操作 ")
+
+RTN_STATUS 
+OnuRa_RegProc_GetRegUnauthOnuByPhyAddr(
+                const UINT16 ponId,
+                const UINT8  phyAddr[PHY_ADDR_LENGTH],
+                ONURA_REG_UNAUTH_ONU_PER_PON_INFO_ST *pRegInfo);
+
+RTN_STATUS 
+OnuRa_RegProc_GetRegUnauthOnuFirst(
+                const UINT16 ponId,
+                ONURA_REG_UNAUTH_ONU_PER_PON_INFO_ST* pRegInfo);
+
+RTN_STATUS 
+OnuRa_RegProc_GetRegUnauthOnuNext(
+                const UINT16 ponId,
+                ONURA_REG_UNAUTH_ONU_PER_PON_INFO_ST *pRegInfo);
+
+
+/**************************************************************
+ * 函数名称: OnuRa_AuthProc_GetOnuPhyAddr
+ * 作           者: keith.gong
+ * 日           期: 2015年03月20日
+ *
+ * 函数功能: 
+                            获取授权ONU的物理标志
+ * 输入参数: 
+                            const UINT16 ponId,
+                            const UINT16 authId,
+ * 输出参数: 
+                            UINT8  * pPhyAddr
+ * 返回数值: 
+                            成功返回OK
+ * 其           它: 
+**************************************************************/
+RTN_STATUS 
+OnuRa_AuthProc_GetOnuPhyAddr(
+                const UINT16 ponId,
+                const UINT16 authId,
+                UINT8 phyAddr[PHY_ADDR_LENGTH]);
+
+RTN_STATUS 
+OnuRa_AuthProc_GetOnuDesc(
+                const UINT16 ponId,
+                const UINT16 authId,
+                UINT8 desc[ONU_MAX_DESC_LEN]);
+RTN_STATUS 
+OnuRa_AuthProc_SetOnuDesc(
+                const UINT16 ponId,
+                const UINT16 authId,
+                const UINT8  desc[ONU_MAX_DESC_LEN]);
+RTN_STATUS 
+OnuRa_AuthProc_GetAuthIdByKeyPhyAddr(
+                const UINT8 phyAddr[PHY_ADDR_LENGTH],
+                UINT16 *pPonId,
+                UINT16 *pAuthId);
+RTN_STATUS 
+OnuRa_AuthProc_SetOnuSrvProfileId(
+                const UINT16 ponId, 
+                const UINT16 authId,
+                const UINT16 profileId);
+
+RTN_STATUS 
+OnuRa_AuthProc_SetOnuLineProfileId(
+                const UINT16 ponId, 
+                const UINT16 authId,
+                const UINT16 profileId);
+
+/**************************************************************
+ * 函数名称: OnuRa_AuthProc_DoesOnuOnline
+ * 作           者: keith.gong
+ * 日           期: 2015年03月20日
+ *
+ * 函数功能:  
+                            判断授权号对应的ONU是否在线
+ * 输入参数: 
+                            const UINT16 ponId, 
+                            const UINT16 authId
+ * 输出参数: 
+ * 返回数值: 
+                            在线返回TRUE,不在线返回FALSE。
+ * 其           它: 
+**************************************************************/
+UINT32 
+OnuRa_AuthProc_DoesOnuOnline(
+                const UINT16 ponId, 
+                const UINT16 authId);
+
+RTN_STATUS 
+OnuRa_RegProc_CancelAllOnu(
+                const UINT16 ponId,
+                UINT32 *pSuccessNum,
+                UINT32 *pFailedNum);
+
+RTN_STATUS 
+OnuRa_RegProc_CancelOnuByPhyAddr(
+                const UINT16 ponId,
+                const UINT8  phyAddr[PHY_ADDR_LENGTH]);
+
+RTN_STATUS 
+OnuRa_AuthProc_GetOnuNum(
+                const UINT16 ponId, 
+                UINT8 *pNum);
+
+RTN_STATUS 
+OnuRa_AuthProc_GetOnuEntry(
+                const UINT16 ponId, 
+                const UINT16 authId,
+                ONURA_AUTH_ONU_ENTRY_ST *pAuthEntry);
+RTN_STATUS 
+OnuRa_AuthProc_GetOnuEntryNext(
+                ONURA_AUTH_ONU_ENTRY_ST *pAuthEntry);
+
+RTN_STATUS 
+OnuRa_AuthProc_GetOnuEntryFirst(
+                ONURA_AUTH_ONU_ENTRY_ST *pAuthEntry);
+
+RTN_STATUS 
+OnuRaGetRegOnuEntry(
+                const UINT16 ponId, 
+                const UINT16 regId,
+                ONURA_REG_ONU_ENTRY_ST *pRegEntry);
+
+#endif
+
+
+#if 0// DEF_FUNC(" 模块接口类操作 ")
+
+
+/**************************************************************
+ * 函数名称: OnuRa_Notify_Assign
+ * 作           者: keith.gong
+ * 日           期: 2015年03月20日
+ *
+ * 函数功能: 
+                            其它模块回调函数挂接接口 
+ * 输入参数: 
+                            const ONURA_ONU_REG_AUTH_NOTIFY_TYPE_ST type,
+                            const onuRegAuthNotifyFunction fun,
+                            const UINT32 pri , 0 is lowest, MAX_RA_HANDLER_PRI-1 is highest
+ * 输出参数: 
+ * 返回数值: 
+                            成功返回OK
+ * 其           它: 
+                            MAX_RA_HANDLER_PRI : 8
+**************************************************************/
+RTN_STATUS 
+OnuRa_Notify_Assign(
+                const ONURA_ONU_REG_AUTH_NOTIFY_TYPE_ST type,
+                const onuRegAuthNotifyFunction fun,
+                const UINT32 pri);
+
+
+RTN_STATUS
+OnuRa_RegProc_GetAutoFind(
+                const UINT16 ponId,
+                UINT8 *pState);
+
+RTN_STATUS
+OnuRa_RegProc_SetAutoFind(
+                const UINT16 ponId,
+                const UINT8  state);
+
+RTN_STATUS 
+OnuRa_AuthProc_OnuDelAll(
+                const UINT16 ponId,
+                UINT32 *pSuccessNum,
+                UINT32 *pFailedNum);
+
+RTN_STATUS 
+OnuRa_AuthProc_OnuDel(
+                const UINT16 ponId,
+                const UINT16 authId);
+
+#endif
+
+
+#endif /* __ONU_RA_EXPO_H__ */
+

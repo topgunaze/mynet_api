@@ -1,0 +1,43 @@
+#  Name         : Makefile
+#  Version      : V2.00
+#  Author       : keith.gong (kizerg@163.com)
+#  Time         : 2016.11.14
+#  Description  : Makefile for FD1616GS PON Driver
+#                 Copyright (c) 2009-2016 C-Data Co.,Ltd.
+#                 All Rights Reserved.
+#  Modification : 2016.11.14, keith.gong, created
+
+MOD_NAME = pondrv
+MOD_TYPE = app
+#MOD_DEPS = host_api api_dev_log bcm_board bcm_user_appl_ps bcm_user_appl_eon \
+#        bcm_user_appl_epon_oam bcm_user_appl_epon_oam_cli pcie pcie_mod \
+#        bcm_user_appl_epon_hde bcm_api_proxy common_epon_oam common_gpon bcm_image_transfer \
+#        device_selector bcm_remote_cli 
+
+#ifneq ("$(RELEASE_BUILD)", "y")
+#    MOD_DEPS +=	bcm_user_appl_gpon_stress bcm_user_appl_gpon_ds_omci \
+#                bcm_user_appl_gpon_sn_acquisition bcm_user_appl_gpon_statistics \
+#                bcm_user_appl_gpon_mac_learning bcm_user_appl_gpon_rssi \
+#		bcm_user_appl_omci_swdl bcm_user_appl_remote_logger
+#endif
+			   
+#MOD_INC_DIRS = $(TOP)/host/board/wrx $(TOP)/common/drivers/maple/pcie $(TOP)/../ponomci/include/ $(TOP)/../../include $(TOP)/../../application/common/include $(TOP)/../sqlite/include $(TOP)/../libev/include $(TOP)/../zlib/include $(TOP)/../ponprofile/include $(TOP)/../../application/include $(TOP)/../pononucfg/include \
+MOD_INC_DIRS =  $(TOP)/../../include $(TOP)/../../application/common/include $(TOP)/../sqlite/include $(TOP)/../libev/include $(TOP)/../zlib/include $(TOP)/../ponprofile/include $(TOP)/../../application/include $(TOP)/../pononucfg/include \
+
+
+#srcs = pon_drv_init.c pon_drv_db.c pon_drv_olt_proc.c pon_drv_onu_proc.c pon_drv_if_onu.c pon_drv_if_olt.c pon_drv_if_nw.c pon_drv_net.c pon_thread_pool.c
+srcs = pon_drv_init.c pon_drv_db.c  pon_drv_net.c pon_thread_pool.c
+
+
+ifeq ("$(OS_KERNEL)", "linux")
+	MOD_DEPS += dev_log_linux
+endif
+ifeq ($(ENABLE_KT2), y)
+	MOD_DEFS += -DENABLE_KT2
+	#EXTRA_INCLUDES += -I$(TOP_DIR)/common/cli
+endif
+#EXTRA_LIBS_PATH += -L$(TOP_DIR)/../sqlite/install/lib -L$(TOP_DIR)/../libev/install/lib -L$(TOP_DIR)/../zlib/install/lib -L$(TOP_DIR)/../ponadp -L$(TOP_DIR)/../../build/libs/ponomci -L$(TOP_DIR)/../../build/libs/ponprofile -L$(TOP_DIR)/../../build/libs/pononucfg
+EXTRA_LIBS_PATH += -L$(TOP_DIR)/../sqlite/install/lib -L$(TOP_DIR)/../libev/install/lib -L$(TOP_DIR)/../zlib/install/lib -L$(TOP_DIR)/../ponadp -L$(TOP_DIR)/../../build/libs/ponprofile -L$(TOP_DIR)/../../build/libs/pononucfg
+#EXTRA_LIBS += -lponomci -lsqlite3
+EXTRA_LIBS += -lsqlite3 -lpthread -lev -lz -lpon_adaptor -lponomci -lponprofile -lpononucfg
+

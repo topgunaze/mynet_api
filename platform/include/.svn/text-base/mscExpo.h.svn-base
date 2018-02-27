@@ -1,0 +1,1606 @@
+#ifndef __MSC_EXPO_H__
+#define __MSC_EXPO_H__
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+#include "sys_common.h"
+
+#define MSC_SEND_BUF_MAX_LEN 8192
+
+#define MSC_SERVICE_VAL(module, index)   (((module) << 16) | (index))
+
+RTN_STATUS mscCmdGet(int slotId, UINT32 cmd, void * var,int ulBufLen, void *pOutBuf, int *pulLen);
+RTN_STATUS mscCmdSet(int slotId, UINT32 cmd, void * var,int ulBufLen);
+
+typedef UINT32 (*MSC_PROCESS_SERVICE_DATA_FUN)(UINT32 ulCmdId,UINT8 *pszBuf,UINT32 ulBufLen);
+
+RTN_STATUS Msc_ModuleServiceReg(UINT32 ulModuleType, MSC_PROCESS_SERVICE_DATA_FUN pfnProcessCallBack);
+
+typedef enum msc_action_en
+{
+    MSC_ACTION_CREATE       = 0x01,
+    MSC_ACTION_DEL          = 0x02,
+    MSC_ACTION_SET          = 0x04
+}MSC_ACTION_EN;
+
+/************************袁可*************************************/
+/*********************************
+   功能:主备idbset同步
+cmdId:MSC_CMD_MS_IDBSET
+*********************************/
+typedef struct 
+{
+    UINT8   ucObjName[64];        
+    UINT32   ulIndex[16] ;          
+    UINT32   ulIndexSubIdCount;  
+    UINT8   ucValueBuf[512] ;       
+    UINT32   ulValueLen ; 
+}MSC_SYNC_HSS_IDBSET_ST;
+
+/*********************************
+   功能:主备cli同步
+cmdId:MSC_CMD_MS_CLISET
+*********************************/
+typedef struct 
+{
+    UINT32 ulNode;
+    UINT32 ulIndex;
+    UINT8 ucCliStr[256];
+}MSC_SYNC_HSS_CLISET_ST;
+
+/*********************************
+   功能:主备发送配置文件
+cmdId:MSC_CMD_MS_RUN
+*********************************/
+typedef struct 
+{
+    UINT32 ulFragId;  /*序号和总数一样就结束 或超时也结束*/
+    UINT32 ulTotalNum;
+    UINT8 ucCfgFile[1400];
+    UINT32 ulFileLen;
+}MSC_SYNC_HSS_CFGFILE_ST;
+
+/*********************************
+   功能:上报热插拔
+cmdId:MSC_CMD_SYS_HOTPLUG
+    功能:主备板卡信息同步
+cmdId:MSC_CMD_DEVICE_SLOTINFO     
+*********************************/
+typedef struct 
+{
+    UINT32 ulSlotId;
+    UINT32 ulBoardStatus; 
+    UINT32 ulBoardBindType;
+    UINT32 ulBoardCurType;
+    UINT8 ucSoftVer[32];  
+    UINT8 ucFirmVer[32];
+    UINT8 ucHardVer[32];
+    UINT8 ucCompTime[32]; /*编译时间*/  
+}MSC_CMD_DEV_SLOTINFO_ST;
+
+
+/*********************************
+   功能:热插拔完成的通知
+cmdId:MSC_CMD_SYS_FINISHHOTPLUG    
+*********************************/
+typedef struct  
+{
+    UINT32 ulSlot;
+    UINT32 ulFinishFlag;     /* 1表示主控发送完成，2表示线卡执行完成*/
+}MSC_CMD_DEV_FINISHHOTPLUG_ST;
+
+/*********************************
+   功能:线路标识使能开关
+cmdId:MSC_CMD_LINE_IDENTIFY_STATUS    
+*********************************/
+typedef struct 
+{
+
+    UINT32 ulUnit;           /*槽位+pon口的unit*/
+    UINT32 ulDhcpEnable;     /*0关、1开*/
+    UINT32 ulPppoeEnable;    /*0关、1开*/
+}MSC_CMD_PON_LINEIDENTIFY_ST;
+
+/*********************************
+   功能:线路标识可配置信息
+cmdId:MSC_CMD_LINE_IDENTIFY_INFO    
+*********************************/
+typedef struct 
+{
+    UINT32   ulLineInfoMode;            /*1标准 2用户自定义*/
+    UINT8   ucLineInfo[16];            /*自定义格式*/
+    UINT8   ucSepaStr[4];              /*分隔符*/
+    
+}MSC_CMD_PON_LINEIDENTIFYCFG_ST;
+
+
+/****************************刘灿**********************************/
+/*======================告警模块==================*/
+/********************************************
+******功能: 告警级别和阈值配置
+*****CMDID: MSC_CMD_ALARM_ALARMCFG
+*********************************************/
+typedef struct 
+{
+    UINT32  ulAlarmID;         /*告警ID*/
+    UINT32  ulRowStatus;
+    UINT32  ulLevel;           /*告警级别*/
+    UINT32  ulThresholdState;  /*阈值状态*/
+    UINT32  ulThresholdValue;  /*阈值*/
+} MSC_CMD_ALARM_ALARMCFGDATA_ST;
+
+
+/********************************************
+******功能: 告警屏蔽配置
+*****CMDID: MSC_CMD_ALARM_MASKCFG
+*********************************************/
+typedef struct 
+{
+    UINT32   ulAlarmID;      
+    UINT32   ulVindex;         /*slot, port */
+    UINT32   ulSubindex;       /*onu, uni*/
+    UINT32   ulRowstatus;
+    UINT32   ulAdminstate;    
+}MSC_CMD_ALARM_ALARMMASKCFGDATA_ST;
+
+
+/********************************************
+******功能: 告警全局屏蔽开关
+*****CMDID: MSC_CMD_ALARM_MASKCTRL
+*********************************************/
+typedef struct
+{
+    UINT32  ulGlobalCtrl;      /*告警屏蔽全局开关*/
+}MSC_CMD_ALARM_ALARMCTRLDATA_ST;
+
+
+
+/********************************************
+******功能: 告警上报
+*****CMDID: MSC_CMD_ALARM_REPORT
+*********************************************/
+typedef struct 
+{
+    UINT32 ulAlarmType;        /*告警上报类型，为线卡上报或主备同步告警*/
+    UINT8 ucAlarmBuf[1024];   /*告警内容*/
+    UINT32 ulAlarmBufLen;      /*告警buf长度*/
+}MSC_REPORT_ALARM_ALARMREPORT_ST;
+
+
+
+/*=====================================升级================================*/
+
+/********************************************
+******功能: 升级OLT
+*****CMDID: MSC_CMD_UPG_UPGRADE_OLT
+*********************************************/
+typedef struct
+{
+    UINT8  ucIpAddr[16];      /*ip地址，点分十进制*/
+    UINT8  ucFileName[32];    /*升级文件名称*/
+}MSC_CMD_UPG_UPGOLTDATA_ST;
+
+
+/********************************************
+******功能: 升级ONU
+*****CMDID: MSC_CMD_UPG_UPGRADE_ONU
+*********************************************/
+typedef struct
+{
+    UINT32  ulOltUnit;         /**/
+    UINT8  ucOnuAuthId[64];   /*要升级的批量ONU*/
+    struct
+    {
+        UINT32   ulTypeFlag ; /*为0表示是其他厂商ONU，为1表示斐讯自己的ONU*/
+        UINT32   ulTypeNum;
+        UINT8   ucTypeString[16];
+    }onuDevType;            /*ONU设备类型*/
+    UINT8  ucIpAddr[16];      /*ip地址，点分十进制*/
+    UINT8  ucFileName[32];    /*升级文件名*/
+}MSC_CMD_UPG_UPGONUDATA_ST;
+
+
+/********************************************
+******功能: 激活ONU
+*****CMDID: MSC_CMD_UPG_ACTIVATE
+*********************************************/
+typedef struct
+{
+    UINT32  ulOltUnit;         /**/
+    UINT8  ucOnuAuthId[64];   /*要批量激活的ONU*/
+}MSC_CMD_UPG_UPGACTIVEONUDATA_ST;
+
+
+
+/********************************************
+******功能: 查询线卡升级状态
+*****CMDID: MSC_CMD_UPG_QUERY_OLT
+*********************************************/
+typedef struct
+{
+    UINT32  ulUpgOltStatus;    /*线卡升级状态*/
+}MSC_CMD_UPG_UPGOLTSTATUSDATA_ST;
+
+
+/********************************************
+******功能: 查询ONU升级状态
+*****CMDID: MSC_CMD_UPG_QUERY_ONU
+*********************************************/
+typedef struct
+{
+    UINT32  ulUpgOltUnit;
+    UINT8  ucUpgOnuStatus[64];    /*ONU升级状态*/
+}MSC_CMD_UPG_UPGONUSTATUSDATA_ST;
+
+
+/*===================================性能统计==============================*/
+/********************************************
+******功能: 统计配置及动作
+*****CMDID: MSC_CMD_STATISTIC_SET_REALTIME_ZERO
+            MSC_CMD_STATISTIC_SET_HISTORY_PERIOD
+            MSC_CMD_STATISTIC_START_STOP
+*********************************************/
+typedef struct
+{
+    UINT32  ulOltUnit;
+    UINT32  ulOnuUnit;
+    UINT32  ulStartOrStop;     /*统计开关*/
+    UINT32  ulHistoryPeriod;   /*历史统计周期*/
+}MSC_CMD_STATIS_PERFORMCFGDATA_ST;
+
+
+/********************************************
+******功能: 统计配置及动作
+*****CMDID: MSC_CMD_STATISTIC_REALTIME
+            MSC_CMD_STATISTIC_HISTORY
+*********************************************/
+typedef struct
+{
+    UINT32  ulOltUnit;
+    UINT32  ulOnuUnit;
+    UINT8  ucPerfData[1024];  /*实时或历史统计数据*/
+}MSC_CMD_STATIS_PERFORMQUERYDATA_ST;
+
+/*===================================时间同步=============================*/
+/********************************************
+******功能: 统计配置及动作
+*****CMDID: MSC_CMD_SYS_TIME
+*********************************************/
+typedef struct
+{
+    UINT32  ulTv_sec; /*秒*/
+    UINT32  ulTv_nsec;/*纳秒*/
+}MSC_CMD_SYS_TIME_ST;
+
+/*=================================板卡温度=============================*/
+/********************************************
+******功能: 统计配置及动作
+*****CMDID: MSC_CMD_DEVICE_SENSOR_TEMP
+*********************************************/
+typedef struct
+{
+    UINT32  ulTemperature;/*板卡温度*/
+    float  ulVoltage[4];    /*板卡电压*/
+    float  ulCpuAvailability;/*cpu利用率*/
+    float  ulRamAvailability;/*ram利用率*/
+}MSC_CMD_DEVICE_PARAMETER_ST;
+
+/*********************************张显峰***********************************/
+/********************************************
+    功能:组播全局使能开关
+    cmdId:MSC_CMD_IGMP_ENABLE
+********************************************/
+typedef struct 
+{
+    UINT32    ulIgmpEnable;
+}MSC_CMD_IGMP_ENABLE_ST;
+
+/********************************************
+    功能:组播全局配置
+    cmdId:MSC_CMD_IGMP_CFG
+********************************************/
+typedef struct 
+{
+    UINT32    ulWorkMode;
+    UINT16   usVlanId;
+    UINT16   usVersion;
+}MSC_CMD_IGMP_CFG_ST;
+
+/********************************************
+    功能:组播查询相关参数配置
+    cmdId:MSC_CMD_IGMP_PARA
+********************************************/
+typedef struct 
+{
+    UINT16  usQueryInterval;
+    UINT16  usQueryMaxRespTime;
+    UINT16  usLastQueryCount;
+    UINT16  usLastQueryInterval;
+    UINT16  usRobust;
+}MSC_CMD_IGMP_PARA_ST;
+
+/********************************************
+    功能:主备组播组端口信息同步
+    cmdId:MSC_SYNC_IGMP_GROUP
+********************************************/
+typedef struct 
+{
+    UINT32 ulPortUnit;
+    UINT32 ulMemberShipTimer;
+    UINT32 ulLastMemberQueryTimer;
+    UINT32 ulLastMemberQueryCount;
+}MSC_SYNC_IGMP_BIND_PORT_ST;
+
+/********************************************
+    功能:主备组播组信息同步
+    cmdId:MSC_SYNC_IGMP_GROUP
+********************************************/
+typedef struct 
+{
+    UINT32 ulGroupAddr;
+    UINT32 ulVlanId;
+    UINT32 ulPortNum;
+    MSC_SYNC_IGMP_BIND_PORT_ST stIgmpBindPort[8];
+}MSC_SYNC_IGMP_GROUP_INFO_ST;
+
+/********************************************
+    功能:未知组播透传策略
+    cmdId:MSC_CMD_IGMP_POLICY
+********************************************/
+typedef struct
+{
+    UINT32  ulUnknownPolicy;
+    UINT32  ulVlanId;
+}MSC_CMD_IGMP_POLICY_ST;
+
+/********************************************
+    功能:IPTV全局使能开关
+    cmdId:MSC_CMD_IPTV_ENABLE
+********************************************/
+typedef struct 
+{
+    UINT32    ulIptvEnable;
+}MSC_CMD_IPTV_ENABLE_ST;
+
+/********************************************
+    功能:IPTV预览标识时间
+    cmdId:MSC_CMD_IPTV_RECOGNITION
+********************************************/
+typedef struct 
+{
+    UINT32    ulIptvRecognition;
+}MSC_CMD_IPTV_RECOGNITION_ST;
+
+/********************************************
+    功能:IPTV 套餐操作
+    cmdId:MSC_CMD_IPTV_PKG_OPER
+********************************************/
+typedef struct
+{
+    UINT32  ulAction;
+    UINT32  ulPackageId;
+}MSC_CMD_IPTV_PKG_OPER_ST;
+
+/********************************************
+    功能:IPTV 频道信息配置
+    cmdId:MSC_CMD_IPTV_CHANNEL_CFG
+********************************************/
+typedef struct
+{
+    UINT32  ulAction;
+    UINT32  ulChannelId;
+    UINT32  ulGroupAddr;
+    UINT32  ulVlanId;
+    UINT32  ulGroupBW;
+    UINT32  ulGroupLeaveDelay;
+}MSC_CMD_IPTV_CHANNEL_CFG_ST;
+
+/********************************************
+    功能:将IPTV 频道添加到套餐，
+                并配置预览权限
+    cmdId:MSC_CMD_IPTV_PKG_ADD_CHANNEL
+********************************************/
+
+typedef struct
+{
+    UINT32  ulAction;
+    UINT32  ulPackageId;
+    UINT32  ulChannelId;
+    UINT32  ulAuthType;
+    UINT32  ulPreviewId;
+}MSC_CMD_IPTV_PKG_ADD_CHANNEL_ST;
+
+/********************************************
+    功能:配置IPTV 预览模板
+    cmdId:MSC_CMD_IPTV_PREVIEW_PROFILE_CFG
+********************************************/
+typedef struct
+{
+    UINT32 ulAction;
+    UINT32 ulPreviewId;
+    UINT32 ulPreviewTime;
+    UINT32 ulPreviewCount;
+    UINT32 ulPreviewInterval;
+    UINT32 ulPreviewReset;
+}MSC_CMD_IPTV_CFG_PREVIEW_ST;
+
+/********************************************
+    功能:绑定端口到套餐
+    cmdId:MSC_CMD_IPTV_BIND_PORT
+********************************************/
+typedef struct
+{
+    UINT32 ulAction;
+    UINT32 ulOltUnit;
+    UINT32 ulOnuUnit;
+    UINT32 ulPackageId;
+}MSC_CMD_IPTV_BIND_PORT_ST;
+
+/********************************************
+    功能:IPTV CDR开关配置
+    cmdId:MSC_CMD_CDR_ENABLE
+********************************************/
+typedef struct 
+{
+    UINT32   ulCdrEnable;
+}MSC_CMD_IPTV_CDR_ENABLE_ST;
+
+/********************************************
+    功能:IPTV CDR上报间隔配置
+    cmdId:MSC_CMD_CDR_INTERVAL
+********************************************/
+typedef struct 
+{
+    UINT32   ulCdrInterval;
+}MSC_CMD_IPTV_CDR_INTERVAL_ST;
+
+/********************************************
+    功能:CDR日志记录
+    cmdId:MSC_REPORT_CDR_UPSEND
+********************************************/
+typedef struct cdr_Record
+{
+    UINT32 ulCurtime;            /* 时间*/
+    UINT32 ulPortMap;            /* 端口号*/ 
+    UINT32 ulGroupAddr;          /* 组播组地址*/    
+    UINT16 usIgnoreFlag;               /* 0表示忽略*/
+    UINT16 usSendFlag;           /* 1表示需要上报给主控，0表示无需上报给主控*/
+    UINT8 ucMsgType;            /* 协议消息类型，1加入，0离开，2保持*/
+    UINT8 ucPermitFlag;         /* 预览标志*/
+    UINT8 ucLeaveMode;         /*离开方式，2 在位，1表示正常离开， 0强制离开*/
+    UINT8 ucFailFlag;          /*请求成功或者失败标志， 1请求成功，0请求失败*/
+}MSC_REPORT_CDR_RECORD_ST;
+
+/********************************************
+    功能:CDR日志记录列表
+                并配置预览权限
+    cmdId:MSC_REPORT_CDR_UPSEND
+********************************************/
+typedef struct cdr_msg
+{
+     UINT32 ulRecordNum;
+     MSC_REPORT_CDR_RECORD_ST stRecord[100];
+}MSC_REPORT_CDR_MSG_ST;
+
+
+/***************************胡俊***********************************/
+/***************************************************
+              功能:PON配置
+          CMD:MSC_CMD_PONCFG_PORTSTATE pon口使能
+          CMD:MSC_CMD_PONCFG_ENCRYMODE pon口加密使能
+          CMD:MSC_CMD_PONCFG_ALARM_THRESHOLD pon口使能
+         
+          
+*******************************************************/
+typedef struct  
+{
+    UINT32 ulOltUnit;
+    UINT32 ulponPortStatus;
+    UINT32 ulencrypMode;
+    UINT32 ulAlarmType;
+    UINT32 ulThresholdType;  
+    INT32  lRisingThreshold;
+    INT32  lFallingThreshold;
+}MSC_CMD_PON_ATTR_TABLE_ST;
+/***************************************************
+                功能:查询pon口下的光传输功率
+                CMD:MSC_CMD_PONCFG_OPTICAL_PARAMETER
+
+***************************************************/
+typedef struct  
+{
+    UINT32 ulOltUnit;
+    UINT32 ulOptical_voltage;
+    UINT32 ulOptical_current;
+    UINT32 ulOptical_rx_power;
+    UINT32 ulOptical_tx_power;
+    INT32 ulOptical_temp;
+    
+}MSC_REPORT_PON_OPTICAL_PARAMETER_ST;
+
+/***************************************************
+              功能:查询某个onu接收光功率
+          CMD:MSC_CMD_PONCFG_RX_POWER onu接收光功率
+*******************************************************/
+typedef struct  
+{
+    UINT32 ulOltUnit;
+    UINT32 ulOnuTxPower[64];
+}MSC_REPORT_PON_RX_POWER_ST;
+
+
+
+/***************************************************
+              功能:加密时间
+          CMD:MSC_CMD_ENCRYTIME 加密时间
+*******************************************************/
+typedef struct  
+{
+    UINT32 ulEncryptime;
+}MSC_CMD_SLOT_ENCRYPTIME_ST;
+/***************************************************
+              功能:老化时间
+          CMD:MSC_CMD_PONCFG_MACAGINGTIME 老化时间
+*******************************************************/
+typedef struct 
+{
+   UINT32 ulMacAgingTime;
+} MSC_CMD_SLOT_MACAGINGTIME_ST;
+/***************************************************
+              功能:DBA配置
+          CMD:MSC_CMD_DBA_ONUBINDACTION 
+*******************************************************/
+/*dba模块结构体*/
+typedef struct  
+{
+    UINT32 ulOltUnit;  /*olt unit*/
+    UINT32 ulOnuUnit;  /*onu unit*/
+    UINT32 ulCir;      /*cir值*/
+    UINT32 ulFir;      /*fir值*/
+    UINT32 ulPir;      /*pri值*/     
+}MSC_CMD_DBA_ONUBIND_ATTR_ST;
+/***************************************************
+              功能:QINQ规则配置
+          CMD:MSC_CMD_SMARTQINQ_RULECONFIG 
+*******************************************************/
+typedef struct 
+{
+    UINT32       ulprofileId;
+    UINT32       ulruleId;
+    UINT32       ulruleType;
+    UINT32       ulcvlan0;
+    UINT32       ulcvlan1;
+    UINT32       ulccos0;
+    UINT32       ulccos1;
+    UINT32       ulsvlan0;
+    UINT32       ulsvlan1;
+    UINT32       ulscos0;
+    UINT32       ulscos1;
+    UINT32       ulethertype;
+}MSC_CMD_QINQ_RULENODE_ST;
+
+typedef struct 
+{
+    UINT32                 ulRuleCount;
+    MSC_CMD_QINQ_RULENODE_ST  stProfileRule[32];
+    
+}MSC_CMD_QINQ_PROFILE_NODE_ST;
+
+/***************************************************
+              功能:QINQ绑定
+          CMD:MSC_CMD_SMARTQINQ_BINDSTATUS 
+*******************************************************/
+typedef struct  
+{
+    UINT32 ulOltUnit;
+    UINT32 ulOnuUnit;
+    UINT32 ulProfileId;
+    UINT32 ulStatus;
+}MSC_CMD_QINQ_BINDACTION_ST;
+/***************************************************
+              功能:TPID配置
+          CMD:MSC_CMD_SMARTQINQ_TPID 
+*******************************************************/
+typedef struct  
+{
+    UINT32 ulTpid;
+}MSC_CMD_QINQ_TPID_ST;
+
+/*********************************黄本莎*************************************/
+/******************************************************
+
+  功能:公共结构体
+  
+***********************************************************/  
+
+typedef struct
+{
+    UINT32     ulOltUnit;
+    UINT32     ulOnuUnit;
+} MSC_CMD_OLT_ONU_UNIT_ST;
+
+ 
+
+typedef struct
+{
+    UINT32    ulOltUnit;
+} MSC_CMD_OLT_UNIT_ST;
+  
+  /**************************************授权模块**********************************************/  
+
+  /* *****************************************************
+
+  功能: 授权ONU
+  CMDID:MSC_CMD_ONURA_AUTHONU
+  
+  ***********************************************************/  
+
+typedef  struct
+{
+    UINT32    ulTypeFlag ;
+    UINT32    ulTypeNum;
+    UINT8    ucTypeString[16];
+} MSC_CMD_ONURA_ONUTYPE_ST;
+ 
+typedef struct
+{   
+    UINT8   ucLoidUsrName[32];
+    UINT8   ucLloidPwd[16];
+    UINT8   ucPwd[16];
+} MSC_CMD_ONURA_ONUINFO_ST;
+
+
+typedef struct
+{
+    UINT32            ulOltUnit;
+    UINT32            ulOnuUnit;
+    UINT8            ucPhyAddress[8];
+    MSC_CMD_ONURA_ONUINFO_ST  stOnuInfo;
+    MSC_CMD_ONURA_ONUTYPE_ST  stOnuType; 
+} MSC_CMD_ONURA_AUTHINFO_ST;
+
+
+/* *****************************************************
+
+  功能: 主备盘同步授权ONU状态
+  CMDID:MSC_SYNC_ONURA_STATUS
+  
+  ***********************************************************/  
+
+
+typedef struct
+{
+    UINT32     ulSlotId;
+    UINT8     onuStatus[SYS_MAX_PON_NUM*SYS_MAX_ONU_NUM];
+} MSC_CMD_ONURA_ONUSTATUS_PER_SLOT_ST;
+
+
+
+/* *****************************************************
+
+  功能: 主备盘同步授权模式
+  CMDID:MSC_SYNC_ONURA_AUTHMODE
+  
+  ***********************************************************/  
+  
+typedef struct
+{
+    UINT8      ucAuthMode[SYS_MAX_SLOT_NUM*SYS_MAX_PON_NUM];
+} MSC_CMD_ONURA_ONUMODE_ST;
+
+
+
+/* *****************************************************
+
+  功能: 配置ONU授权模式和静默开关
+  CMDID:MSC_CMD_ONURA_AUTHMODE                         
+    MSC_CMD_ONURA_LEGALIZE_STATUS           
+  
+  ***********************************************************/  
+
+typedef struct
+{
+    UINT32       ulOltUnit;
+    UINT32       ulAuthMode; 
+    UINT32       ulRegisterMode; 
+} MSC_CMD_ONURA_PONATTR_ST;
+
+
+typedef struct
+{
+    UINT32       ulSlotId;
+    UINT32       ulAuthPolicy;
+    UINT32       ulHotPlugFlag; /*0，为普通下发，1 为热插拔下发*/
+} MSC_CMD_ONURA_AUTH_POLICY_ST;
+
+/* *****************************************************
+
+  功能: 设置线卡重新上报授权ONU命令
+  CMDID:MSC_CMD_ONURA_REPORT_AUTH_REG_ONU                               
+  
+  ***********************************************************/  
+
+typedef struct
+{
+    UINT32       ulSlotId;
+} MSC_CMD_ONURA_REPORT_AUTH_REG_ONU_ST;
+
+
+
+/* *****************************************************
+
+  功能: 从线卡读取ONU的信息
+  CMDID:MSC_REPORT_ONURA_RTT                       
+  MSC_REPORT_ONURA_OAM_VER 
+  MSC_REPORT_ONURA_ONU_LLID
+  MSC_REPORT_ONURA_MAC_ADDR
+  
+  ***********************************************************/  
+
+typedef struct
+{
+    UINT32          ulOltUnit;
+    UINT32          ulOnuUnit;
+    UINT32          ulOamVer;
+    UINT32          ulLlid;
+    UINT32          ulRtt;
+    UINT32          ulLinkNum;
+    UINT32          ucRegMac[8];
+} MSC_REPORT_ONURA_REGINFO_ST;
+
+
+
+/* *****************************************************
+
+  功能: 从线卡读取ONU的SN
+  CMDID:MSC_REPORT_ONURA_SERIALNUM                         
+  
+  ***********************************************************/  
+typedef struct
+{
+    UINT32        ulOltUnit;
+    UINT32        ulOnuUnit;
+    UINT8        ucVendorId[4];
+    UINT32        ulOnuModel;
+    UINT8        ucOnuId[8];
+    UINT8        ucHardwareVersion[8];
+    UINT8        ucSoftwareVersion[16];
+}MSC_REPORT_ONURA_SERIALNUM_ST;
+
+
+/* *****************************************************
+
+  功能: 从线卡读取ONU的固件版本
+  CMDID:MSC_REPORT_ONURA_FWVER                         
+  
+  ***********************************************************/  
+typedef struct
+{
+    UINT32         ulOltUnit;
+    UINT32         ulOnuUnit;
+    UINT32         ulLen;
+    UINT8         ucVer[16];
+} MSC_REPORT_ONURA_FIRMVER_ST;
+
+
+
+/* *****************************************************
+
+  功能: 从线卡读取ONU的芯片信息
+  CMDID:MSC_REPORT_ONURA_CHIPSETID                         
+  
+  ***********************************************************/  
+
+typedef struct
+{
+    UINT32        ulOltUnit;
+    UINT32        ulOnuUnit;
+    UINT8        ucVendorId[8];
+    UINT32        ulChipModel;
+    UINT32        ulRevision;
+    UINT8        ucDate[8];
+} MSC_REPORT_ONURA_CHIPID_ST;
+
+
+
+/* *****************************************************
+
+  功能: 从线卡读取ONU的能力集1
+  CMDID:MSC_REPORT_ONURA_ONUCAPABILITY1                        
+  
+  ***********************************************************/  
+typedef struct
+{
+    UINT32       ulOltUnit;
+    UINT32       ulOnuUnit;
+    UINT32       ulIfSupport;
+    UINT32       ulServiceSupported;
+    UINT32       ulGePortsNumber;
+    UINT8       ulGePortsBitmap[8];
+    UINT32       ulFePortsNumber;
+    UINT8       ulFePortsBitmap[8];
+    UINT32       ulPotsPortsNumber;
+    UINT32       ulE1PortsNumber;
+    UINT32       ulUsQueuesNumber;
+    UINT32       ulUsMaxQueuesPerPort;
+    UINT32       ulDsQueuesNumber;
+    UINT32       ulDsMaxQueuesPerPort;
+    UINT32       ulBatteryBackup;
+} MSC_REPORT_ONURA_CAPA_1_ST;
+
+
+
+
+/* *****************************************************
+
+  功能: 从线卡读取ONU的能力集2
+  CMDID:MSC_REPORT_ONURA_ONUCAPABILITY2                        
+  
+  ***********************************************************/  
+typedef struct
+{
+    UINT32       ulIfType;
+    UINT32       ulPortNum;
+}MSC_REPORT_ONU_INTERFACE_TYPE_ST;
+
+
+typedef struct
+{
+    UINT32   ulOltUnit;
+    UINT32   ulOnuUnit;
+    UINT32   ulIfSupport;
+    UINT32   ulOnuType;
+    UINT32   ulMultiLlid;
+    UINT32   ulProtectionType;
+    UINT32   ulPonIfNum;
+    UINT32   ulSlotNum;
+    UINT32   ulIfTypeNum;
+    MSC_REPORT_ONU_INTERFACE_TYPE_ST  stIfTypeList[10];
+    UINT32   batteryBackup;
+} MSC_REPORT_ONU_CAPA_2_ST;
+
+
+
+/* *****************************************************
+
+  功能: 从线卡读取ONU的能力集3
+  CMDID:MSC_REPORT_ONURA_ONUCAPABILITY3                        
+  
+  ***********************************************************/  
+
+typedef struct
+{
+     UINT32   ulOltUnit;
+     UINT32   ulOnuUnit;
+     UINT32   ulIfSupport;
+     UINT32   ulIpv6Support;
+     UINT32   ulOnuPowerSupplyControl;
+}MSC_REPORT_ONU_CAPA_3_ST;
+
+
+
+/* *****************************************************
+
+  功能: 从线卡读取ONU上线时间
+  CMDID:MSC_REPORT_ONURA_ONU_TIME                          
+  
+  ***********************************************************/  
+
+typedef struct
+{
+     UINT32   ulOltUnit;
+     UINT32   ulOnuUnit;
+     UINT32   ulYears;
+     UINT32   ulMonth;
+     UINT32   ulDay;
+     UINT32   ulHour;
+     UINT32   ulMinute;
+     UINT32   ulSecond;
+}MSC_REPORT_ONU_TIME_STAMP_ST;
+
+
+typedef struct
+{
+     UINT32   ulOltUnit;
+     UINT32   ulOnuUnit;
+     UINT32   ulOnuStatus;
+}MSC_REPORT_ONU_STATUS_ST;
+
+
+
+typedef struct
+{
+     UINT32   ulOltUnit;
+     UINT8   ucOnuStatus[8];
+}MSC_REPORT_ONU_STATUS_PER_PON_ST;
+
+
+
+
+typedef struct
+{
+    UINT32   ulRegId;
+    UINT8   ucPhyAddress[8];    
+    UINT8   ucOnuType[16];  
+    UINT32   ulLinkNum;      
+    MSC_CMD_ONURA_ONUINFO_ST   stOnuInfo;     
+}MSC_REPORT_ONU_REGINFO_ST;
+
+
+typedef struct
+{
+      UINT32       ulOltUnit;
+      UINT32       ulRegOnuNum;
+      MSC_REPORT_ONU_REGINFO_ST   stOnuRegInfo[64];
+}MSC_REPORT_ONU_REGINFO_PER_PON_ST;
+
+/* *****************************************************
+
+  功能:授权策略为自动授权时
+ 线卡上报授权ONU信息                    
+  
+  ***********************************************************/  
+
+typedef struct
+{
+    UINT32       ulOltUnit ;
+    UINT32       ulOnuUnit ;
+    UINT32       ulOnuStatus ;
+    UINT8       ucOnuMac[8];     
+    UINT8       ucOnuType[16];
+}MSC_REPORT_ONU_AUTHINFO_ST;
+
+
+typedef struct
+{
+    UINT32       ulOption; /*操作类型，1静默，2 去静默*/
+    UINT32       ulOltUnit ;
+    UINT32       ulOnuUnit;
+    UINT8       ucOnuMac[8]; 
+}MSC_CMD_ONURA_SILENCE_ONU_ST;   
+
+
+/***************************************************
+              功能:ONU长发光 
+    MSC_CMD_ONUCFG_ONULASERMODE          ONU长发光关断模式 
+    MSC_CMD_ONUCFG_ONULASERTIME          ONU长发光关断时间
+    MSC_CMD_ONUCFG_CLOSE_ONULASER        关断某个onu长发光
+*******************************************************/
+typedef struct  
+{
+    UINT32 ulOltUnit;
+    UINT32 ulOnuUnit;
+    UINT32 ulCloseOnuLaserMode;
+    UINT32 ulcloseOnuLaserRestartTime;
+}MSC_CMD_ONUCFG_LASER_CLOSE_ST;
+
+typedef struct
+{
+    UINT8  ucUserMac[8];
+    UINT8  ucOnuMac[8];
+}MSC_CMD_ONUCFG_MAC_ADDR_CHECK_ST;
+
+typedef struct
+{
+    UINT32    ulOltUnit;
+    UINT32    ulOnuUnit;
+    UINT32    ulMacAgeTime;
+    UINT32    ulCatvStatus;
+    UINT32    ulEncryptStatus;
+    UINT32    ulFecStatus;       
+    UINT32    ulLlidMacLimitStatus;
+    UINT32    ulLlidMacLimitNumber;
+    UINT32    ulTxPowerAction;
+    UINT32    ulTxPowerTransmitterId;
+    UINT32    ulIsolateStatus;
+} MSC_CDM_ONUCFG_BASICPARAM_ST;
+
+
+typedef struct
+{
+    UINT32    ulOltUnit;
+    UINT32    ulOnuUnit;
+    UINT32    ulMngIpAddr;
+    UINT32    ulMngIpMask;
+    UINT32    ulMngIpGw;
+    UINT32    ulMngDataCVlan;        
+    UINT32    ulMngDataSVlan;
+    UINT32    ulMngDataPriority;
+}MSC_CDM_ONUCFG_SNMP_GLOBALPARAM_ST;
+
+typedef struct
+{
+    UINT32    ulOltUnit;
+    UINT32    ulOnuUnit;
+    UINT32    ulSnmpVer;
+    UINT32    ulTrapHostIPAddr;
+    UINT32    ulTrapPort;
+    UINT32    ulSnmpPort;
+    UINT8    ucSecurityName[64];
+    UINT8    ucCommForRead[64];
+    UINT8    ucCommForWrite[64];
+}MSC_CDM_ONUCFG_SNMP_PROTLPARAM_ST;
+
+
+typedef struct
+{
+    UINT32    ulOltUnit;
+    UINT32    ulOnuUnit;
+    UINT32    ulMcastMode;
+    UINT32    ulMcastLeaveMode;
+}MSC_CDM_ONUCFG_MCAST_ST;
+
+typedef struct
+{
+    UINT32    ulOltUnit;
+    UINT32    ulOnuUnit;
+    UINT32    ulQueueNum;
+    UINT32    ulQueueWeight[8];
+}MSC_CDM_ONUCFG_LLID_QUEUE_ST;
+
+typedef struct
+{
+     UINT32  ulThreSholdStatus ;   
+     UINT8  ucQueueThreSholds[16];
+}MSC_CDM_ONUCFG_DBA_QUEUE_ST;
+
+
+
+typedef struct
+{
+    UINT32   ulOltUnit;
+    UINT32   ulOnuUnit;
+    UINT32   ulQueueSetsNum;
+    MSC_CDM_ONUCFG_DBA_QUEUE_ST stDbaQueue[4];
+}MSC_CDM_ONUCFG_DBA_QUEUESETS_ST;
+
+
+typedef struct
+{
+  UINT32    ulOltUnit;
+  UINT32    ulOnuUnit;
+  UINT32    ulAlarmId;
+  UINT32    ulAlarmAdminState;
+  UINT32    ulAlarmThresholdValue[2];
+} MSC_CDM_ONUCFG_ALARM_ST;
+  
+
+
+typedef struct
+{
+    UINT32    ulOltUnit;
+    UINT32    ulOnuUnit;
+    UINT32    ulAdmCtrlStatus;
+    UINT32    ulAutoNegoStatus;
+    UINT32    ulFlowCtrlStatus;
+    UINT32    ulLoopDetectStatus;
+    UINT32    ulMacLimitStatus;
+    UINT32    ulMacLimitNum;
+    UINT32    ulIsolateStatus;
+}MSC_CDM_ONUCFG_ONU_ETH_PARAM_ST;
+
+typedef struct
+{
+    UINT32    ulOltUnit;
+    UINT32    ulOnuUnit;
+    UINT32    ulUsCir;
+    UINT32    ulUsCbs;
+    UINT32    ulUsEbs;
+    UINT32    ulDsCir;
+    UINT32    ulDsPir;
+}MSC_CDM_ONUCFG_ONU_ETH_SPEEDLIMIT_ST;
+    
+typedef struct
+{
+    UINT32    ulOltUnit;
+    UINT32    ulOnuUnit;
+    UINT32    ulLinkStatus;
+    UINT32    ulAdminStatus;
+    UINT32    ulAutoNegStatus;
+    UINT32    ulAutoNegLocalTechAbility;
+    UINT32    ulAutoNegAdvTechAbility;
+}MSC_REPORT_ONUCFG_ONU_ETH_INFO_ST;
+
+typedef struct
+{
+    UINT32    ulOltUnit;
+    UINT32    ulOnuUnit;
+    UINT32    ulFecStatus;
+    UINT32    ulFecAbility;
+    UINT32    ulFastAbility;
+    UINT32    ulLoopBackTest;
+}MSC_REPORT_ONUCFG_ONU_INFO_ST;
+  
+typedef struct
+{
+    UINT32        ulOltUnit;
+    UINT32        ulOnuUnit;
+    UINT32        ulIfSupport;
+    INT32         lTemperature;
+    UINT32        ulVoltage;
+    UINT32        ulTxBiasCurrent;
+    UINT32        ulTxPowerInPut;
+    UINT32        ulTxPowerOutPut;
+}MSC_REPORT_ONUCFG_OPTICAL_DIAG_ST;
+
+typedef struct
+{
+    UINT32        ulOltUnit;
+    UINT32        ulOnuUnit;  
+    UINT32        ulLearnedMacNum;    /*已经学习到的mac个数*/
+    UINT32        ulMacNum;           /*目前返回的MAC个数*/
+    UINT8        ucMacList[1024][6];
+}MSC_REPORT_ONUCFG_DYNAMIC_MAC_ST;
+
+typedef struct
+{
+    UINT32  ulOltUnit;
+    UINT32  ulOnuUnit;
+    UINT32  ulVlanMode;
+}MSC_CMD_ONUCFG_ETH_TP_ST;
+  
+typedef struct
+{
+    UINT32  ulOltUnit;
+    UINT32  ulOnuUnit;
+    UINT32  ulVlanMode;
+    UINT32  ulVlanTag;
+}MSC_CMD_ONUCFG_ETH_TAG_ST;
+
+typedef struct
+{
+    UINT32  ulSrcVlan;
+    UINT32  ulDstVlan;
+}MSC_CMD_ONUCFG_ETH_TLVLAN_ST;
+
+typedef struct
+{
+    UINT32  ulOltUnit;
+    UINT32  ulOnuUnit;
+    UINT32  ulVlanMode;
+    UINT32  ulDefVlanTag;      
+    UINT32  ulTranslateNum;
+    MSC_CMD_ONUCFG_ETH_TLVLAN_ST    stlVlan[8];
+}MSC_CMD_ONUCFG_ETH_TL_ST;
+
+typedef struct
+{
+    UINT32  ulSrcVlanNum;
+    UINT32  ulSrcVlan[8];
+    UINT32  ulDstVlan;
+}MSC_CMD_ONUCFG_ETH_AGVLAN_ST;
+
+typedef struct
+{
+    UINT32  ulOltUnit;
+    UINT32  ulOnuUnit;
+    UINT32  ulVlanMode;
+    UINT32  ulDefVlanTag;    
+    UINT32  ulAgNum;  
+    MSC_CMD_ONUCFG_ETH_AGVLAN_ST    stAgVlan[8];     
+}MSC_CMD_ONUCFG_ETH_AG_ST;
+
+typedef struct
+{
+    UINT32  ulOltUnit;
+    UINT32  ulOnuUnit;
+    UINT32  ulVlanMode;
+    UINT32  ulDefVlanTag;    
+    UINT32  ulTrunkNum;  
+    UINT32  ulTrunkVlan[8];    
+}MSC_CMD_ONUCFG_ETH_TRUNK_ST;
+ 
+typedef struct
+{
+    UINT32    ulRuleField;
+    UINT8    ucRuleVal[8];
+    UINT32    ulRuleOper;
+}MSC_CMD_ONUCFG_CLASSRULE_ST;
+
+typedef struct
+{
+    UINT32   ulPrecedence;       
+    UINT32   ulQueueMapped;
+    UINT32   ulPriorityMark;
+    UINT32   ulRuleNum;
+    MSC_CMD_ONUCFG_CLASSRULE_ST   stRuleTable[8];
+}MSC_CMD_ONUCFG_ETH_CLASSTABLE_ST;
+
+typedef struct
+{
+    UINT32  ulOltUnit;
+    UINT32  ulOnuUnit;
+    UINT32  ulCamNum;
+    MSC_CMD_ONUCFG_ETH_CLASSTABLE_ST   stCamTable[8];
+}MSC_CMD_ONUCFG_ETH_CLASSANDMARK_ST;
+
+typedef struct
+{
+    UINT32 ulMulticastVlan;  
+    UINT32 ulIptvUserVlan;       
+}MSC_CMD_ONUCFG_ETH_SWITCH_ST;
+
+typedef struct
+{
+    UINT32  ulOltUnit;
+    UINT32  ulOnuUnit;
+    UINT32  ulMcastVlanStrip;    
+    UINT32  ulMcastVlanId;       
+    UINT32  ulMcastMaxGroup; 
+    UINT32  ulMcastXlateNum;
+    UINT32  ulIptvPackageId;
+    MSC_CMD_ONUCFG_ETH_SWITCH_ST    stMcastSwitchingList[8];
+}MSC_CMD_ONUCFG_ETH_MCAST_ST;
+
+typedef struct
+{
+    UINT32  ulOltUnit;
+    UINT32  ulOnuUnit;
+    UINT32  ulMacNum;
+    UINT8  ucMacTable[8][6];
+}MSC_CMD_ONUCFG_ETH_MAC_ST;
+
+typedef struct
+{
+    UINT32  ulOltUnit;
+    UINT32  ulOnuUnit;
+    UINT32  ulAdmCtrlStatus; 
+}MSC_CMD_ONUCFG_VOIP_ST;
+
+typedef struct
+{
+    UINT32  ulOltUnit;
+    UINT32  ulOnuUnit;
+    UINT32  ulAdmCtrlStatus; 
+}MSC_CMD_ONUCFG_E1_ST;
+
+/*创建/删除模板*/
+typedef struct
+{
+    UINT32   ulWorkMode;
+    UINT32   ulProfileId;
+}MSC_CMD_GLINEMGMT_PROFILE_ST;
+
+/*设置模板名字*/
+typedef struct
+{
+    UINT32   ulProfileId;
+    UINT8    chProfileName[64];
+}MSC_CMD_GLINEMGMT_NAME_ST;
+
+/*创建/删除Tcont*/
+typedef struct
+{
+    UINT32   ulWorkMode;
+    UINT32   ulProfileId;
+    UINT32   ulTcontId;
+}MSC_CMD_GLINEMGMT_TCONT_ST;
+
+/*设置DBA*/
+typedef struct
+{
+    UINT32   ulProfileId;
+    UINT32   ulTcontId;
+    UINT32   ulDbaProfileId;
+}MSC_CMD_GLINEMGMT_DBA_ST;
+
+/*创建/删除Gemport*/
+typedef struct
+{
+    UINT32   ulWorkMode;
+    UINT32   ulProfileId;
+    UINT32   ulTcontId;
+    UINT32   ulGemportId;
+}MSC_CMD_GLINEMGMT_GEMPORT_ST;
+
+/*创建/删除Gemmapping*/
+/*设置VID 和优先级*/
+typedef struct
+{
+    UINT32   ulProfileId;
+    UINT32   ulTcontId;
+    UINT32   ulGemportId;
+    UINT8   ucVid[512];
+    UINT32   ulPriority;
+}MSC_CMD_GLINEMGMT_GEMPORT_PARAM_ST;
+
+/*绑定/去绑定模板*/
+typedef struct
+{
+    UINT32   ulWorkMode;
+    UINT32   ulProfileId;
+    UINT32   ulOltUnit;
+    UINT32   ulOnuUnit;
+}MSC_CMD_GLINEMGMT_BIND_ST;
+
+/*绑定状态上报*/
+typedef struct
+{
+    UINT32   ulOltUnit;
+    UINT32   ulOnuUnit;
+    UINT32   ulProfileId;
+    UINT32   ulState;
+}MSC_REPORT_GLINEMGMT_BIND_REPORT_ST;
+
+
+typedef enum msc_module_type_en
+{
+    MSC_MODULE_VLAN             = 0x01,           /* vlan 配置模块 */
+    MSC_MODULE_ACL              = 0x02,           /* acl  配置模块 */    
+    MSC_MODULE_QOS              = 0x03,           /* qos  配置模块 */
+    MSC_MODULE_ISOLATE          = 0x04,           /* 隔离配置模块  */
+
+    MSC_MODULE_IGMP             = 0x11,           /* 组播配置模块  */
+    MSC_MODULE_IPTV             = 0x12,           /* 可控组播配置模块 */
+    MSC_MODULE_MLD              = 0x13,           /* MLD 模块 */
+
+    MSC_MODULE_PONCFG           = 0x21,           /* pon 配置模块 */
+    MSC_MODULE_PONDBA           = 0x22,           /* DBA 配置模块 */
+    MSC_MODULE_QINQ             = 0x23,           /* 灵活QINQ 配置模块 */
+
+    MSC_MODULE_ONURA            = 0x31,           /* 注册授权模块 */
+    MSC_MODULE_ONUCFG           = 0x32,           /*ONU 配置模块 */
+    MSC_MODULE_ONUUPG           = 0x33,           /*ONU 远程升级模块 */
+
+    MSC_MODULE_LINE_IDENTIFY    = 0x41,           /* 线路标识模块 */
+
+    MSC_MODULE_ALARM            = 0x51,            /* 告警模块 */   
+        
+    MSC_MODULE_MS               = 0x61,            /* 主备模块 */   
+
+    MSC_MODULE_SYS              = 0x62,            /*系统模块*/
+
+    MSC_MODULE_STATISTIC        = 0x71,            /*性能统计模块*/
+    MSC_MODULE_PS               = 0x72,            /*保护倒换控制模块*/
+    MSC_MODULE_DEVICE           = 0x81,            /* 设备管理模块 */
+    MSC_MODULE_HPY              = 0x82,            /* HPY模块 */
+    MSC_MODULE_LINEMGMT         = 0x91,            /* 线路管理模块 */
+    MSC_MODULE_BUTT
+}MSC_MODULE_EN;
+
+enum {
+    /* VLAN 模块相关类型 */
+    MSC_SERVICE_VLAN                    = MSC_SERVICE_VAL(MSC_MODULE_VLAN, 0x01),
+
+    /* ACL模块相关类型 */
+    MSC_CMD_ACL                         = MSC_SERVICE_VAL(MSC_MODULE_ACL,  0x01),
+
+    /* QOS模块相关类型 */
+    MSC_CMD_QOS_PROFILE                 = MSC_SERVICE_VAL(MSC_MODULE_QOS,  0x01), /* 主控盘QOS模板配置 */
+    MSC_CMD_QOS_PRIMODE                 = MSC_SERVICE_VAL(MSC_MODULE_QOS,  0x02), /* QOS优先级队列调度模式配置 */
+    MSC_CMD_QOS_LIMIT_RATE              = MSC_SERVICE_VAL(MSC_MODULE_QOS,  0x03), /* QOS端口限速配置 */
+
+    /* IGMP组播模块相关类型 */
+    MSC_CMD_IGMP_CFG                    = MSC_SERVICE_VAL(MSC_MODULE_IGMP, 0x01), /* IGMP组播 基本参数配置 */
+    MSC_CMD_IGMP_ENABLE                 = MSC_SERVICE_VAL(MSC_MODULE_IGMP, 0x02), /*IGMP全局开关配置*/
+    MSC_CMD_IGMP_PARA                   = MSC_SERVICE_VAL(MSC_MODULE_IGMP, 0x03), /*IGMP 参数配置*/
+    MSC_SYNC_IGMP_GROUP                 = MSC_SERVICE_VAL(MSC_MODULE_IGMP, 0x04), /*IGMP组信息主备同步*/
+    MSC_CMD_IGMP_POLICY                 = MSC_SERVICE_VAL(MSC_MODULE_IGMP, 0x05),  /*IGMP未知组播透传策略*/
+
+    /* IPTV模块相关类型 */
+    MSC_CMD_IPTV_ENABLE                 = MSC_SERVICE_VAL(MSC_MODULE_IPTV, 0x01), /*IPTV 全局开关配置 */
+    MSC_CMD_IPTV_RECOGNITION            = MSC_SERVICE_VAL(MSC_MODULE_IPTV, 0x02), /*IPTV预览标识时间*/ 
+    MSC_CMD_IPTV_PKG_OPER               = MSC_SERVICE_VAL(MSC_MODULE_IPTV, 0x03), /*IPTV可控组播套餐*/    
+    MSC_CMD_IPTV_CHANNEL_CFG            = MSC_SERVICE_VAL(MSC_MODULE_IPTV, 0x04), /*IPTV 组播频道配置*/
+    MSC_CMD_IPTV_PKG_ADD_CHANNEL        = MSC_SERVICE_VAL(MSC_MODULE_IPTV, 0x05), /*IPTV将频道添加到套餐，并配置权限 */
+    MSC_CMD_IPTV_PREVIEW_PROFILE_CFG    = MSC_SERVICE_VAL(MSC_MODULE_IPTV, 0x06), /*IPTV预览模板配置*/ 
+    MSC_CMD_IPTV_BIND_PORT              = MSC_SERVICE_VAL(MSC_MODULE_IPTV, 0x07), /* IPTV绑定或者解绑定用户到套餐*/
+    MSC_CMD_CDR_ENABLE                  = MSC_SERVICE_VAL(MSC_MODULE_IPTV, 0x08), /*IPTV CDR 日志开关*/
+    MSC_CMD_CDR_REPORT_INTERVAL         = MSC_SERVICE_VAL(MSC_MODULE_IPTV, 0x09), /*IPTV CDR 日志上报周期*/
+    MSC_REPORT_CDR_UPSEND               = MSC_SERVICE_VAL(MSC_MODULE_IPTV, 0x0A), /*IPTV CDR 日志上报消息*/
+    
+    /* PONCFG模块相关类型 */
+    MSC_CMD_PONCFG_PORTSTATE            = MSC_SERVICE_VAL(MSC_MODULE_PONCFG, 0x01), /* PON口使能 */
+    MSC_CMD_PONCFG_ENCRYMODE            = MSC_SERVICE_VAL(MSC_MODULE_PONCFG, 0x02), /* PON口加密模式 */
+    MSC_CMD_PONCFG_ALARM_THRESHOLD      = MSC_SERVICE_VAL(MSC_MODULE_PONCFG, 0x03), /* PON口阈值告警*/
+    MSC_CMD_ENCRYTIME                   = MSC_SERVICE_VAL(MSC_MODULE_PONCFG, 0x04), /* 线卡加密时间*/
+    MSC_CMD_PONCFG_MACAGINGTIME         = MSC_SERVICE_VAL(MSC_MODULE_PONCFG, 0x05), /* PON口老化时间 */
+    MSC_CMD_PONCFG_FIRMWAREVE           = MSC_SERVICE_VAL(MSC_MODULE_PONCFG, 0x06), /* 固件版本 */
+    MSC_CMD_PONCFG_OPTICAL_PARAMETER    = MSC_SERVICE_VAL(MSC_MODULE_PONCFG, 0x07), /* 光功率查询 */
+    MSC_CMD_PONCFG_RX_POWER             = MSC_SERVICE_VAL(MSC_MODULE_PONCFG, 0x08), /* PON口接收功率 */
+
+    /* PONDBA模块相关类型 */
+    MSC_CMD_DBA_ONUBINDACTION           = MSC_SERVICE_VAL(MSC_MODULE_PONDBA, 0x01), /* DBA参数*/
+
+    /*Qinq 模块相关类型*/
+    MSC_CMD_SMARTQINQ_RULECONFIG        = MSC_SERVICE_VAL(MSC_MODULE_QINQ, 0x01),
+    MSC_CMD_SMARTQINQ_BINDSTATUS        = MSC_SERVICE_VAL(MSC_MODULE_QINQ, 0x02),
+    MSC_CMD_SMARTQINQ_TPID              = MSC_SERVICE_VAL(MSC_MODULE_QINQ, 0x03),
+    
+    
+    /* 注册授权模块相关类型 */
+
+    MSC_CMD_ONURA_AUTHONU               = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x01), /* Onu授权 */
+    MSC_CMD_ONURA_DEAUTHONU             = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x02), /* Onu授权 */
+    MSC_CMD_ONURA_AUTHMODE              = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x03), /* Onu认证模式 */   
+    MSC_CMD_ONURA_LEGALIZE_STATUS       = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x04), /*onu 的合法认证开关*/
+    MSC_CMD_ONURA_AUTHPOLICY            = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x05), /*onu 的授权策略*/
+    MSC_CMD_ONURA_SILENCE_ONU           = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x06), /*静默/去静默单个ONU，解决自动授权时不同线卡相同MAC地址的ONU同时自动授权问题*/
+  
+    MSC_CMD_ONURA_FWVER                 = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x11), /* Onu固件版本*/
+    MSC_CMD_ONURA_ONUCAPABILITY1        = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x12), /* Onu能力集1*/
+    MSC_CMD_ONURA_ONUCAPABILITY2        = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x13), /* Onu能力集2*/
+    MSC_CMD_ONURA_ONUCAPABILITY3        = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x14), /* Onu能力集3*/
+    MSC_CMD_ONURA_SERIALNUM             = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x15), /* Onu sn*/
+    MSC_CMD_ONURA_CHIPSETID             = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x16), /* Onu  chipset id*/ 
+    MSC_CMD_ONURA_RTT                   = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x17), /* RTT */
+    MSC_CMD_ONURA_ONULOID               = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x18), /*   loid    */
+    MSC_CMD_ONURA_OAM_VER               = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x19), /*   oam 版本    */
+    MSC_CMD_ONURA_ONU_LLID              = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x1A), /*   LLID    */
+    MSC_CMD_ONURA_ONU_TIME              = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x1B), /*   onu上线时间    */
+    MSC_CMD_ONURA_MAC_ADDR              = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x1C), /* mac地址 */ 
+    MSC_CMD_ONURA_LINKNUM               = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x1D), /*onu 的link NUM*/
+    MSC_REPORT_ONURA_STATUS_PER_PON     = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x1E), /*一个PON口所有的ONU状态*/
+    MSC_REPORT_ONURA_STATUS             = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x1F), /*一个ONU的状态*/
+    MSC_REPORT_ONURA_AUTO_AUTHONU       = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x20), /*自动授权上报ONU信息*/
+    MSC_REPORT_ONURA_REGONU_PER_PON     = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x21), /* 线卡上报一个PON口下注册ONU信息*/
+
+    
+    MSC_SYNC_ONURA_STATUS               = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x30), /* Onu状态，用于备盘插拔同步*/
+    MSC_SYNC_ONURA_AUTHMODE             = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x31), /* Onu授权模式，用于主备同步 */
+
+    MSC_CMD_ONURA_REPORT_AUTH_REG_ONU       = MSC_SERVICE_VAL(MSC_MODULE_ONURA, 0x41), /* 设置线卡再次上报此时已经上报的授权ONU,和注册ONU的信息*/
+        
+    /*线路标识命令类型*/
+    MSC_CMD_LINE_IDENTIFY_STATUS        = MSC_SERVICE_VAL(MSC_MODULE_LINE_IDENTIFY, 0x01), /* 线路标识开关 */   
+    MSC_CMD_LINE_IDENTIFY_INFO          = MSC_SERVICE_VAL(MSC_MODULE_LINE_IDENTIFY, 0x02), /* 配置的线路标识信息格式*/
+
+    /********************ONUCFG模块相关命令类型***********************/
+    MSC_CMD_ONUCFG_ENCRYPT              =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x01),  /*onu加密状态*/
+    MSC_CMD_ONUCFG_FEC_STATUS           =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x02),  /*onu FEC模式*/
+    MSC_CMD_ONUCFG_MAC_AGETIME          =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x03),  /*ONU MAC老化时间*/
+    MSC_CMD_ONUCFG_CATVSTATUS           =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x04),  /*ONU catv status*/
+    MSC_CMD_ONUCFG_SNMP_GLOBALPARAM     =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x05),  /*ONU SNMP 全局参数*/
+    MSC_CMD_ONUCFG_SNMP_PROTOPARAM      =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x06),  /*onu SNMP协议参数*/
+    MSC_CMD_ONUCFG_REBOOT               =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x07),  /*onu 重启*/
+    MSC_CMD_ONUCFG_MCAST_MODE           =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x08),  /*onu组播模式*/
+    MSC_CMD_ONUCFG_MCAST_FASTLEAVE      =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x09),  /*onu 组播快速离开*/
+    MSC_CMD_ONUCFG_LLID_MACLIMIT        =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x0A),  /*onu MAC 地址限制*/    
+    MSC_CMD_ONUCFG_LLID_QUEUE_CONFIG    =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x0B),  /*onu llid队列配置*/
+    MSC_CMD_ONUCFG_DBA_QUEUESETS        =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x0C),  /*onu dba queue sets配置*/
+    MSC_CMD_ONUCFG_TX_POWER_ACTION      =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x0D),  /*光发送机电源控制*/
+    MSC_CMD_ONUCFG_MIB_SYN_AUDIT        =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x0E),  /*onu  MIB 同步*/
+    MSC_CMD_ONUCFG_ISOLATE_STATUS      =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x0f),  /*onu以太网端口自协商功能*/
+
+    MSC_CMD_ONUCFG_ETH_ADMCTRL_STATUS   =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x30),  /*onu以太网端口管理状态 */
+    MSC_CMD_ONUCFG_ETH_AUTONEGO_STATUS  =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x31),  /*onu以太网端口自协商功能*/
+    MSC_CMD_ONUCFG_ETH_FLOWCTRL         =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x32),  /*onu以太网端口流控功能*/
+    MSC_CMD_ONUCFG_ETH_LOOPDETECT_STATUS=MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x33),  /*onu以太网端口环路检测功能*/ 
+    MSC_CMD_ONUCFG_ETH_MAC_LIMITING     =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x34),  /*onu以太网端口MAC地址限制*/
+    MSC_CMD_ONUCFG_ETH_SUPPRESSING      =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x35),  /*onu以太网端口包抑制*/
+    MSC_CMD_ONUCFG_ETH_US_RATELIMIT     =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x36),  /*onu以太网端口上行速率限制*/
+    MSC_CMD_ONUCFG_ETH_DS_RATELIMIT     =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x37),  /*onu以太网端口下行速率限制*/
+
+    MSC_CMD_ONUCFG_ETH_MCAST_MAXGROUP   =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x38),  /*onu以太网端口最大组*/
+    MSC_CMD_ONUCFG_ETH_MCAST_STRIP      =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x39),  /*onu以太网端口组VLAN剥离*/
+    MSC_CMD_ONUCFG_ETH_MCAST_SWITCHING  =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x3A), /*组播vlan交换*/
+    MSC_CMD_ONUCFG_ETH_MCAST_VLAN      =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x3B), /*组播vlan交换*/
+    
+    MSC_CMD_ONUCFG_ETH_VLAN_TP          =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x3C),  /*onu以太网端口VLAN*/
+    MSC_CMD_ONUCFG_ETH_VLAN_TAG         =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x3D),  /*onu以太网端口VLAN*/
+    MSC_CMD_ONUCFG_ETH_VLAN_TL          =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x3E),  /*onu以太网端口VLAN*/
+    MSC_CMD_ONUCFG_ETH_VLAN_AG          =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x3F),  /*onu以太网端口VLAN*/
+    MSC_CMD_ONUCFG_ETH_VLAN_TRUNK       =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x40),  /*onu以太网端口VLAN*/
+    MSC_CMD_ONUCFG_ETH_CLEAR_CAM        = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x41), /*清空端口全部流分类*/
+
+    MSC_CMD_ONUCFG_ETH_CLASSANDMARK     =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x42),  /*onu以太网端口流分类规则*/
+    MSC_CMD_ONUCFG_ETH_IPTV_PACKAGE_ID  =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x43),  /*IPTV套餐ID*/
+    MSC_CMD_ONUCFG_ETH_MAC_FILTER       =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x44),  /*以太端口MAC地址过滤*/
+    MSC_CMD_ONUCFG_ETH_MAC_STATICBIND   =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x45),  /*以太端口MAC地址绑定*/
+
+    MSC_CMD_ONUCFG_VOIP_ADMCTRL         =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x51),  /*onu voip 端口管理状态*/
+
+    MSC_CMD_ONUCFG_E1_ADMCTRL           =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x61),  /*onu E1端口管理状态*/
+
+    MSC_CMD_ONUCFG_ALARM_ADMINSTATE     =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x71),  /*onu 告警开关*/
+    MSC_CMD_ONUCFG_ALARM_THRESHOLD      =MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x72),  /*onu 告警阈值*/
+
+
+
+    
+    MSC_CMD_ONUCFG_FECABILITY           = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x81), /* Onu FEC能力*/
+    MSC_CMD_ONUCFG_GET_FEC_STATUS       = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x82), /* Onu FEC能力*/
+    MSC_CMD_ONUCFG_FASTLEAVEABILITY     = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x83), /* Onu FEC能力*/
+    MSC_CMD_ONUCFG_LOOPBACK_TEST        = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x84), /*环回检测数据*/
+    MSC_CMD_ONUCFG_LOOPBACK_ENABLE      = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x85), /*开启环回检测功能*/   
+    MSC_CMD_ONUCFG_OPTRXDIAG            = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x86), /* onu 的光模块诊断能力*/
+    MSC_CMD_ONUCFG_LASERPOWER_CTRL      = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x87), /*onu 的光发射机电源控制*/
+    MSC_CMD_ONUCFG_DYNAMIC_MAC          = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x88), /*onu 动态学习的MAC地址*/
+
+
+    MSC_CMD_ONUCFG_ETH_GET_ADMCTRL_STATUS   = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x91), /*onu以太端口管理状态*/
+    MSC_CMD_ONUCFG_ETH_GET_AUTONEGO_STATUS  = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x92), /*onu以太端口自协商状态*/    
+    MSC_CMD_ONUCFG_ETH_LINK_STATUS          = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x95),  /*onu 以太端口链路状态*/
+    MSC_CMD_ONUCFG_ETH_AUTONEGLOCALTECHABILITY  = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0X96),   /* Onu本地自协商能力*/
+    MSC_CMD_ONUCFG_ETH_AUTONEGADVTECHABILITY    = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x97), /* Onu ADVERTISED 自协商能力*/
+
+    MSC_CMD_ONUCFG_ONULASERMODE           = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x98), /* ONU长发光关断模式 */
+    MSC_CMD_ONUCFG_ONULASERTIME           = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x99), /* ONU长发光关断时间 */
+    MSC_CMD_ONUCFG_CLOSE_ONULASER           = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x9A), /*关断某个onu的长发光 */
+    MSC_CMD_ONUCFG_USER_ONUMAC_ADDRESS    = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x9B),   /*用户mac*/
+    MSC_CMD_ONUCFG_ONUMAC_ADDRESS        = MSC_SERVICE_VAL(MSC_MODULE_ONUCFG, 0x9C),    /*ONU mac*/
+    
+    /* 端口隔离模块相关类型 */
+    MSC_CMD_ISOLATE                     = MSC_SERVICE_VAL(MSC_MODULE_ISOLATE, 0x01), /* 端口隔离模块配置 */
+
+    /* 告警模块相关类型 */
+    MSC_CMD_ALARM_ALARMCFG              = MSC_SERVICE_VAL(MSC_MODULE_ALARM, 0x01), /* 告警模块 ,告警配置*/
+    MSC_CMD_ALARM_MASKCFG               = MSC_SERVICE_VAL(MSC_MODULE_ALARM, 0x02), /* 告警模块 ,屏蔽配置*/
+    MSC_CMD_ALARM_MASKCTRL              = MSC_SERVICE_VAL(MSC_MODULE_ALARM, 0x03), /* 告警模块 ,全局屏蔽开关*/
+    MSC_CMD_ALARM_REPORT                = MSC_SERVICE_VAL(MSC_MODULE_ALARM, 0x04), /* 告警模块 ,线卡告警上报*/
+    MSC_CMD_ALARM_MS_REPORT             = MSC_SERVICE_VAL(MSC_MODULE_ALARM, 0X05),   /*主盘产生告警发送到备盘*/
+
+    /* 主备模块相关类型 */
+    MSC_CMD_MS_IDBSET                   = MSC_SERVICE_VAL(MSC_MODULE_MS, 0x01),   /* idbset */
+    MSC_CMD_MS_RUN                      = MSC_SERVICE_VAL(MSC_MODULE_MS, 0x02),   /* 主备配置 */
+    MSC_CMD_MS_CLISET                   = MSC_SERVICE_VAL(MSC_MODULE_MS, 0x03),   /* cliset */    
+    
+    /* 系统模块相关类型 */
+    MSC_CMD_SYS_HOTPLUG                 = MSC_SERVICE_VAL(MSC_MODULE_SYS, 0x01),  /* 热插*/
+    MSC_CMD_SYS_FINISHHOTPLUG           = MSC_SERVICE_VAL(MSC_MODULE_SYS, 0x02),  /* 主控盘完成发送配置文件*/
+    MSC_CMD_SYS_TIME                    = MSC_SERVICE_VAL(MSC_MODULE_SYS, 0x03),  /* 系统时间*/
+    
+    /*设备管理模块相关类型*/
+    MSC_CMD_DEVICE_SLOTINFO             = MSC_SERVICE_VAL(MSC_MODULE_DEVICE,0x01),  /*槽位的板卡信息*/     
+    MSC_CMD_DEVICE_QUERY_PARAMETER      = MSC_SERVICE_VAL(MSC_MODULE_DEVICE,0x02),  /*板卡温度、电压、cpu、ram的参数*/ 
+
+
+    /*HPY 模块相关类型*/
+    MSC_CMD_HPY_OPER                    = MSC_SERVICE_VAL(MSC_MODULE_HPY,0x01),  /*操作类*/     
+    MSC_CMD_HPY_BASE                    = MSC_SERVICE_VAL(MSC_MODULE_HPY,0x02),  /*基本配置*/
+    MSC_CMD_HPY_ADV                     = MSC_SERVICE_VAL(MSC_MODULE_HPY,0x03),  /*高级配置*/
+    MSC_CMD_HPY_QUERY                   = MSC_SERVICE_VAL(MSC_MODULE_HPY,0x04),  /*查询*/
+    
+    
+    /*升级模块相关类型*/
+    MSC_CMD_UPG_UPGRADE_OLT             = MSC_SERVICE_VAL(MSC_MODULE_ONUUPG, 0x01),  /* 升级线卡 */
+    MSC_CMD_UPG_UPGRADE_ONU             = MSC_SERVICE_VAL(MSC_MODULE_ONUUPG, 0x02),  /* 升级ONU */
+    MSC_CMD_UPG_ACTIVATE                = MSC_SERVICE_VAL(MSC_MODULE_ONUUPG, 0x03),  /* 主控下发的activate命令配置 */
+    MSC_CMD_UPG_QUERY_OLT               = MSC_SERVICE_VAL(MSC_MODULE_ONUUPG, 0x04),  /* 查询OLT升级状态 */
+    MSC_CMD_UPG_QUERY_ONU               = MSC_SERVICE_VAL(MSC_MODULE_ONUUPG, 0x05),  /* 查询ONU升级状态 */
+    /*性能统计模块相关类型*/
+    MSC_CMD_STATISTIC_SET_REALTIME_ZERO = MSC_SERVICE_VAL(MSC_MODULE_STATISTIC, 0x01),    /*设置清零*/
+    MSC_CMD_STATISTIC_SET_HISTORY_PERIOD= MSC_SERVICE_VAL(MSC_MODULE_STATISTIC, 0x02),    /*设置历史统计周期*/
+    MSC_CMD_STATISTIC_START_STOP        = MSC_SERVICE_VAL(MSC_MODULE_STATISTIC, 0x03),    /*统计开关*/
+    MSC_CMD_STATISTIC_REALTIME          = MSC_SERVICE_VAL(MSC_MODULE_STATISTIC, 0x04),  /* 实时统计 */
+    MSC_CMD_STATISTIC_HISTORY           = MSC_SERVICE_VAL(MSC_MODULE_STATISTIC, 0x05),     /*历史统计 */
+
+    /*保护倒换控制模块相关类型*/
+    MSC_CMD_PS_GROUP                    = MSC_SERVICE_VAL(MSC_MODULE_PS, 0x01),    /*保护倒换保护组*/
+    MSC_CMD_PS_GROUP_USING_PONID        = MSC_SERVICE_VAL(MSC_MODULE_PS, 0x02),    /*保护倒换使用pon口*/
+
+    /*线路管理模块*/
+    MSC_CMD_GLINEMGMT_PROFILE           = MSC_SERVICE_VAL(MSC_MODULE_LINEMGMT, 0x01),/*创建/删除模板*/
+    MSC_CMD_GLINEMGMT_NAME              = MSC_SERVICE_VAL(MSC_MODULE_LINEMGMT, 0x02),/*设置模板名字*/
+    MSC_CMD_GLINEMGMT_TCONT             = MSC_SERVICE_VAL(MSC_MODULE_LINEMGMT, 0x03),/*创建/删除Tcont*/
+    MSC_CMD_GLINEMGMT_DBA               = MSC_SERVICE_VAL(MSC_MODULE_LINEMGMT, 0x04), /*设置DBA*/
+    MSC_CMD_GLINEMGMT_GEMPORT           = MSC_SERVICE_VAL(MSC_MODULE_LINEMGMT, 0x05),/*创建/删除Gemport*/
+    MSC_CMD_GLINEMGMT_GEMMAPPING        = MSC_SERVICE_VAL(MSC_MODULE_LINEMGMT, 0x06), /*创建/删除Gemmapping*/
+    MSC_CMD_GLINEMGMT_VID               = MSC_SERVICE_VAL(MSC_MODULE_LINEMGMT, 0x07),/*设置VID*/
+    MSC_CMD_GLINEMGMT_PRI               = MSC_SERVICE_VAL(MSC_MODULE_LINEMGMT, 0x08),/*设置PRI*/
+    MSC_CMD_GLINEMGMT_BIND              = MSC_SERVICE_VAL(MSC_MODULE_LINEMGMT, 0x09),/*绑定/去绑定模板*/
+    MSC_REPORT_GLINEMGMT_BIND_REPORT    = MSC_SERVICE_VAL(MSC_MODULE_LINEMGMT, 0x0a),/*绑定状态上报*/
+    
+    MSC_CMD_All                         = MSC_SERVICE_VAL(0xff, 0xff) /* 所有配置 */
+    
+};
+
+RTN_STATUS mscSend(int slot,char* buf,int len,int ifAlarm);
+
+RTN_STATUS mscInit(int slot);
+
+//void regMscRcvHook(FUNCPTR hook); /*void hook(char* buf ,int len);*/
+
+extern int getLocalSlotNum();
+
+int IfCmdRequest(UINT32 ulCmd);
+
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
+
+#endif
+

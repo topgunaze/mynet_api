@@ -1,0 +1,131 @@
+/*
+ *
+ * panger123   
+ *
+ * 2014/02/27 - ?
+ *
+ */
+#ifndef __CDT_SYS_CFG_H__
+#define __CDT_SYS_CFG_H__
+
+#include <cdt_types.h>
+
+//#define XINDE_VERSION
+
+#define SYS_VERSION				"2.1.13"
+
+#ifndef XINDE_VERSION
+#define CDT_SYS_VERSION			SYS_VERSION
+#else
+#define VERSION_PULS			"s"
+#define CDT_SYS_VERSION			SYS_VERSION VERSION_PULS
+#endif
+
+enum
+{
+    SYSTEM_CFG_RESTORING      = 1,
+    SYSTEM_CFG_RESTORE_OK     = 2,
+    SYSTEM_CFG_RESTORE_ERR    = 3,
+    SYSTEM_CFG_RESTORE_WAIT   = 4
+};
+
+#define CDT_L2_CFG_FILE         "l2.cfg"
+#define CDT_IGMP_CFG_FILE       "igmp.cfg"
+#define CDT_DHCP_CFG_FILE      "dhcp.cfg"
+#define CDT_RSTP_CFG_FILE       "rstp.cfg"
+#define CDT_TRUNK_CFG_FILE      "trunk.cfg"
+#define CDT_EPON_CFG_FILE       "epon.cfg"
+#define CDT_SYSCTRL_CFG_FILE    "sysctrl.cfg"
+
+/******************************* Sys Base Info *************************************/
+#ifdef CDT_1U4PON
+#define CDT_OLT_MODEL		    0x01070000
+#else
+#define CDT_OLT_MODEL		    0x01060000	
+#endif
+
+#ifdef CDT_1U4PON
+#define CORP_TS_S 				"C-Data FD1104"
+#else
+#define CORP_TS_S 				"C-Data FD1108"
+#endif
+#define CORP_TS_L 				"C-Data Co.,Ltd."
+
+#ifdef CDT_1U4PON
+#define CDT_OLT_DEF_DESC		"CDATA FD1104 OLT"
+#else
+#define CDT_OLT_DEF_DESC		"CDATA FD1108 OLT"
+#endif
+#define CDT_MAX_DESC_LEN		256
+
+#define CDT_OLT_DEF_LOCATION	"Flat 6, Bldg 4,South 2 of Honghualing Industrial Zone, Liuxian Road, Xili Town, Shenzhen, Guangdong, China(518055)"
+#define CDT_MAX_LOCATION_LEN	512
+
+#define CDT_OLT_DEF_CONTACT		"marketing@cdatatec.com"
+#define CDT_MAX_CONTACT_LEN		256
+
+#define CDT_MAX_ALARM_DESC_LEN  128
+
+#define CDT_DEF_FTP_IP 			0xC0A80165
+#define CDT_DEF_FTP_USER		"admin"
+#define CDT_DEF_FTP_PASS		"admin"
+#ifdef CDT_1U4PON
+#define CDT_DEF_FTP_FILE		"FD1104S.image.gz"
+#else
+#define CDT_DEF_FTP_FILE		"FD1108S.image.gz"
+#endif
+
+#ifdef CDT_1U4PON
+/***************/
+/**  FD1104S  **/
+/***************/
+/******************************* Chassis Info *************************************/
+#define CDT_CHASSIC_TYPE 		0x01070101
+
+
+/******************************* Card Module *************************************/
+#define CDT_MAIN_CARN_TYPE 		0x01070201
+
+/******************************* Card Module *************************************/
+#define CDT_PON_CARD_TYPE 		0x01070301
+
+#else
+/***************/
+/**  FD1108S  **/
+/***************/
+/******************************* Chassis Info *************************************/
+#define CDT_CHASSIC_TYPE 		0x01060101
+
+
+/******************************* Card Module *************************************/
+#define CDT_MAIN_CARN_TYPE 		0x01060201
+
+/******************************* Card Module *************************************/
+#define CDT_PON_CARD_TYPE 		0x01060302
+
+#endif
+typedef struct sysInfo_t
+{
+	UINT8										mac[6];
+	UINT8										hardware[20];
+	UINT8										serialNum[20];
+}sysInfo_t;
+
+typedef struct cliUser_t
+{
+	UINT8										cliUserName[20];
+	UINT8										cliUserPassword[20];
+}cliUser_t;
+
+typedef struct cdtSys_t
+{
+	UINT8										console;/*1--enable to output, 0--disable*/
+	cliUser_t									cliUser;
+	UINT8										sysDesc[CDT_MAX_DESC_LEN];
+	UINT8										sysLocation[CDT_MAX_LOCATION_LEN];
+	UINT8										sysContact[CDT_MAX_CONTACT_LEN];
+}cdtSys_t;
+
+cdtSys_t	sysCfg;
+
+#endif
